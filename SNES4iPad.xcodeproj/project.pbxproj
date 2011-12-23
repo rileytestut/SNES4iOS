@@ -18,6 +18,8 @@
 		6CD00F45135FED04003E789A /* libpocketsnes.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CD00F44135FED04003E789A /* libpocketsnes.a */; };
 		6CD00F60135FEE9C003E789A /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CD00F5F135FEE9C003E789A /* AudioToolbox.framework */; };
 		6CD00F64135FEEBA003E789A /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CD00F63135FEEBA003E789A /* libz.dylib */; };
+		BFC0361214A50D3A00E49D8D /* MTStatusBarOverlay.m in Sources */ = {isa = PBXBuildFile; fileRef = BFC0360F14A50D3A00E49D8D /* MTStatusBarOverlay.m */; };
+		BFC0361314A50D3A00E49D8D /* MTStatusBarTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = BFC0361114A50D3A00E49D8D /* MTStatusBarTableViewCell.m */; };
 		CE43A4A5119DEA3C0007E399 /* EmulationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE43A4A4119DEA3C0007E399 /* EmulationViewController.m */; };
 		CE43A4B4119DF2B00007E399 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE43A4B3119DF2B00007E399 /* QuartzCore.framework */; };
 		CE43A4B6119DF2D80007E399 /* CoreSurface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE43A4B5119DF2D80007E399 /* CoreSurface.framework */; };
@@ -77,6 +79,10 @@
 		6CD00F44135FED04003E789A /* libpocketsnes.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpocketsnes.a; path = src/snes4iphone_src/libpocketsnes.a; sourceTree = "<group>"; };
 		6CD00F5F135FEE9C003E789A /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		6CD00F63135FEEBA003E789A /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
+		BFC0360E14A50D3A00E49D8D /* MTStatusBarOverlay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTStatusBarOverlay.h; sourceTree = "<group>"; };
+		BFC0360F14A50D3A00E49D8D /* MTStatusBarOverlay.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTStatusBarOverlay.m; sourceTree = "<group>"; };
+		BFC0361014A50D3A00E49D8D /* MTStatusBarTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTStatusBarTableViewCell.h; sourceTree = "<group>"; };
+		BFC0361114A50D3A00E49D8D /* MTStatusBarTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTStatusBarTableViewCell.m; sourceTree = "<group>"; };
 		CE43A4A3119DEA3C0007E399 /* EmulationViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmulationViewController.h; sourceTree = "<group>"; };
 		CE43A4A4119DEA3C0007E399 /* EmulationViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EmulationViewController.m; sourceTree = "<group>"; };
 		CE43A4B3119DF2B00007E399 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
@@ -163,6 +169,7 @@
 				CEEA77D0119F3F6100440258 /* ScreenLayer.m */,
 				CEE8574211AAA81100784F8D /* WebBrowserViewController.h */,
 				CEE8574311AAA81100784F8D /* WebBrowserViewController.m */,
+				BFC0361414A50D3E00E49D8D /* MTStatusBarOverlay */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -213,6 +220,17 @@
 				6CD00F63135FEEBA003E789A /* libz.dylib */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		BFC0361414A50D3E00E49D8D /* MTStatusBarOverlay */ = {
+			isa = PBXGroup;
+			children = (
+				BFC0360E14A50D3A00E49D8D /* MTStatusBarOverlay.h */,
+				BFC0360F14A50D3A00E49D8D /* MTStatusBarOverlay.m */,
+				BFC0361014A50D3A00E49D8D /* MTStatusBarTableViewCell.h */,
+				BFC0361114A50D3A00E49D8D /* MTStatusBarTableViewCell.m */,
+			);
+			name = MTStatusBarOverlay;
 			sourceTree = "<group>";
 		};
 		CE43A4CC119DFEF70007E399 /* Resources */ = {
@@ -337,6 +355,8 @@
 				CEEA77CE119F3F4400440258 /* ScreenView.m in Sources */,
 				CEEA77D1119F3F6100440258 /* ScreenLayer.m in Sources */,
 				CEE8574411AAA81100784F8D /* WebBrowserViewController.m in Sources */,
+				BFC0361214A50D3A00E49D8D /* MTStatusBarOverlay.m in Sources */,
+				BFC0361314A50D3A00E49D8D /* MTStatusBarTableViewCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

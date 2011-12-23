@@ -44,7 +44,7 @@ extern void clearFramebuffer(void);
 
 
 
-- (void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+/*- (void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
 	UITouch *touch = [touches anyObject];
 	if (touch.tapCount == 2) {
@@ -84,7 +84,7 @@ extern void clearFramebuffer(void);
     [actionSheet dismissWithClickedButtonIndex:buttonIndex animated:YES];
 	__emulation_paused = 0;
 	
-}
+}*/
 	
 
 

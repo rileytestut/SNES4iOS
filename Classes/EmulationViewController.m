@@ -9,9 +9,12 @@
 #import "SNES4iPadAppDelegate.h"
 #import "EmulationViewController.h"
 #import "ScreenView.h"
+#import "MTStatusBarOverlay.h"
 
 #import <pthread.h>
 #import <QuartzCore/QuartzCore.h>
+
+#define kSavedState @"savedState"
 
 
 volatile int __emulation_run;
@@ -117,9 +120,57 @@ void saveScreenshotToFile(char *filepath)
 
 - (void)loadView {
 	self.view = (UIView *)[[ScreenView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    
+    UIButton *exitButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    exitButton.frame = CGRectMake(0, 0, 100, 100);
+    [exitButton addTarget:self action:@selector(exit:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:exitButton];
+    
+    UIButton *loadStateButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    loadStateButton.frame = CGRectMake(self.view.bounds.size.width - 100, 0, 100, 100);
+    [loadStateButton addTarget:self action:@selector(loadState:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:loadStateButton];
+    
+    UIButton *saveNewStateButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    saveNewStateButton.frame = CGRectMake(0, self.view.bounds.size.height - 100, 100, 100);
+    saveNewStateButton.tag = 1;
+    [saveNewStateButton addTarget:self action:@selector(saveState:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:saveNewStateButton];
+    
+    UIButton *saveStateButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    saveStateButton.frame = CGRectMake(self.view.bounds.size.width - 100, self.view.bounds.size.height - 100, 100, 100);
+    saveStateButton.tag = 2;
+    [saveStateButton addTarget:self action:@selector(saveState:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:saveStateButton];
 	
 }
 
+#pragma mark - Save States
+
+- (void)saveState:(id)sender {
+    UIButton *button = (UIButton *)sender;
+    __emulation_saving = button.tag;
+    double delayInSeconds = 1.0;
+    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+    dispatch_after(popTime, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
+        NSString *message = @"Saved state!";
+        if (button.tag == 1) {
+            message = @"Saved new state!";
+        }
+        [[MTStatusBarOverlay threadSafeSharedOverlay] postFinishMessage:message key:kSavedState duration:2.0];
+    });
+}
+
+- (void)loadState:(id)sender {
+    
+}
+
+#pragma mark -
+
+- (void)exit {
+    __emulation_run = 0;
+    [AppDelegate() showEmulator:NO];
+}
 
 - (void) refreshScreen
 {
