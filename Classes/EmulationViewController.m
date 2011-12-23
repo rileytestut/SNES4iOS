@@ -95,7 +95,7 @@ void saveScreenshotToFile(char *filepath)
     UIImage *uiImage = [[UIImage alloc] initWithCGImage:imageRef];
 	
 	NSData *pngData = UIImagePNGRepresentation(uiImage);
-	[pngData writeToFile:[NSString stringWithCString:filepath] atomically:YES];
+	[pngData writeToFile:[NSString stringWithCString:filepath encoding:NSUTF8StringEncoding] atomically:YES];
 	
 	CGImageRelease(imageRef);
     free(argb_buffer);

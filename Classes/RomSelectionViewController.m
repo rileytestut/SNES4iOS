@@ -92,7 +92,7 @@
 	
 	int i;
 	NSFileManager *fileManager = [NSFileManager defaultManager];
-	NSArray* dirContents = [fileManager directoryContentsAtPath: romDir];
+	NSArray* dirContents = [fileManager contentsOfDirectoryAtPath:romDir error:nil];
 	NSInteger entries = [dirContents count];
 	int characterLUT[27];
 	NSMutableArray* arrayOfIndexedFiles[27];
@@ -170,15 +170,16 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath 
 {
+    static NSString *reuseIdentifier = @"labelCell";
 	UITableViewCell*      cell;
 	NSMutableDictionary*  objects;
 	
 	objects = objectsForCharacters;
 	
-	cell = [tableView dequeueReusableCellWithIdentifier:@"labelCell"];
+	cell = [tableView dequeueReusableCellWithIdentifier:reuseIdentifier];
 	if (cell == nil) 
 	{
-		cell = [[UITableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:@"labelCell"];
+		cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier];
 		cell.textLabel.adjustsFontSizeToFitWidth = YES;
 		cell.textLabel.numberOfLines = 1;
 		cell.textLabel.minimumFontSize = 9.0f;

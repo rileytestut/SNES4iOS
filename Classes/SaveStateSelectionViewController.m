@@ -89,7 +89,7 @@
 	
 	int i;
 	NSFileManager *fileManager = [NSFileManager defaultManager];
-	NSArray* dirContents = [fileManager directoryContentsAtPath: saveDir];
+	NSArray* dirContents = [fileManager contentsOfDirectoryAtPath:saveDir error:nil];
 	NSInteger entries = [dirContents count];
 
 	
