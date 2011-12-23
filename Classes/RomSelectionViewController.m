@@ -23,9 +23,9 @@
 	arrayOfCharacters = [[NSMutableArray alloc] init];
 	objectsForCharacters = [[NSMutableDictionary alloc] init];
 	
-	alphabetIndex = [[NSArray arrayWithArray:
+	alphabetIndex = [NSArray arrayWithArray:
 					  [@"A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|#"
-					   componentsSeparatedByString:@"|"]] retain];
+					   componentsSeparatedByString:@"|"]];
 }
 
 - (void)viewDidLoad {
@@ -35,7 +35,6 @@
     
     UIBarButtonItem *refreshButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(rescanRomDirectory)];
     self.navigationItem.rightBarButtonItem = refreshButton;
-    [refreshButton release];
 	
 	[self scanRomDirectory:[AppDelegate() romDirectoryPath]];
 }
@@ -157,7 +156,6 @@
 			[arrayOfCharacters addObject:characterIndex];
 			[objectsForCharacters setObject:arrayOfIndexedFiles[i] forKey:characterIndex];
 		}
-		[arrayOfIndexedFiles[i] release];
 	}
 	
 	
@@ -180,7 +178,7 @@
 	cell = [tableView dequeueReusableCellWithIdentifier:@"labelCell"];
 	if (cell == nil) 
 	{
-		cell = [[[UITableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:@"labelCell"] autorelease];
+		cell = [[UITableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:@"labelCell"];
 		cell.textLabel.adjustsFontSizeToFitWidth = YES;
 		cell.textLabel.numberOfLines = 1;
 		cell.textLabel.minimumFontSize = 9.0f;
@@ -334,10 +332,6 @@
 }
 
 
-- (void)dealloc {
-    [romDetailViewController release];
-    [super dealloc];
-}
 
 
 @end

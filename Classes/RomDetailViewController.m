@@ -16,8 +16,8 @@
 #import "EmulationViewController.h"
 
 @interface RomDetailViewController ()
-@property (nonatomic, retain) UIPopoverController *splitViewPopoverController;
-@property (nonatomic, retain) UIPopoverController *buttonPopoverController;
+@property (nonatomic, strong) UIPopoverController *splitViewPopoverController;
+@property (nonatomic, strong) UIPopoverController *buttonPopoverController;
 - (void)configureView;
 @end
 
@@ -83,7 +83,6 @@
 			UIImage *screenshot = [[UIImage alloc] initWithContentsOfFile:
 								   self.saveStateSelectionViewController.selectedScreenshotPath];
 			[self.snapshotImageView setImage:screenshot];
-			[screenshot release];
 			self.snapshotImageView.hidden = NO;
 		} else {
 			[self.snapshotImageView setImage:nil];
@@ -166,7 +165,6 @@
 {
 	if (popoverController == buttonPopoverController)
 	{
-		[buttonPopoverController release];
 		buttonPopoverController = nil;
 	}
     if (AppDelegate().controlPadConnectViewController.state == ControlPadConnectionStateSearching) {
@@ -183,8 +181,7 @@
  */
 - (void)setDetailItem:(id)newDetailItem {
     if (detailItem != newDetailItem) {
-        [detailItem release];
-        detailItem = [newDetailItem retain];
+        detailItem = newDetailItem;
         
         // Update the view.
 
@@ -236,7 +233,6 @@
     NSMutableArray *items = [[toolbar items] mutableCopy];
     [items insertObject:barButtonItem atIndex:0];
     [toolbar setItems:items animated:YES];
-    [items release];
     self.splitViewPopoverController = pc;
 }
 
@@ -247,7 +243,6 @@
     NSMutableArray *items = [[toolbar items] mutableCopy];
     [items removeObjectAtIndex:0];
     [toolbar setItems:items animated:YES];
-    [items release];
     self.splitViewPopoverController = nil;
 }
 
@@ -313,14 +308,7 @@
 
 - (void)dealloc {
 	[saveStateSelectionViewController removeObserver:self forKeyPath:@"selectedSavePath"];
-	[saveStateSelectionViewController release];
-    [splitViewPopoverController release];
-    [toolbar release];
     
-    [detailItem release];
-    [romTitleLabel release];
-	[romImageView release];
-    [super dealloc];
 }
 
 @end

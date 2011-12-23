@@ -38,27 +38,27 @@
 	SaveStateSelectionViewController *saveStateSelectionViewController;
 }
 
-@property (nonatomic, retain) IBOutlet UIToolbar *toolbar;
+@property (nonatomic, strong) IBOutlet UIToolbar *toolbar;
 
-@property (nonatomic, retain) id detailItem;
-@property (nonatomic, retain) IBOutlet UILabel *romTitleLabel;
-@property (nonatomic, retain) IBOutlet UIImageView *romImageView;
-@property (nonatomic, retain) IBOutlet UIBarButtonItem *romTitleButton;
-@property (nonatomic, retain) IBOutlet UIBarButtonItem *settingsButton;
-@property (nonatomic, retain) IBOutlet UIBarButtonItem *searchButton;
+@property (nonatomic, strong) id detailItem;
+@property (nonatomic, strong) IBOutlet UILabel *romTitleLabel;
+@property (nonatomic, strong) IBOutlet UIImageView *romImageView;
+@property (nonatomic, strong) IBOutlet UIBarButtonItem *romTitleButton;
+@property (nonatomic, strong) IBOutlet UIBarButtonItem *settingsButton;
+@property (nonatomic, strong) IBOutlet UIBarButtonItem *searchButton;
 
-@property (nonatomic, retain) IBOutlet UIButton *powerButton;
-@property (nonatomic, retain) IBOutlet UIButton *loadButton;
-@property (nonatomic, retain) IBOutlet UIButton *ejectButton;
-@property (nonatomic, retain) IBOutlet UIImageView *snapshotImageView;
+@property (nonatomic, strong) IBOutlet UIButton *powerButton;
+@property (nonatomic, strong) IBOutlet UIButton *loadButton;
+@property (nonatomic, strong) IBOutlet UIButton *ejectButton;
+@property (nonatomic, strong) IBOutlet UIImageView *snapshotImageView;
 
-@property (nonatomic, retain) IBOutlet UIView *multiTapView;
-@property (nonatomic, retain) IBOutlet UIButton *playerOneButton;
-@property (nonatomic, retain) IBOutlet UIButton *playerTwoButton;
-@property (nonatomic, retain) IBOutlet UIButton *playerThreeButton;
-@property (nonatomic, retain) IBOutlet UIButton *playerFourButton;
+@property (nonatomic, strong) IBOutlet UIView *multiTapView;
+@property (nonatomic, strong) IBOutlet UIButton *playerOneButton;
+@property (nonatomic, strong) IBOutlet UIButton *playerTwoButton;
+@property (nonatomic, strong) IBOutlet UIButton *playerThreeButton;
+@property (nonatomic, strong) IBOutlet UIButton *playerFourButton;
 
-@property (nonatomic, retain) IBOutlet SaveStateSelectionViewController *saveStateSelectionViewController;
+@property (nonatomic, strong) IBOutlet SaveStateSelectionViewController *saveStateSelectionViewController;
 
 - (IBAction) buttonPressed:(id)sender;
 

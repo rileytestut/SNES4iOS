@@ -20,13 +20,13 @@
 	UISwitch*				autoconnect;
 }
 
-@property (nonatomic, retain) IBOutlet UISwitch* autosave;
-@property (nonatomic, retain) IBOutlet UISwitch* smoothScaling;
-@property (nonatomic, retain) IBOutlet UISwitch* fpsDisplay;
-@property (nonatomic, retain) IBOutlet UISwitch* transparency;
-@property (nonatomic, retain) IBOutlet UISwitch* speedHack;
-@property (nonatomic, retain) IBOutlet UISwitch* multiTap;
-@property (nonatomic, retain) IBOutlet UISwitch* autoconnect;
+@property (nonatomic, strong) IBOutlet UISwitch* autosave;
+@property (nonatomic, strong) IBOutlet UISwitch* smoothScaling;
+@property (nonatomic, strong) IBOutlet UISwitch* fpsDisplay;
+@property (nonatomic, strong) IBOutlet UISwitch* transparency;
+@property (nonatomic, strong) IBOutlet UISwitch* speedHack;
+@property (nonatomic, strong) IBOutlet UISwitch* multiTap;
+@property (nonatomic, strong) IBOutlet UISwitch* autoconnect;
 
 - (IBAction) settingChanged:(id)sender;
 

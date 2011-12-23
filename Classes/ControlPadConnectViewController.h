@@ -30,12 +30,12 @@ typedef enum {
 	ControlPadConnectionState state;
 }
 
-@property (nonatomic, retain) IBOutlet UILabel *controllerLabel;
-@property (nonatomic, retain) IBOutlet UILabel *statusLabel;
-@property (nonatomic, retain) IBOutlet UIActivityIndicatorView *spinner;
-@property (nonatomic, retain) IBOutlet UIButton *acceptButton;
-@property (nonatomic, retain) IBOutlet UIButton *denyButton;
-@property (nonatomic, retain) IBOutlet UIButton *disconnectButton;
+@property (nonatomic, strong) IBOutlet UILabel *controllerLabel;
+@property (nonatomic, strong) IBOutlet UILabel *statusLabel;
+@property (nonatomic, strong) IBOutlet UIActivityIndicatorView *spinner;
+@property (nonatomic, strong) IBOutlet UIButton *acceptButton;
+@property (nonatomic, strong) IBOutlet UIButton *denyButton;
+@property (nonatomic, strong) IBOutlet UIButton *disconnectButton;
 @property (nonatomic, assign) NSUInteger currentPadNumber;
 @property (nonatomic, assign) ControlPadConnectionState state;
 

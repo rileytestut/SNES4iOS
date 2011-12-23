@@ -128,9 +128,6 @@ SettingsViewController *SettingsController()
 }
 
 
-- (void)dealloc {
-    [super dealloc];
-}
 
 
 @end

@@ -13,19 +13,19 @@
 	NSArray*         saveFiles;
 	
 	NSString *romFilter;
-	NSString *selectedSavePath;
-	NSString *selectedScreenshotPath;
+	NSString *__weak selectedSavePath;
+	NSString *__weak selectedScreenshotPath;
 	
 	UIBarButtonItem *editButton;
 
 	UITableView *saveTableView;
 }
 
-@property (nonatomic, retain) NSString *romFilter;
+@property (nonatomic, strong) NSString *romFilter;
 @property (nonatomic, readonly) NSString *selectedSavePath;
 @property (nonatomic, readonly) NSString *selectedScreenshotPath;
-@property (nonatomic, retain) IBOutlet UITableView *saveTableView;
-@property (nonatomic, retain) IBOutlet UIBarButtonItem *editButton;
+@property (nonatomic, strong) IBOutlet UITableView *saveTableView;
+@property (nonatomic, strong) IBOutlet UIBarButtonItem *editButton;
 
 - (void) scanSaveDirectory;
 - (IBAction) buttonPressed:(id)sender;

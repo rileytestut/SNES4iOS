@@ -33,17 +33,17 @@ void refreshScreenSurface()
 // entry point for emulator thread
 void *threadedStart(void *arg)
 {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	char *filename = malloc(strlen((char *)arg) + 1);
+	@autoreleasepool {
+		char *filename = malloc(strlen((char *)arg) + 1);
     strcpy(filename, (char *)arg);
-	printf("Starting emulator for %s\n", filename);
-	__emulation_run = 1;
-	iphone_main(filename);
-	__emulation_run = 0;
-	__emulation_saving = 0;
-	
+		printf("Starting emulator for %s\n", filename);
+		__emulation_run = 1;
+		iphone_main(filename);
+		__emulation_run = 0;
+		__emulation_saving = 0;
+		
     free(filename);
-	[pool release];
+	}
 }
 
 
@@ -97,7 +97,6 @@ void saveScreenshotToFile(char *filepath)
 	NSData *pngData = UIImagePNGRepresentation(uiImage);
 	[pngData writeToFile:[NSString stringWithCString:filepath] atomically:YES];
 	
-	[uiImage release];
 	CGImageRelease(imageRef);
     free(argb_buffer);
 
@@ -165,9 +164,6 @@ void saveScreenshotToFile(char *filepath)
 }
 
 
-- (void)dealloc {
-    [super dealloc];
-}
 
 
 @end

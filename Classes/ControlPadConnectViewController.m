@@ -122,16 +122,6 @@
 }
 
 
-- (void)dealloc {
-    [super dealloc];
-	[numberStrings release];
-	[controllerLabel release];
-	[statusLabel release];
-	[spinner release];
-	[acceptButton release];
-	[denyButton release];
-
-}
 
 
 @end

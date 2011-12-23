@@ -239,8 +239,6 @@
 	self.navigationItem.leftBarButtonItem = backButton;
 	self.navigationItem.rightBarButtonItem = forwardButton;
 	
-	[backButton release];
-	[forwardButton release];
 	
 	self.contentSizeForViewInPopover = CGSizeMake(600, 700);
 	[self loadBaseURL];
@@ -290,49 +288,46 @@
 										delegate:self cancelButtonTitle:nil
                     otherButtonTitles:@"DENY",@"CONFIRM",nil];
 	[downloadAlertView show];
-	[downloadAlertView release];
 }
 
 -(void)startDownload
 {
-  NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-  [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-  
+  @autoreleasepool {
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    
 	NSLog(@"Downloading...");
-  //[NSThread detachNewThreadSelector:@selector(updatingDownload) toTarget:SOApp.webBrowserView withObject:nil];
-  	
-  NSURLResponse *urlResponse = [[NSURLResponse alloc] init];
+    //[NSThread detachNewThreadSelector:@selector(updatingDownload) toTarget:SOApp.webBrowserView withObject:nil];
+    	
+    NSURLResponse *urlResponse = [[NSURLResponse alloc] init];
 
-  NSError *error;
-  //NSLog(@" *********** REQUESTING CATALOG CHECK FROM: %@", apiUrl);
-  NSData *returnData = [NSURLConnection sendSynchronousRequest:downloadRequest returningResponse:&urlResponse error:&error];
+    NSError *error;
+    //NSLog(@" *********** REQUESTING CATALOG CHECK FROM: %@", apiUrl);
+    NSData *returnData = [NSURLConnection sendSynchronousRequest:downloadRequest returningResponse:&urlResponse error:&error];
 
-  if(returnData != nil)
-  {
-    NSString* fileName = [[[downloadRequest URL] path] lastPathComponent];
-    if(![fileName hasSuffix:@".zip"] && ![fileName hasSuffix:@".smc"] && ![fileName hasSuffix:@".swc"] && ![fileName hasSuffix:@".zip"] && ![fileName hasSuffix:@".bin"])
+    if(returnData != nil)
     {
-      if([downloadType isEqualToString:@"application/zip"] || [downloadType isEqualToString:@"application/x-zip"])
+      NSString* fileName = [[[downloadRequest URL] path] lastPathComponent];
+      if(![fileName hasSuffix:@".zip"] && ![fileName hasSuffix:@".smc"] && ![fileName hasSuffix:@".swc"] && ![fileName hasSuffix:@".zip"] && ![fileName hasSuffix:@".bin"])
       {
-        [fileName stringByAppendingPathExtension:@"zip"];
+        if([downloadType isEqualToString:@"application/zip"] || [downloadType isEqualToString:@"application/x-zip"])
+        {
+          [fileName stringByAppendingPathExtension:@"zip"];
+        }
+        else
+        {
+          [fileName stringByAppendingPathExtension:@"bin"];
+        }
       }
-      else
-      {
-        [fileName stringByAppendingPathExtension:@"bin"];
-      }
+      [returnData writeToFile:[NSString stringWithFormat:@"%@/%@", AppDelegate().romDirectoryPath, fileName] atomically:NO];
+    
+      [AppDelegate().romSelectionViewController scanRomDirectory:AppDelegate().romDirectoryPath];
     }
-    [returnData writeToFile:[NSString stringWithFormat:@"%@/%@", AppDelegate().romDirectoryPath, fileName] atomically:NO];
-  
-    [AppDelegate().romSelectionViewController scanRomDirectory:AppDelegate().romDirectoryPath];
-  }
 
-  isDownloading = 0;
-  
-  [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-  [downloadWaitAlertView dismissWithClickedButtonIndex:0 animated:YES];
-  [downloadRequest release];
-  [downloadType release];
-  [pool release];
+    isDownloading = 0;
+    
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+    [downloadWaitAlertView dismissWithClickedButtonIndex:0 animated:YES];
+  }
 }
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
@@ -348,17 +343,11 @@
   	indiView.center=CGPointMake(145, 115);
   	[downloadWaitAlertView addSubview:indiView];
   	[indiView startAnimating];
-  	[indiView release];
   	[downloadWaitAlertView show];
-  	[downloadWaitAlertView release];
     [NSThread detachNewThreadSelector:@selector(startDownload) toTarget:AppDelegate().webViewController withObject:nil];
   }
 }
 
-- (void)dealloc 
-{
-    [super dealloc];
-}
 
 @end
 

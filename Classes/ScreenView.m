@@ -82,15 +82,11 @@ extern void clearFramebuffer(void);
 	}
 	
     [actionSheet dismissWithClickedButtonIndex:buttonIndex animated:YES];
-    [actionSheet release];
 	__emulation_paused = 0;
 	
 }
 	
 
-- (void)dealloc {
-    [super dealloc];
-}
 
 
 @end

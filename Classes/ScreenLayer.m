@@ -97,9 +97,6 @@ unsigned int *screenPixels;
 }
 
 
-- (void)dealloc {
-    [super dealloc];
-}
 
 
 @end

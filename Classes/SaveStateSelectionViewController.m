@@ -117,12 +117,7 @@
 	
 	// sort the array by decending filename (reverse chronological order, since the date is in the filename)
 	NSSortDescriptor *sorter = [[NSSortDescriptor alloc] initWithKey:@"description" ascending:NO];
-	if (saveFiles)
-	{
-		[saveFiles release];
-	}
-	saveFiles = [[saveArray sortedArrayUsingDescriptors:[NSArray arrayWithObject:sorter]] retain];
-	[saveArray release];
+	saveFiles = [saveArray sortedArrayUsingDescriptors:[NSArray arrayWithObject:sorter]];
 	
 	[self.saveTableView reloadData];
     
@@ -162,9 +157,7 @@
 		NSMutableArray *mutableSaves = [saveFiles mutableCopy];
 
 		[mutableSaves removeObjectAtIndex:saveIndex];
-		[saveFiles release];
 		saveFiles = [[NSArray alloc] initWithArray:mutableSaves];
-		[mutableSaves release];
 		
 		NSIndexPath *indexPath = [NSIndexPath indexPathForRow:saveIndex inSection:0];
 		[saveTableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:YES];
@@ -191,12 +184,13 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath 
 {
+    static NSString *reuseIdentifier = @"labelCell";
 	UITableViewCell*      cell;	
 
-	cell = [tableView dequeueReusableCellWithIdentifier:@"labelCell"];
+	cell = [tableView dequeueReusableCellWithIdentifier:reuseIdentifier];
 	if (cell == nil) 
 	{
-		cell = [[[UITableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:@"labelCell"] autorelease];
+		cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier];
 		cell.textLabel.numberOfLines = 1;
 		cell.textLabel.adjustsFontSizeToFitWidth = YES;
 		cell.textLabel.minimumFontSize = 9.0f;
@@ -221,7 +215,6 @@
 	
 	
 	cell.textLabel.text = [dateFormatter stringFromDate:saveDate];
-	[dateFormatter release];
 
 	// Set up the cell
 	return cell;
@@ -289,7 +282,6 @@
 	[self willChangeValueForKey:@"selectedScreenshotPath"];
 	if (selectedScreenshotPath)
 	{
-		[selectedScreenshotPath release];
 		selectedScreenshotPath = nil;
 	}
 	
@@ -297,17 +289,13 @@
 	if ([fileManager fileExistsAtPath:screenshotPath])
 	{
 		NSLog(@"Found screenshot at %@", screenshotPath);
-		selectedScreenshotPath = [screenshotPath retain];
+		selectedScreenshotPath = screenshotPath;
 	} 
 	[self didChangeValueForKey:@"selectedScreenshotPath"];
 	
 	
-	if (selectedSavePath)
-	{
-		[selectedSavePath release];
-	}
 	[self willChangeValueForKey:@"selectedSavePath"];
-	selectedSavePath = [savePath retain];
+	selectedSavePath = savePath;
 	[self didChangeValueForKey:@"selectedSavePath"];
 
 	
@@ -332,12 +320,6 @@
 }
 
 
-- (void)dealloc {
-    [super dealloc];
-	[saveFiles release];
-	[romFilter release];
-	[selectedSavePath release];
-}
 
 
 @end

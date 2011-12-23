@@ -28,7 +28,7 @@ extern unsigned long padStatusForPadNumber(int which);
 }
 
 @property (nonatomic, assign) NSUInteger padAwaitingConnection;
-@property (nonatomic, retain) NSString *pendingConnectionPeerID;
+@property (nonatomic, strong) NSString *pendingConnectionPeerID;
 
 - (void) searchForConnectionToPadNumber:(NSUInteger)padNumber;
 - (void) stopSearchingForConnection;

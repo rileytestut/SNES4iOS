@@ -32,21 +32,21 @@
 	WebBrowserViewController *webViewController;
 	UINavigationController *webNavController;
 	
-	NSString *romDirectoryPath, *saveDirectoryPath, *snapshotDirectoryPath;
+	NSString *romDirectoryPath, *__weak saveDirectoryPath, *__weak snapshotDirectoryPath;
 }
 
-@property (nonatomic, retain) IBOutlet UIWindow *window;
+@property (nonatomic, strong) IBOutlet UIWindow *window;
 
-@property (nonatomic, retain) IBOutlet UISplitViewController *splitViewController;
-@property (nonatomic, retain) IBOutlet RomSelectionViewController *romSelectionViewController;
-@property (nonatomic, retain) IBOutlet RomDetailViewController *romDetailViewController;
-@property (nonatomic, retain) SettingsViewController *settingsViewController;
-@property (nonatomic, retain) ControlPadConnectViewController *controlPadConnectViewController;
-@property (nonatomic, retain) ControlPadManager *controlPadManager;
+@property (nonatomic, strong) IBOutlet UISplitViewController *splitViewController;
+@property (nonatomic, strong) IBOutlet RomSelectionViewController *romSelectionViewController;
+@property (nonatomic, strong) IBOutlet RomDetailViewController *romDetailViewController;
+@property (nonatomic, strong) SettingsViewController *settingsViewController;
+@property (nonatomic, strong) ControlPadConnectViewController *controlPadConnectViewController;
+@property (nonatomic, strong) ControlPadManager *controlPadManager;
 
-@property (nonatomic, retain) EmulationViewController *emulationViewController;
-@property (nonatomic, retain) WebBrowserViewController *webViewController;
-@property (nonatomic, retain) UINavigationController *webNavController;
+@property (nonatomic, strong) EmulationViewController *emulationViewController;
+@property (nonatomic, strong) WebBrowserViewController *webViewController;
+@property (nonatomic, strong) UINavigationController *webNavController;
 
 @property (nonatomic, readonly) NSString *romDirectoryPath;
 @property (nonatomic, readonly) NSString *saveDirectoryPath;

@@ -18,7 +18,7 @@
 	NSArray             *alphabetIndex;
 }
 
-@property (nonatomic, retain) IBOutlet RomDetailViewController *romDetailViewController;
+@property (nonatomic, strong) IBOutlet RomDetailViewController *romDetailViewController;
 
 - (void) scanRomDirectory:(NSString *)path;
 

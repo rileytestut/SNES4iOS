@@ -47,14 +47,13 @@ SNES4iPadAppDelegate *AppDelegate()
 	NSString *documentsPath = [SNES4iPadAppDelegate applicationDocumentsDirectory];
 //	romDirectoryPath = [[documentsPath stringByAppendingPathComponent:@"ROMs/SNES/"] retain];
 	romDirectoryPath = [documentsPath copy];
-	saveDirectoryPath = [[romDirectoryPath stringByAppendingPathComponent:@"saves"] retain];
-	snapshotDirectoryPath = [[saveDirectoryPath stringByAppendingPathComponent:@"snapshots"] retain];
+	saveDirectoryPath = [romDirectoryPath stringByAppendingPathComponent:@"saves"];
+	snapshotDirectoryPath = [saveDirectoryPath stringByAppendingPathComponent:@"snapshots"];
     
     NSFileManager *fileManager = [[NSFileManager alloc] init];
     [fileManager createDirectoryAtPath:saveDirectoryPath withIntermediateDirectories:YES attributes:nil error:nil];
     [fileManager createDirectoryAtPath:snapshotDirectoryPath withIntermediateDirectories:YES attributes:nil error:nil];
     //Apple says its better to attempt to create the directories and accept an error than to manually check if they exist.
-    [fileManager release];
 		
 	// Make the main emulator view controller
 	emulationViewController = [[EmulationViewController alloc] init];
@@ -107,17 +106,6 @@ SNES4iPadAppDelegate *AppDelegate()
 #pragma mark -
 #pragma mark Memory management
 
-- (void)dealloc {
-	[romDirectoryPath release];
-	[settingsViewController release];
-	[romDetailViewController release];
-	[romSelectionViewController release];
-	[controlPadManager release];
-	[controlPadConnectViewController release];
-    [splitViewController release];
-    [window release];
-    [super dealloc];
-}
 
 
 @end
