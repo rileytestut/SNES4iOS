@@ -81,7 +81,7 @@ unsigned int *screenPixels;
     self.affineTransform = CGAffineTransformIdentity;
     self.contents = nil;
     self.affineTransform = rotateTransform;
-    self.contents = (id) _surface;
+    self.contents = (__bridge id) _surface;
     IOSurfaceUnlock(_surface, 1, &_seed);
 }
 

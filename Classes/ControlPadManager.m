@@ -9,6 +9,7 @@
 #import "SNES4iPadAppDelegate.h"
 #import "ControlPadManager.h"
 #import "ControlPadConnectViewController.h"
+#import "RomDetailViewController.h"
 
 #define MAX_CONNECTIONS 4
 #define SESSION_ID @"com.snes-hd.controller"
@@ -114,8 +115,8 @@ unsigned long padStatusForPadNumber(int which)
 	[gkSession acceptConnectionFromPeer:self.pendingConnectionPeerID error:nil];
 	[[controlPadPeerIDs objectAtIndex:padAwaitingConnection] setString:self.pendingConnectionPeerID];
 	self.pendingConnectionPeerID = nil;
-	
-	[AppDelegate().romDetailViewController updateConnectionButtons];
+
+	[[AppDelegate() romDetailViewController] updateConnectionButtons];
 }
 
 - (void) denyPendingConnection

@@ -53,6 +53,7 @@ SNES4iPadAppDelegate *AppDelegate()
     NSFileManager *fileManager = [[NSFileManager alloc] init];
     [fileManager createDirectoryAtPath:saveDirectoryPath withIntermediateDirectories:YES attributes:nil error:nil];
     [fileManager createDirectoryAtPath:snapshotDirectoryPath withIntermediateDirectories:YES attributes:nil error:nil];
+    //Apple says its better to attempt to create the directories and accept an error than to manually check if they exist.
     [fileManager release];
 		
 	// Make the main emulator view controller

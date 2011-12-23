@@ -92,14 +92,14 @@
   Method origMethod = class_getInstanceMethod(self, origSel_);
   if (!origMethod) {
     NSLog(@"Couldn't find orig method %@ %@", NSStringFromSelector(origSel_), [self class]);
-    SetNSError(error_, @"method %@ not found for class %@", NSStringFromSelector(origSel_), [self className]);
+    SetNSError(error_, @"method %@ not found for class %@", NSStringFromSelector(origSel_), [self class]);
     return NO;
   }
 
   Method altMethod = class_getInstanceMethod(self, altSel_);
   if (!altMethod) {
     NSLog(@"Couldn't find alt method %@ %@", NSStringFromSelector(altSel_), [self class]);
-    SetNSError(error_, @"alt method %@ not found for class %@", NSStringFromSelector(altSel_), [self className]);
+    SetNSError(error_, @"alt method %@ not found for class %@", NSStringFromSelector(altSel_), [self class]);
     return NO;
   }
 
@@ -187,14 +187,14 @@
   Method origMethod = class_getClassMethod(self, origSel_);
   if (!origMethod) {
   //NSLog(@"Couldn't find orig method");
-    SetNSError(error_, @"method %@ not found for class %@", NSStringFromSelector(origSel_), [self className]);
+    SetNSError(error_, @"method %@ not found for class %@", NSStringFromSelector(origSel_), [self class]);
     return NO;
   }
 
   Method altMethod = class_getClassMethod(self, altSel_);
   if (!altMethod) {
   //NSLog(@"Couldn't find alt method");
-    SetNSError(error_, @"alt method %@ not found for class %@", NSStringFromSelector(altSel_), [self className]);
+    SetNSError(error_, @"alt method %@ not found for class %@", NSStringFromSelector(altSel_), [self class]);
     return NO;
   }
 
