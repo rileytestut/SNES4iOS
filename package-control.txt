@@ -1,0 +1,9 @@
+Package: com.wherethewoozlewasnt.snes-hd
+Name: SNES (HD)
+Version: 1.1-1
+Architecture: iphoneos-arm 
+Description: SNES (HD) is a Super Nintendo emulator for the iPad.  It is designed to be controlled with an iPhone/iPod Touch app called ControlPad, also available in this repository.
+Homepage: http://wherethewoozlewasnt.com/?page_id=12
+Maintainer: WoozleWrangler <wrangler@wherethewoozlewasnt.com> 
+Author: Yusef Napora (WoozleWrangler) <wrangler@wherethewoozlewasnt.com> 
+Section: Games

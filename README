@@ -1,0 +1,83 @@
+SNES (HD) is a Super Nintendo emulator for the Apple iPad.  It is designed to be controlled by an iPhone application named ControlPad, available at http://github.com/WoozleWrangler/ControlPad or in binary form from the Cydia repository http://wherethewoozlewasnt.com/cydia 
+
+Some features include:
+  * Fullscreen graphics
+  * iPhone/iPod touch controllers
+  * Up to four controllers at a time
+  * Save state preview screenshots
+
+SNES (HD) is based on ZodTTD's port of Snes9x called snes4iphone.  I have altered most of the Objective C code to suit my tastes and the differences between platforms, and have redesigned the user interface.  Zod's port can be accessed at http://github.com/zodttd/snes4iphone and is available in ad-supported and commercial versions from the Cydia store.
+
+*** About building the project ***
+Please note that the Xcode project DOES NOT WORK!  It's included because I like using the
+Xcode IDE for objective C code.  To edit the code for the emulator itself (contained in src/snes4iphone),
+you'll need another text editor (I use TextMate). 
+You have to use the Makefile in the top level of the source directory.  
+A simple "make" will result in a ControlPad.app directory which you can ssh over
+to your iPad.  Note that you must have ldid installed on your system for the fake
+codesigning.  If ldid is not in /usr/local/bin, you'll also need to change the LDID
+variable in the makefile.  Also please note that if you add any classes, you'll have to
+add them to the OBJS variable in the Makefile.  Likewise with Interface Builder .xib files -
+you'll need to add the filename, with the ".nib" extension to the NIB_FILES variable.
+
+If you set the SSH_DESTINATION to something appropriate for your machine, you can
+do a "make transfer" and it will copy the bundle over to your machine.  Mine is set to
+root@ipad:/Applications because "ipad" is the name of my iPad on my local network. 
+If you set it to the hostname or ip address of your iPad, it makes testing a lot easier.
+Make sure you keep the ":/Applications" part.  If you don't want scp to prompt you for your
+iPad's password every time, add your public key to the iPad's root users' .ssh/authorized_keys file.
+There's a good tutorial on how to do that here: http://www.petefreitag.com/item/532.cfm
+
+
+If you want to make a .deb package, type "make package" and it will create SNES-HD.deb  
+
+Finally, I just added a file called "logwrapper.sh" to the Resources directory.  This will
+be copied over to the app bundle, and if you edit SNES4iPad-Info.plist and change the value
+for CFBundleExecutable from "SNES-HD" to "logwrapper.sh", when you run the app all output from
+stdout and stderr are redirected to "/tmp/snes-hd.log".  This is very useful when debugging, as
+there's no way I know of to attach a GDB session to a jailbreak app.  Just run "tail -f /tmp/snes-hd.log"
+in an ssh session.
+
+
+SNES (HD) is free for non-commercial use, in keeping with the original Snes9x licence, reproduced below:
+
+/*
+ * Snes9x - Portable Super Nintendo Entertainment System (TM) emulator.
+ *
+ * (c) Copyright 1996 - 2001 Gary Henderson (gary.henderson@ntlworld.com) and
+ *                           Jerremy Koot (jkoot@snes9x.com)
+ *
+ * Super FX C emulator code 
+ * (c) Copyright 1997 - 1999 Ivar (ivar@snes9x.com) and
+ *                           Gary Henderson.
+ * Super FX assembler emulator code (c) Copyright 1998 zsKnight and _Demo_.
+ *
+ * DSP1 emulator code (c) Copyright 1998 Ivar, _Demo_ and Gary Henderson.
+ * C4 asm and some C emulation code (c) Copyright 2000 zsKnight and _Demo_.
+ * C4 C code (c) Copyright 2001 Gary Henderson (gary.henderson@ntlworld.com).
+ *
+ * DOS port code contains the works of other authors. See headers in
+ * individual files.
+ *
+ * Snes9x homepage: http://www.snes9x.com
+ *
+ * Permission to use, copy, modify and distribute Snes9x in both binary and
+ * source form, for non-commercial purposes, is hereby granted without fee,
+ * providing that this license information and copyright notice appear with
+ * all copies and any derived work.
+ *
+ * This software is provided 'as-is', without any express or implied
+ * warranty. In no event shall the authors be held liable for any damages
+ * arising from the use of this software.
+ *
+ * Snes9x is freeware for PERSONAL USE only. Commercial users should
+ * seek permission of the copyright holders first. Commercial use includes
+ * charging money for Snes9x or software derived from Snes9x.
+ *
+ * The copyright holders request that bug fixes and improvements to the code
+ * should be forwarded to them so everyone can benefit from the modifications
+ * in future versions.
+ *
+ * Super NES and Super Nintendo Entertainment System are trademarks of
+ * Nintendo Co., Limited and its subsidiary companies.
+ */

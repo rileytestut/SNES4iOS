@@ -1,0 +1,462 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1D3623260D0F684500981E51 /* SNES4iPadAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* SNES4iPadAppDelegate.m */; };
+		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
+		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
+		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
+		2804200B108E984D000629CD /* RomSelectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28042008108E984D000629CD /* RomSelectionViewController.m */; };
+		2804200C108E984D000629CD /* RomDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2804200A108E984D000629CD /* RomDetailViewController.m */; };
+		2892E4100DC94CBA00A64D0F /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */; };
+		6C3CE6EB135BCD0400D61F53 /* IOSurface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C3CE6EA135BCD0400D61F53 /* IOSurface.framework */; };
+		6CD00F45135FED04003E789A /* libpocketsnes.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CD00F44135FED04003E789A /* libpocketsnes.a */; };
+		6CD00F60135FEE9C003E789A /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CD00F5F135FEE9C003E789A /* AudioToolbox.framework */; };
+		6CD00F64135FEEBA003E789A /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CD00F63135FEEBA003E789A /* libz.dylib */; };
+		CE43A4A5119DEA3C0007E399 /* EmulationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE43A4A4119DEA3C0007E399 /* EmulationViewController.m */; };
+		CE43A4B4119DF2B00007E399 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE43A4B3119DF2B00007E399 /* QuartzCore.framework */; };
+		CE43A4B6119DF2D80007E399 /* CoreSurface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE43A4B5119DF2D80007E399 /* CoreSurface.framework */; };
+		CE43A4DB119DFEF70007E399 /* cartridge.png in Resources */ = {isa = PBXBuildFile; fileRef = CE43A4CD119DFEF70007E399 /* cartridge.png */; };
+		CE43A4DC119DFEF70007E399 /* console.png in Resources */ = {isa = PBXBuildFile; fileRef = CE43A4CE119DFEF70007E399 /* console.png */; };
+		CE43A4DD119DFEF70007E399 /* controlpad.png in Resources */ = {isa = PBXBuildFile; fileRef = CE43A4CF119DFEF70007E399 /* controlpad.png */; };
+		CE43A4DE119DFEF70007E399 /* ControlPadConnectViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = CE43A4D0119DFEF70007E399 /* ControlPadConnectViewController.xib */; };
+		CE43A4DF119DFEF70007E399 /* DetailView.xib in Resources */ = {isa = PBXBuildFile; fileRef = CE43A4D1119DFEF70007E399 /* DetailView.xib */; };
+		CE43A4E0119DFEF70007E399 /* gear.png in Resources */ = {isa = PBXBuildFile; fileRef = CE43A4D2119DFEF70007E399 /* gear.png */; };
+		CE43A4E1119DFEF70007E399 /* greenButton.png in Resources */ = {isa = PBXBuildFile; fileRef = CE43A4D3119DFEF70007E399 /* greenButton.png */; };
+		CE43A4E2119DFEF70007E399 /* loadbutton.png in Resources */ = {isa = PBXBuildFile; fileRef = CE43A4D4119DFEF70007E399 /* loadbutton.png */; };
+		CE43A4E3119DFEF70007E399 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = CE43A4D5119DFEF70007E399 /* MainWindow.xib */; };
+		CE43A4E4119DFEF70007E399 /* powerbutton.png in Resources */ = {isa = PBXBuildFile; fileRef = CE43A4D6119DFEF70007E399 /* powerbutton.png */; };
+		CE43A4E5119DFEF70007E399 /* redButton.png in Resources */ = {isa = PBXBuildFile; fileRef = CE43A4D7119DFEF70007E399 /* redButton.png */; };
+		CE43A4E6119DFEF70007E399 /* SaveStateSelectionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = CE43A4D8119DFEF70007E399 /* SaveStateSelectionViewController.xib */; };
+		CE43A4E7119DFEF70007E399 /* SettingsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = CE43A4D9119DFEF70007E399 /* SettingsViewController.xib */; };
+		CE43A4E8119DFEF70007E399 /* snapshot-test.png in Resources */ = {isa = PBXBuildFile; fileRef = CE43A4DA119DFEF70007E399 /* snapshot-test.png */; };
+		CEA57D651198B621004DCD60 /* SaveStateSelectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CEA57D631198B621004DCD60 /* SaveStateSelectionViewController.m */; };
+		CEA57E2B1198D3BC004DCD60 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CEA57E291198D3BC004DCD60 /* SettingsViewController.m */; };
+		CEA57F091198E5E8004DCD60 /* ControlPadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = CEA57F081198E5E8004DCD60 /* ControlPadManager.m */; };
+		CEA57F0B1198E6F8004DCD60 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEA57F0A1198E6F8004DCD60 /* GameKit.framework */; };
+		CEA57F111198ED61004DCD60 /* ControlPadConnectViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CEA57F0F1198ED61004DCD60 /* ControlPadConnectViewController.m */; };
+		CEE8574411AAA81100784F8D /* WebBrowserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE8574311AAA81100784F8D /* WebBrowserViewController.m */; };
+		CEE8575411AAD27900784F8D /* WebBrowserViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = CEE8575311AAD27900784F8D /* WebBrowserViewController.xib */; };
+		CEE8575C11AADBE100784F8D /* ArrowBack.png in Resources */ = {isa = PBXBuildFile; fileRef = CEE8575A11AADBE100784F8D /* ArrowBack.png */; };
+		CEE8575D11AADBE100784F8D /* ArrowForward.png in Resources */ = {isa = PBXBuildFile; fileRef = CEE8575B11AADBE100784F8D /* ArrowForward.png */; };
+		CEEA77CE119F3F4400440258 /* ScreenView.m in Sources */ = {isa = PBXBuildFile; fileRef = CEEA77CD119F3F4400440258 /* ScreenView.m */; };
+		CEEA77D1119F3F6100440258 /* ScreenLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = CEEA77D0119F3F6100440258 /* ScreenLayer.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		6CD00DEC135FE472003E789A /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 7;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		1D3623240D0F684500981E51 /* SNES4iPadAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNES4iPadAppDelegate.h; sourceTree = "<group>"; };
+		1D3623250D0F684500981E51 /* SNES4iPadAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SNES4iPadAppDelegate.m; sourceTree = "<group>"; };
+		1D6058910D05DD3D006BFB54 /* SNES4iPad.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SNES4iPad.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		28042007108E984D000629CD /* RomSelectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RomSelectionViewController.h; sourceTree = "<group>"; };
+		28042008108E984D000629CD /* RomSelectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RomSelectionViewController.m; sourceTree = "<group>"; };
+		28042009108E984D000629CD /* RomDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RomDetailViewController.h; sourceTree = "<group>"; };
+		2804200A108E984D000629CD /* RomDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RomDetailViewController.m; sourceTree = "<group>"; };
+		2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		28A0AAE50D9B0CCF005BE974 /* SNES4iPad_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNES4iPad_Prefix.pch; sourceTree = "<group>"; };
+		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		6C3CE6EA135BCD0400D61F53 /* IOSurface.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOSurface.framework; path = System/Library/PrivateFrameworks/IOSurface.framework; sourceTree = SDKROOT; };
+		6CD00F44135FED04003E789A /* libpocketsnes.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpocketsnes.a; path = src/snes4iphone_src/libpocketsnes.a; sourceTree = "<group>"; };
+		6CD00F5F135FEE9C003E789A /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		6CD00F63135FEEBA003E789A /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
+		CE43A4A3119DEA3C0007E399 /* EmulationViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmulationViewController.h; sourceTree = "<group>"; };
+		CE43A4A4119DEA3C0007E399 /* EmulationViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EmulationViewController.m; sourceTree = "<group>"; };
+		CE43A4B3119DF2B00007E399 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		CE43A4B5119DF2D80007E399 /* CoreSurface.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreSurface.framework; path = System/Library/PrivateFrameworks/CoreSurface.framework; sourceTree = SDKROOT; };
+		CE43A4CD119DFEF70007E399 /* cartridge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = cartridge.png; sourceTree = "<group>"; };
+		CE43A4CE119DFEF70007E399 /* console.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = console.png; sourceTree = "<group>"; };
+		CE43A4CF119DFEF70007E399 /* controlpad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = controlpad.png; sourceTree = "<group>"; };
+		CE43A4D0119DFEF70007E399 /* ControlPadConnectViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ControlPadConnectViewController.xib; sourceTree = "<group>"; };
+		CE43A4D1119DFEF70007E399 /* DetailView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DetailView.xib; sourceTree = "<group>"; };
+		CE43A4D2119DFEF70007E399 /* gear.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = gear.png; sourceTree = "<group>"; };
+		CE43A4D3119DFEF70007E399 /* greenButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = greenButton.png; sourceTree = "<group>"; };
+		CE43A4D4119DFEF70007E399 /* loadbutton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = loadbutton.png; sourceTree = "<group>"; };
+		CE43A4D5119DFEF70007E399 /* MainWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainWindow.xib; sourceTree = "<group>"; };
+		CE43A4D6119DFEF70007E399 /* powerbutton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = powerbutton.png; sourceTree = "<group>"; };
+		CE43A4D7119DFEF70007E399 /* redButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = redButton.png; sourceTree = "<group>"; };
+		CE43A4D8119DFEF70007E399 /* SaveStateSelectionViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SaveStateSelectionViewController.xib; sourceTree = "<group>"; };
+		CE43A4D9119DFEF70007E399 /* SettingsViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SettingsViewController.xib; sourceTree = "<group>"; };
+		CE43A4DA119DFEF70007E399 /* snapshot-test.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "snapshot-test.png"; sourceTree = "<group>"; };
+		CE43A50D119E01600007E399 /* CoreSurface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreSurface.h; sourceTree = "<group>"; };
+		CE43A516119E087E0007E399 /* SNES4iPad-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "SNES4iPad-Info.plist"; sourceTree = "<group>"; };
+		CEA57D621198B621004DCD60 /* SaveStateSelectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SaveStateSelectionViewController.h; sourceTree = "<group>"; };
+		CEA57D631198B621004DCD60 /* SaveStateSelectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SaveStateSelectionViewController.m; sourceTree = "<group>"; };
+		CEA57E281198D3BC004DCD60 /* SettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsViewController.h; sourceTree = "<group>"; };
+		CEA57E291198D3BC004DCD60 /* SettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsViewController.m; sourceTree = "<group>"; };
+		CEA57F071198E5E8004DCD60 /* ControlPadManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ControlPadManager.h; sourceTree = "<group>"; };
+		CEA57F081198E5E8004DCD60 /* ControlPadManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ControlPadManager.m; sourceTree = "<group>"; };
+		CEA57F0A1198E6F8004DCD60 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
+		CEA57F0E1198ED61004DCD60 /* ControlPadConnectViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ControlPadConnectViewController.h; sourceTree = "<group>"; };
+		CEA57F0F1198ED61004DCD60 /* ControlPadConnectViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ControlPadConnectViewController.m; sourceTree = "<group>"; };
+		CEE8574211AAA81100784F8D /* WebBrowserViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebBrowserViewController.h; sourceTree = "<group>"; };
+		CEE8574311AAA81100784F8D /* WebBrowserViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebBrowserViewController.m; sourceTree = "<group>"; };
+		CEE8575311AAD27900784F8D /* WebBrowserViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = WebBrowserViewController.xib; sourceTree = "<group>"; };
+		CEE8575A11AADBE100784F8D /* ArrowBack.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ArrowBack.png; sourceTree = "<group>"; };
+		CEE8575B11AADBE100784F8D /* ArrowForward.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ArrowForward.png; sourceTree = "<group>"; };
+		CEEA77CC119F3F4400440258 /* ScreenView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenView.h; sourceTree = "<group>"; };
+		CEEA77CD119F3F4400440258 /* ScreenView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenView.m; sourceTree = "<group>"; };
+		CEEA77CF119F3F6100440258 /* ScreenLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenLayer.h; sourceTree = "<group>"; };
+		CEEA77D0119F3F6100440258 /* ScreenLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenLayer.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1D60588F0D05DD3D006BFB54 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */,
+				1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */,
+				2892E4100DC94CBA00A64D0F /* CoreGraphics.framework in Frameworks */,
+				CEA57F0B1198E6F8004DCD60 /* GameKit.framework in Frameworks */,
+				CE43A4B4119DF2B00007E399 /* QuartzCore.framework in Frameworks */,
+				CE43A4B6119DF2D80007E399 /* CoreSurface.framework in Frameworks */,
+				6C3CE6EB135BCD0400D61F53 /* IOSurface.framework in Frameworks */,
+				6CD00F45135FED04003E789A /* libpocketsnes.a in Frameworks */,
+				6CD00F60135FEE9C003E789A /* AudioToolbox.framework in Frameworks */,
+				6CD00F64135FEEBA003E789A /* libz.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		080E96DDFE201D6D7F000001 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				1D3623240D0F684500981E51 /* SNES4iPadAppDelegate.h */,
+				1D3623250D0F684500981E51 /* SNES4iPadAppDelegate.m */,
+				28042007108E984D000629CD /* RomSelectionViewController.h */,
+				28042008108E984D000629CD /* RomSelectionViewController.m */,
+				28042009108E984D000629CD /* RomDetailViewController.h */,
+				2804200A108E984D000629CD /* RomDetailViewController.m */,
+				CEA57D621198B621004DCD60 /* SaveStateSelectionViewController.h */,
+				CEA57D631198B621004DCD60 /* SaveStateSelectionViewController.m */,
+				CEA57E281198D3BC004DCD60 /* SettingsViewController.h */,
+				CEA57E291198D3BC004DCD60 /* SettingsViewController.m */,
+				CEA57F071198E5E8004DCD60 /* ControlPadManager.h */,
+				CEA57F081198E5E8004DCD60 /* ControlPadManager.m */,
+				CEA57F0E1198ED61004DCD60 /* ControlPadConnectViewController.h */,
+				CEA57F0F1198ED61004DCD60 /* ControlPadConnectViewController.m */,
+				CE43A4A3119DEA3C0007E399 /* EmulationViewController.h */,
+				CE43A4A4119DEA3C0007E399 /* EmulationViewController.m */,
+				CEEA77CC119F3F4400440258 /* ScreenView.h */,
+				CEEA77CD119F3F4400440258 /* ScreenView.m */,
+				CEEA77CF119F3F6100440258 /* ScreenLayer.h */,
+				CEEA77D0119F3F6100440258 /* ScreenLayer.m */,
+				CEE8574211AAA81100784F8D /* WebBrowserViewController.h */,
+				CEE8574311AAA81100784F8D /* WebBrowserViewController.m */,
+			);
+			path = Classes;
+			sourceTree = "<group>";
+		};
+		19C28FACFE9D520D11CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1D6058910D05DD3D006BFB54 /* SNES4iPad.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
+			isa = PBXGroup;
+			children = (
+				080E96DDFE201D6D7F000001 /* Classes */,
+				CE43A4CC119DFEF70007E399 /* Resources */,
+				29B97315FDCFA39411CA2CEA /* Other Sources */,
+				29B97323FDCFA39411CA2CEA /* Frameworks */,
+				19C28FACFE9D520D11CA2CBB /* Products */,
+			);
+			name = CustomTemplate;
+			sourceTree = "<group>";
+		};
+		29B97315FDCFA39411CA2CEA /* Other Sources */ = {
+			isa = PBXGroup;
+			children = (
+				CE43A50C119E01600007E399 /* CoreSurface */,
+				28A0AAE50D9B0CCF005BE974 /* SNES4iPad_Prefix.pch */,
+				CE43A516119E087E0007E399 /* SNES4iPad-Info.plist */,
+				29B97316FDCFA39411CA2CEA /* main.m */,
+				6CD00F44135FED04003E789A /* libpocketsnes.a */,
+			);
+			name = "Other Sources";
+			sourceTree = "<group>";
+		};
+		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				CEA57F0A1198E6F8004DCD60 /* GameKit.framework */,
+				CE43A4B3119DF2B00007E399 /* QuartzCore.framework */,
+				CE43A4B5119DF2D80007E399 /* CoreSurface.framework */,
+				6CD00F5F135FEE9C003E789A /* AudioToolbox.framework */,
+				6C3CE6EA135BCD0400D61F53 /* IOSurface.framework */,
+				1DF5F4DF0D08C38300B7A737 /* UIKit.framework */,
+				1D30AB110D05D00D00671497 /* Foundation.framework */,
+				2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */,
+				6CD00F63135FEEBA003E789A /* libz.dylib */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		CE43A4CC119DFEF70007E399 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				CEE8575A11AADBE100784F8D /* ArrowBack.png */,
+				CEE8575B11AADBE100784F8D /* ArrowForward.png */,
+				CE43A4CD119DFEF70007E399 /* cartridge.png */,
+				CE43A4CE119DFEF70007E399 /* console.png */,
+				CE43A4CF119DFEF70007E399 /* controlpad.png */,
+				CE43A4D0119DFEF70007E399 /* ControlPadConnectViewController.xib */,
+				CE43A4D1119DFEF70007E399 /* DetailView.xib */,
+				CE43A4D2119DFEF70007E399 /* gear.png */,
+				CE43A4D3119DFEF70007E399 /* greenButton.png */,
+				CE43A4D4119DFEF70007E399 /* loadbutton.png */,
+				CE43A4D5119DFEF70007E399 /* MainWindow.xib */,
+				CE43A4D6119DFEF70007E399 /* powerbutton.png */,
+				CE43A4D7119DFEF70007E399 /* redButton.png */,
+				CE43A4D8119DFEF70007E399 /* SaveStateSelectionViewController.xib */,
+				CE43A4D9119DFEF70007E399 /* SettingsViewController.xib */,
+				CE43A4DA119DFEF70007E399 /* snapshot-test.png */,
+				CEE8575311AAD27900784F8D /* WebBrowserViewController.xib */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		CE43A50C119E01600007E399 /* CoreSurface */ = {
+			isa = PBXGroup;
+			children = (
+				CE43A50D119E01600007E399 /* CoreSurface.h */,
+			);
+			path = CoreSurface;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1D6058900D05DD3D006BFB54 /* SNES4iPad */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "SNES4iPad" */;
+			buildPhases = (
+				1D60588D0D05DD3D006BFB54 /* Resources */,
+				1D60588E0D05DD3D006BFB54 /* Sources */,
+				1D60588F0D05DD3D006BFB54 /* Frameworks */,
+				6CD00DEC135FE472003E789A /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SNES4iPad;
+			productName = SNES4iPad;
+			productReference = 1D6058910D05DD3D006BFB54 /* SNES4iPad.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		29B97313FDCFA39411CA2CEA /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "SNES4iPad" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+				en,
+			);
+			mainGroup = 29B97314FDCFA39411CA2CEA /* CustomTemplate */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1D6058900D05DD3D006BFB54 /* SNES4iPad */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1D60588D0D05DD3D006BFB54 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CE43A4DB119DFEF70007E399 /* cartridge.png in Resources */,
+				CE43A4DC119DFEF70007E399 /* console.png in Resources */,
+				CE43A4DD119DFEF70007E399 /* controlpad.png in Resources */,
+				CE43A4DE119DFEF70007E399 /* ControlPadConnectViewController.xib in Resources */,
+				CE43A4DF119DFEF70007E399 /* DetailView.xib in Resources */,
+				CE43A4E0119DFEF70007E399 /* gear.png in Resources */,
+				CE43A4E1119DFEF70007E399 /* greenButton.png in Resources */,
+				CE43A4E2119DFEF70007E399 /* loadbutton.png in Resources */,
+				CE43A4E3119DFEF70007E399 /* MainWindow.xib in Resources */,
+				CE43A4E4119DFEF70007E399 /* powerbutton.png in Resources */,
+				CE43A4E5119DFEF70007E399 /* redButton.png in Resources */,
+				CE43A4E6119DFEF70007E399 /* SaveStateSelectionViewController.xib in Resources */,
+				CE43A4E7119DFEF70007E399 /* SettingsViewController.xib in Resources */,
+				CE43A4E8119DFEF70007E399 /* snapshot-test.png in Resources */,
+				CEE8575411AAD27900784F8D /* WebBrowserViewController.xib in Resources */,
+				CEE8575C11AADBE100784F8D /* ArrowBack.png in Resources */,
+				CEE8575D11AADBE100784F8D /* ArrowForward.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1D60588E0D05DD3D006BFB54 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1D60589B0D05DD56006BFB54 /* main.m in Sources */,
+				1D3623260D0F684500981E51 /* SNES4iPadAppDelegate.m in Sources */,
+				2804200B108E984D000629CD /* RomSelectionViewController.m in Sources */,
+				2804200C108E984D000629CD /* RomDetailViewController.m in Sources */,
+				CEA57D651198B621004DCD60 /* SaveStateSelectionViewController.m in Sources */,
+				CEA57E2B1198D3BC004DCD60 /* SettingsViewController.m in Sources */,
+				CEA57F091198E5E8004DCD60 /* ControlPadManager.m in Sources */,
+				CEA57F111198ED61004DCD60 /* ControlPadConnectViewController.m in Sources */,
+				CE43A4A5119DEA3C0007E399 /* EmulationViewController.m in Sources */,
+				CEEA77CE119F3F4400440258 /* ScreenView.m in Sources */,
+				CEEA77D1119F3F6100440258 /* ScreenLayer.m in Sources */,
+				CEE8574411AAA81100784F8D /* WebBrowserViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1D6058940D05DD3E006BFB54 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_UNIVERSAL_IPHONE_OS)";
+				CODE_SIGN_ENTITLEMENTS = Entitlements.plist;
+				CODE_SIGN_RESOURCE_RULES_PATH = "$(SDKROOT)/ResourceRules.plist";
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS4.3.sdk/System/Library/PrivateFrameworks,
+					"$(inherited)",
+					"\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"",
+				);
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = SNES4iPad_Prefix.pch;
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/\"";
+				INFOPLIST_FILE = "SNES4iPad-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/src/snes4iphone_src\"",
+				);
+				PRODUCT_NAME = SNES4iPad;
+				SDKROOT = iphoneos;
+				VALID_ARCHS = armv7;
+			};
+			name = Debug;
+		};
+		1D6058950D05DD3E006BFB54 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_UNIVERSAL_IPHONE_OS)";
+				CODE_SIGN_ENTITLEMENTS = Entitlements.plist;
+				CODE_SIGN_RESOURCE_RULES_PATH = "$(SDKROOT)/ResourceRules.plist";
+				COPY_PHASE_STRIP = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS4.3.sdk/System/Library/PrivateFrameworks,
+					"$(inherited)",
+					"\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = SNES4iPad_Prefix.pch;
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/\"";
+				INFOPLIST_FILE = "SNES4iPad-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/src/snes4iphone_src\"",
+				);
+				PRODUCT_NAME = SNES4iPad;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+				VALID_ARCHS = armv7;
+			};
+			name = Release;
+		};
+		C01FCF4F08A954540054247B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"ARCHS[sdk=iphoneos*]" = armv7;
+				"ARCHS[sdk=iphonesimulator*]" = i386;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS3.2.sdk/System/Library/PrivateFrameworks/;
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = iphoneos3.2;
+				TARGETED_DEVICE_FAMILY = 2;
+			};
+			name = Debug;
+		};
+		C01FCF5008A954540054247B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"ARCHS[sdk=iphoneos*]" = armv7;
+				"ARCHS[sdk=iphonesimulator*]" = i386;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS3.2.sdk/System/Library/PrivateFrameworks/;
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				PREBINDING = NO;
+				SDKROOT = iphoneos3.2;
+				TARGETED_DEVICE_FAMILY = 2;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "SNES4iPad" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1D6058940D05DD3E006BFB54 /* Debug */,
+				1D6058950D05DD3E006BFB54 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C01FCF4E08A954540054247B /* Build configuration list for PBXProject "SNES4iPad" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C01FCF4F08A954540054247B /* Debug */,
+				C01FCF5008A954540054247B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 29B97313FDCFA39411CA2CEA /* Project object */;
+}
