@@ -73,6 +73,7 @@
 	NSMutableArray *saveArray = [[NSMutableArray alloc] init];
 	NSString *saveDir;
 	NSString *path = AppDelegate().saveDirectoryPath;
+    NSLog(@"Save Directory: %@", path);
 	if([[path substringWithRange:NSMakeRange([path length]-1,1)] compare:@"/"] == NSOrderedSame)
 	{
 		saveDir = path;

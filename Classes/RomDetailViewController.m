@@ -119,7 +119,7 @@
 	}
 	else if (sender == powerButton) {
 		NSLog(@"power button pressed");
-		[AppDelegate().emulationViewController startWithRom:(NSString *)detailItem];
+		[AppDelegate().emulationViewController startWithRom:(NSString *)self.detailItem];
 		[AppDelegate() showEmulator:YES];
 	} else if (sender == loadButton) {
 		NSLog(@"load button pressed");

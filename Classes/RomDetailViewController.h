@@ -40,7 +40,7 @@
 
 @property (nonatomic, strong) IBOutlet UIToolbar *toolbar;
 
-@property (nonatomic, strong) id detailItem;
+@property (nonatomic, copy) id detailItem;
 @property (nonatomic, strong) IBOutlet UILabel *romTitleLabel;
 @property (nonatomic, strong) IBOutlet UIImageView *romImageView;
 @property (nonatomic, strong) IBOutlet UIBarButtonItem *romTitleButton;

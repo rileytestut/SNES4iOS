@@ -51,9 +51,9 @@
 @property (strong, nonatomic) SNESControllerAppDelegate *snesControllerAppDelegate;
 @property (strong, nonatomic) SNESControllerViewController *snesControllerViewController;
 
-@property (nonatomic, strong) NSString *romDirectoryPath;
-@property (nonatomic, strong) NSString *saveDirectoryPath;
-@property (nonatomic, strong) NSString *snapshotDirectoryPath;
+@property (nonatomic, copy) NSString *romDirectoryPath;
+@property (nonatomic, copy) NSString *saveDirectoryPath;
+@property (nonatomic, copy) NSString *snapshotDirectoryPath;
 
 - (void) showEmulator:(BOOL)showOrHide;
 //- (void) showEmulationMenu:(BOOL)showOrHide;

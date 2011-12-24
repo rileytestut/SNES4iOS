@@ -129,7 +129,7 @@ void saveScreenshotToFile(char *filepath)
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didRotate:) name:@"UIDeviceOrientationDidChangeNotification" object:nil];
     }*/
     
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+    /*if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
         UIButton *exitButton = [UIButton buttonWithType:UIButtonTypeCustom];
         exitButton.frame = CGRectMake(0, 0, 100, 100);
         [exitButton addTarget:self action:@selector(exit:) forControlEvents:UIControlEventTouchUpInside];
@@ -151,7 +151,8 @@ void saveScreenshotToFile(char *filepath)
         saveStateButton.tag = 2;
         [saveStateButton addTarget:self action:@selector(saveState:) forControlEvents:UIControlEventTouchUpInside];
         [self.view addSubview:saveStateButton];
-    }
+    }*/
+    //Above methods were a replacement to the double-tapping to access these options, which sometimes crashes the app. Convering over to GCD appears to have fixed this crash, but I've left these here just in case.
 }
 
 #pragma mark - Save States
@@ -191,6 +192,8 @@ void saveScreenshotToFile(char *filepath)
 
 - (void) startWithRom:(NSString *)romFile
 {
+    
+    /*
     pthread_create(&main_tid, NULL, threadedStart, (void *) [[romFile lastPathComponent] UTF8String]);
 	
 	struct sched_param    param;
@@ -198,7 +201,13 @@ void saveScreenshotToFile(char *filepath)
     if(pthread_setschedparam(main_tid, SCHED_OTHER, &param) != 0)
     {
 		fprintf(stderr, "Error setting pthread priority\n");
-    }
+    }*/
+    
+    dispatch_queue_t dispatchQueue = dispatch_queue_create("EmulationThread", DISPATCH_QUEUE_CONCURRENT);
+    dispatch_async(dispatchQueue, ^{
+        threadedStart((void *) [[romFile lastPathComponent] UTF8String]);
+    });
+    dispatch_release(dispatchQueue);
 }
 
 

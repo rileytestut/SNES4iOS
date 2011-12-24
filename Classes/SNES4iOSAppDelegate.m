@@ -47,9 +47,9 @@ SNES4iOSAppDelegate *AppDelegate()
 
 	NSString *documentsPath = [SNES4iOSAppDelegate applicationDocumentsDirectory];
 //	romDirectoryPath = [[documentsPath stringByAppendingPathComponent:@"ROMs/SNES/"] retain];
-	romDirectoryPath = [documentsPath copy];
-	saveDirectoryPath = [romDirectoryPath stringByAppendingPathComponent:@"saves"];
-	snapshotDirectoryPath = [saveDirectoryPath stringByAppendingPathComponent:@"snapshots"];
+	self.romDirectoryPath = [documentsPath copy];
+	self.saveDirectoryPath = [romDirectoryPath stringByAppendingPathComponent:@"saves"];
+	self.snapshotDirectoryPath = [saveDirectoryPath stringByAppendingPathComponent:@"snapshots"];
     
     NSFileManager *fileManager = [[NSFileManager alloc] init];
     [fileManager createDirectoryAtPath:saveDirectoryPath withIntermediateDirectories:YES attributes:nil error:nil];

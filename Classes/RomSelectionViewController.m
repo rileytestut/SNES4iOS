@@ -166,10 +166,6 @@
 	
 	
 	[(UITableView*)self.view reloadData];
-    
-    NSLog(@"Path to scan: %@", romDir);
-    
-	self.navigationItem.prompt = romDir;  
 }
 
 
@@ -320,7 +316,7 @@
 				   [[objects objectForKey:[arrayOfCharacters objectAtIndex:indexPath.section]] objectAtIndex:indexPath.row]];
 	}
 	
-	self.romDetailViewController.detailItem = (id) romPath;
+	self.romDetailViewController.detailItem = (id)[romPath copy];
     
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         SNESControllerViewController *controller = [[SNESControllerViewController alloc] initWithNibName:@"SNESControllerViewController" bundle:[NSBundle mainBundle]];

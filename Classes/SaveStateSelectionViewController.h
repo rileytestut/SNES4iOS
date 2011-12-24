@@ -21,9 +21,9 @@
 	UITableView *saveTableView;
 }
 
-@property (nonatomic, strong) NSString *romFilter;
-@property (nonatomic, readonly) NSString *selectedSavePath;
-@property (nonatomic, readonly) NSString *selectedScreenshotPath;
+@property (nonatomic, copy) NSString *romFilter;
+@property (nonatomic, copy) NSString *selectedSavePath;
+@property (nonatomic, copy) NSString *selectedScreenshotPath;
 @property (nonatomic, strong) IBOutlet UITableView *saveTableView;
 @property (nonatomic, strong) IBOutlet UIBarButtonItem *editButton;
 
