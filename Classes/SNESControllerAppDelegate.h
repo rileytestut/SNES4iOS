@@ -17,6 +17,11 @@
 
 #endif
 
+typedef enum {
+    SNESControllerTypeLocal,
+    SNESControllerTypeWireless,
+} SNESControllerType;
+
 @class SNESControllerViewController;
 @class SessionController;
 
@@ -34,6 +39,7 @@
 @property (nonatomic, strong) IBOutlet UIWindow *window;
 @property (nonatomic, strong) IBOutlet SNESControllerViewController *viewController;
 @property (nonatomic, strong) SessionController *sessionController;
+@property (nonatomic) SNESControllerType controllerType;
 
 - (void) autosendStatus:(NSTimer *)timer;
 

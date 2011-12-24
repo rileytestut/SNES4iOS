@@ -12,6 +12,7 @@
 #import "MTStatusBarOverlay.h"
 #import "EmulationViewController.h"
 #import "SNESControllerViewController.h"
+#import "ScreenLayer.h"
 
 #define RADIANS(degrees) ((degrees * M_PI) / 180.0)
 
@@ -39,6 +40,8 @@
     UIBarButtonItem *refreshButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(rescanRomDirectory)];
     self.navigationItem.rightBarButtonItem = refreshButton;
     
+    UIBarButtonItem *searchButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSearch target:self action:@selector(getMoreRoms)];
+    
     MTStatusBarOverlay *overlay = [MTStatusBarOverlay sharedOverlay];
     overlay.animation = MTStatusBarOverlayAnimationFallDown;
 	
@@ -47,6 +50,10 @@
 
 - (void)rescanRomDirectory {
     [self scanRomDirectory:[AppDelegate() romDirectoryPath]];
+}
+
+- (void)getMoreRoms {
+    [self.navigationController presentModalViewController:AppDelegate().webNavController animated:YES];
 }
 
 /*
@@ -319,16 +326,18 @@
 	self.romDetailViewController.detailItem = (id)[romPath copy];
     
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        SNESControllerViewController *controller = [[SNESControllerViewController alloc] initWithNibName:@"SNESControllerViewController" bundle:[NSBundle mainBundle]];
-
-        [controller.view insertSubview:AppDelegate().emulationViewController.view atIndex:0];
-        controller.wantsFullScreenLayout = YES;
+        AppDelegate().snesControllerAppDelegate.controllerType = SNESControllerTypeLocal;
+        AppDelegate().emulationViewController.view.userInteractionEnabled = NO;
+        [AppDelegate().snesControllerViewController.view insertSubview:AppDelegate().emulationViewController.view atIndex:0];
+        AppDelegate().snesControllerViewController.wantsFullScreenLayout = YES;
         CGFloat rotationAngle = 90.0f;
         AppDelegate().emulationViewController.view.bounds = CGRectMake(0, 0, 480, 320);
-        AppDelegate().emulationViewController.view.transform = CGAffineTransformRotate(CGAffineTransformIdentity, RADIANS(rotationAngle));
+        ScreenLayer *screenLayer = (ScreenLayer *)AppDelegate().emulationViewController.view.layer;
+        screenLayer.rotateTransform = CGAffineTransformRotate(CGAffineTransformIdentity, RADIANS(rotationAngle));
+        
         AppDelegate().emulationViewController.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
         [UIApplication sharedApplication].statusBarHidden = YES;
-        [self presentViewController:controller animated:YES completion:^{
+        [self presentViewController:AppDelegate().snesControllerViewController animated:YES completion:^{
             [AppDelegate().emulationViewController startWithRom:romPath];
             [AppDelegate() showEmulator:YES];
         }];

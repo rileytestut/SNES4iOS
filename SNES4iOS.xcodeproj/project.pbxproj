@@ -18,6 +18,9 @@
 		6CD00F45135FED04003E789A /* libpocketsnes.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CD00F44135FED04003E789A /* libpocketsnes.a */; };
 		6CD00F60135FEE9C003E789A /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CD00F5F135FEE9C003E789A /* AudioToolbox.framework */; };
 		6CD00F64135FEEBA003E789A /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CD00F63135FEEBA003E789A /* libz.dylib */; };
+		BF3B5F4614A661C100AC8101 /* snes-1.txt in Resources */ = {isa = PBXBuildFile; fileRef = BF3B5F4414A661C100AC8101 /* snes-1.txt */; };
+		BF3B5F4714A661C100AC8101 /* SNESControllerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = BF3B5F4514A661C100AC8101 /* SNESControllerViewController.xib */; };
+		BF3B5F5014A6810E00AC8101 /* portrait_controller.txt in Resources */ = {isa = PBXBuildFile; fileRef = BF3B5F4F14A6810D00AC8101 /* portrait_controller.txt */; };
 		BF7B7A0914A64BEA00014E61 /* SessionController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF7B7A0414A64BE900014E61 /* SessionController.m */; };
 		BF7B7A0A14A64BEA00014E61 /* SNESControllerAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = BF7B7A0614A64BEA00014E61 /* SNESControllerAppDelegate.m */; };
 		BF7B7A0B14A64BEA00014E61 /* SNESControllerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF7B7A0814A64BEA00014E61 /* SNESControllerViewController.m */; };
@@ -35,7 +38,6 @@
 		BFD71BAC14A5AC2F00850EEE /* portrait_controller.png in Resources */ = {isa = PBXBuildFile; fileRef = BFD71BAA14A5AC2F00850EEE /* portrait_controller.png */; };
 		BFD71BD414A5B23B00850EEE /* snes-1.png in Resources */ = {isa = PBXBuildFile; fileRef = BFD71BD114A5B23B00850EEE /* snes-1.png */; };
 		BFD71BD514A5B23B00850EEE /* landscape_controller.txt in Resources */ = {isa = PBXBuildFile; fileRef = BFD71BD214A5B23B00850EEE /* landscape_controller.txt */; };
-		BFD71BD614A5B23B00850EEE /* SNESControllerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = BFD71BD314A5B23B00850EEE /* SNESControllerViewController.xib */; };
 		CE43A4A5119DEA3C0007E399 /* EmulationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE43A4A4119DEA3C0007E399 /* EmulationViewController.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		CE43A4B4119DF2B00007E399 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE43A4B3119DF2B00007E399 /* QuartzCore.framework */; };
 		CE43A4B6119DF2D80007E399 /* CoreSurface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE43A4B5119DF2D80007E399 /* CoreSurface.framework */; };
@@ -95,6 +97,9 @@
 		6CD00F44135FED04003E789A /* libpocketsnes.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpocketsnes.a; path = src/snes4iphone_src/libpocketsnes.a; sourceTree = "<group>"; };
 		6CD00F5F135FEE9C003E789A /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		6CD00F63135FEEBA003E789A /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
+		BF3B5F4414A661C100AC8101 /* snes-1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "snes-1.txt"; path = "../Classes/snes-1.txt"; sourceTree = "<group>"; };
+		BF3B5F4514A661C100AC8101 /* SNESControllerViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SNESControllerViewController.xib; sourceTree = "<group>"; };
+		BF3B5F4F14A6810D00AC8101 /* portrait_controller.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = portrait_controller.txt; sourceTree = "<group>"; };
 		BF7B7A0314A64BE900014E61 /* SessionController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SessionController.h; sourceTree = "<group>"; };
 		BF7B7A0414A64BE900014E61 /* SessionController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SessionController.m; sourceTree = "<group>"; };
 		BF7B7A0514A64BE900014E61 /* SNESControllerAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNESControllerAppDelegate.h; sourceTree = "<group>"; };
@@ -139,7 +144,6 @@
 		BFD71BAA14A5AC2F00850EEE /* portrait_controller.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = portrait_controller.png; sourceTree = "<group>"; };
 		BFD71BD114A5B23B00850EEE /* snes-1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "snes-1.png"; sourceTree = "<group>"; };
 		BFD71BD214A5B23B00850EEE /* landscape_controller.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = landscape_controller.txt; sourceTree = "<group>"; };
-		BFD71BD314A5B23B00850EEE /* SNESControllerViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SNESControllerViewController.xib; sourceTree = "<group>"; };
 		CE43A4A3119DEA3C0007E399 /* EmulationViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmulationViewController.h; sourceTree = "<group>"; };
 		CE43A4A4119DEA3C0007E399 /* EmulationViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EmulationViewController.m; sourceTree = "<group>"; };
 		CE43A4B3119DF2B00007E399 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
@@ -306,6 +310,7 @@
 				BF7B7A0414A64BE900014E61 /* SessionController.m */,
 				BF7B7A0714A64BEA00014E61 /* SNESControllerViewController.h */,
 				BF7B7A0814A64BEA00014E61 /* SNESControllerViewController.m */,
+				BF3B5F4514A661C100AC8101 /* SNESControllerViewController.xib */,
 				BF7B7A3314A64F8B00014E61 /* SessionController.xib */,
 			);
 			name = "SNES Controller";
@@ -370,11 +375,12 @@
 				BF7B7A2D14A64DFD00014E61 /* ConnectedIcon.png */,
 				BF7B7A2E14A64DFE00014E61 /* grayButton.png */,
 				BF7B7A2F14A64DFE00014E61 /* NotConnectedIcon.png */,
+				BF3B5F4414A661C100AC8101 /* snes-1.txt */,
 				BFD71BD114A5B23B00850EEE /* snes-1.png */,
 				BFD71BD214A5B23B00850EEE /* landscape_controller.txt */,
-				BFD71BD314A5B23B00850EEE /* SNESControllerViewController.xib */,
 				BFD71BA914A5AC2E00850EEE /* landscape_controller.png */,
 				BFD71BAA14A5AC2F00850EEE /* portrait_controller.png */,
+				BF3B5F4F14A6810D00AC8101 /* portrait_controller.txt */,
 			);
 			name = iPhone;
 			sourceTree = "<group>";
@@ -440,6 +446,9 @@
 /* Begin PBXProject section */
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0420;
+			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "SNES4iOS" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
@@ -487,11 +496,13 @@
 				BFD71BAC14A5AC2F00850EEE /* portrait_controller.png in Resources */,
 				BFD71BD414A5B23B00850EEE /* snes-1.png in Resources */,
 				BFD71BD514A5B23B00850EEE /* landscape_controller.txt in Resources */,
-				BFD71BD614A5B23B00850EEE /* SNESControllerViewController.xib in Resources */,
 				BF7B7A3014A64DFE00014E61 /* ConnectedIcon.png in Resources */,
 				BF7B7A3114A64DFE00014E61 /* grayButton.png in Resources */,
 				BF7B7A3214A64DFE00014E61 /* NotConnectedIcon.png in Resources */,
 				BF7B7A3414A64F8B00014E61 /* SessionController.xib in Resources */,
+				BF3B5F4614A661C100AC8101 /* snes-1.txt in Resources */,
+				BF3B5F4714A661C100AC8101 /* SNESControllerViewController.xib in Resources */,
+				BF3B5F5014A6810E00AC8101 /* portrait_controller.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -597,8 +608,8 @@
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				PREBINDING = NO;
-				SDKROOT = iphoneos3.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
+				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 2;
 			};
 			name = Debug;
@@ -614,9 +625,9 @@
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
-				PREBINDING = NO;
-				SDKROOT = iphoneos3.2;
+				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 2;
 			};
 			name = Release;

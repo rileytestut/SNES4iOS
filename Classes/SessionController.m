@@ -226,11 +226,13 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath 
 {
 	UITableViewCell*      cell;	
+    
+    static NSString *identifier = @"labelCell";
 	
-	cell = [tableView dequeueReusableCellWithIdentifier:@"labelCell"];
+	cell = [tableView dequeueReusableCellWithIdentifier:identifier];
 	if (cell == nil) 
 	{
-		cell = [[UITableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:@"labelCell"];
+		cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
 		cell.textLabel.numberOfLines = 1;
 		cell.textLabel.adjustsFontSizeToFitWidth = YES;
 		cell.textLabel.minimumFontSize = 9.0f;

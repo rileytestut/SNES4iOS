@@ -9,9 +9,9 @@
 #import "SNESControllerAppDelegate.h"
 #import "SNESControllerViewController.h"
 #import "SessionController.h"
+#import "ControlPadManager.h"
 
-
-#define	DefaultControllerImage @"snes-1.png"
+#define	DefaultControllerImage @"landscape_controller"
 
 unsigned long gp2x_pad_status;
 static unsigned long newtouches[10];
@@ -22,38 +22,65 @@ enum  { GP2X_UP=0x1,       GP2X_LEFT=0x4,       GP2X_DOWN=0x10,  GP2X_RIGHT=0x40
 	GP2X_A=1<<12,      GP2X_B=1<<13,        GP2X_X=1<<14,    GP2X_Y=1<<15,
 	GP2X_VOL_UP=1<<23, GP2X_VOL_DOWN=1<<22, GP2X_PUSH=1<<27 };
 
+void rt_dispatch_sync_on_main_thread(dispatch_block_t block) {
+    if ([NSThread isMainThread]) {
+        block();
+    } else {
+        dispatch_sync(dispatch_get_main_queue(), block);
+    }
+}
+
 @implementation SNESControllerViewController
 @synthesize imageView;
 @synthesize infoButton;
 @synthesize connectionButton;
-
+@synthesize imageName;
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad {
     [super viewDidLoad];
 	
 	self.view.multipleTouchEnabled = YES;
-	self.imageView.image = [UIImage imageNamed:DefaultControllerImage];
-	[self getControllerCoords];
+	//self.imageView.image = [UIImage imageNamed:DefaultControllerImage];
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    NSString *newImageName = @"landscape_controller";
+    if (ControllerAppDelegate().controllerType == SNESControllerTypeLocal) {
+        self.connectionButton.hidden = YES;
+        self.infoButton.hidden = YES;
+        newImageName = @"landscape_controller";
+    }
+    else {
+        self.connectionButton.hidden = NO;
+        self.connectionButton.hidden = NO;
+        newImageName = @"snes-1";
+    }
+    
+}
+
+- (void) changeBackgroundImage:(NSString *)newImageName {
+    self.imageName = newImageName;
+    rt_dispatch_sync_on_main_thread(^{
+        self.imageView.image = [UIImage imageNamed:self.imageName];
+    });
+    [self getControllerCoords];
+}
 
 - (void) viewDidAppear:(BOOL)animated
 {
-	if (! ControllerAppDelegate().sessionController.isConnected)
-	{
-		[ControllerAppDelegate().sessionController showModal];
-	}
+    if (ControllerAppDelegate().controllerType == SNESControllerTypeWireless) {
+        if (! ControllerAppDelegate().sessionController.isConnected)
+        {
+            [ControllerAppDelegate().sessionController showModal];
+        }
+    }
 }
-
-
-
 
 // Override to allow orientations other than the default portrait orientation.
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
     // Return YES for supported orientations
-    return (interfaceOrientation == UIInterfaceOrientationLandscapeLeft ||
-			interfaceOrientation == UIInterfaceOrientationLandscapeRight);
+    return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
 
@@ -281,7 +308,13 @@ enum  { GP2X_UP=0x1,       GP2X_LEFT=0x4,       GP2X_DOWN=0x10,  GP2X_RIGHT=0x40
 		}
 	}
 	
-	[ControllerAppDelegate().sessionController sendPadStatus:gp2x_pad_status];
+    if (ControllerAppDelegate().controllerType == SNESControllerTypeWireless) {
+        [ControllerAppDelegate().sessionController sendPadStatus:gp2x_pad_status];
+    }
+    else {
+        NSData *data = [NSData dataWithBytes:&gp2x_pad_status length:sizeof(gp2x_pad_status)];
+        [AppDelegate().controlPadManager convertData:data padNumber:0];
+    }
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
@@ -301,7 +334,7 @@ enum  { GP2X_UP=0x1,       GP2X_LEFT=0x4,       GP2X_DOWN=0x10,  GP2X_RIGHT=0x40
     char string[256];
     FILE *fp;
 	
-	NSString *filepath = [[NSBundle mainBundle] pathForResource:@"snes-1" ofType:@"txt"];
+	NSString *filepath = [[NSBundle mainBundle] pathForResource:self.imageName ofType:@"txt"];
 	fp = fopen([filepath UTF8String], "r");
 	
 	if (fp) 

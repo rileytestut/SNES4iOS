@@ -14,6 +14,7 @@
 
 unsigned int *screenPixels;
 @implementation ScreenLayer
+@synthesize rotateTransform;
 
 + (id) defaultActionForKey:(NSString *)key
 {
@@ -63,13 +64,13 @@ unsigned int *screenPixels;
 			[self setMagnificationFilter: kCAFilterNearest];
 		}
 		
-		if (1) {
+		/*if (1) {
 		    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
             [[NSNotificationCenter defaultCenter] addObserver:self 
                                                      selector:@selector(orientationChanged:) 
                                                          name:@"UIDeviceOrientationDidChangeNotification" 
                                                        object:nil];
-        }
+        }*/
 	}
 	return self;
 }
@@ -92,6 +93,8 @@ unsigned int *screenPixels;
         rotateTransform = CGAffineTransformMakeRotation(RADIANS(90));
     } else if (orientation == UIDeviceOrientationLandscapeRight) {
         rotateTransform = CGAffineTransformMakeRotation(RADIANS(270));
+    } else if (orientation == UIDeviceOrientationPortrait) {
+        rotateTransform = CGAffineTransformMakeRotation(RADIANS(0.0));
     }
     
 }

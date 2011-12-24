@@ -14,7 +14,7 @@
 
 SNESControllerAppDelegate *ControllerAppDelegate()
 {
-	return (SNESControllerAppDelegate *)[[UIApplication sharedApplication] delegate];
+	return ((SNES4iOSAppDelegate *)[[UIApplication sharedApplication] delegate]).snesControllerAppDelegate;
 }
 
 #ifdef TARGET_OS_IPHONE
@@ -67,7 +67,7 @@ void handle_event (void* target, void* refcon, IOHIDServiceRef service, IOHIDEve
 @synthesize window;
 @synthesize viewController;
 @synthesize sessionController;
-
+@synthesize controllerType;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {    
     

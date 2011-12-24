@@ -47,11 +47,13 @@
 @property (nonatomic, strong) IBOutlet UIImageView *imageView;
 @property (nonatomic, strong) IBOutlet UIButton *infoButton;
 @property (nonatomic, strong) IBOutlet UIButton *connectionButton;
+@property (copy, nonatomic) NSString *imageName;
 
 - (IBAction) buttonPressed:(id)sender;
 - (void) getControllerCoords;
 - (void) updateConnectionStatus;
 - (void) showDisconnectionAlert;
+- (void) changeBackgroundImage:(NSString *)newImageName;
 
 
 @end

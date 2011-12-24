@@ -232,16 +232,31 @@
 	UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"ArrowBack.png"]
 																   style:UIBarButtonItemStylePlain
 																  target:webView action:@selector(goBack)];
-	UIBarButtonItem *forwardButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"ArrowForward.png"]
-																	  style:UIBarButtonItemStylePlain
-																	 target:webView action:@selector(goForward)];
-	self.navigationItem.hidesBackButton = YES;
-	self.navigationItem.leftBarButtonItem = backButton;
-	self.navigationItem.rightBarButtonItem = forwardButton;
+    self.navigationItem.leftBarButtonItem = backButton;
+    self.navigationItem.hidesBackButton = YES;
+    
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+        UIBarButtonItem *forwardButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"ArrowForward.png"]
+                                                                          style:UIBarButtonItemStylePlain
+                                                                         target:webView action:@selector(goForward)];
+        self.navigationItem.rightBarButtonItem = forwardButton;
+    }
+    else {
+        UIBarButtonItem *doneButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(dismissWebController)];
+        self.navigationItem.rightBarButtonItem = doneButton;
+    }
 	
 	
 	self.contentSizeForViewInPopover = CGSizeMake(600, 700);
 	[self loadBaseURL];
+}
+
+- (void)dismissWebController {
+    UIViewController *parentViewController = [self parentViewController];
+    if ([self respondsToSelector:@selector(presentingViewController)]) {
+        parentViewController = [self presentingViewController];//Fixes iOS 5 bug
+    }
+    [parentViewController dismissModalViewControllerAnimated:YES];
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)aWebView
@@ -327,6 +342,7 @@
     
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     [downloadWaitAlertView dismissWithClickedButtonIndex:0 animated:YES];
+      [self dismissWebController];
   }
 }
 

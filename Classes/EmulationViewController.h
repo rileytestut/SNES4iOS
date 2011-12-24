@@ -22,4 +22,5 @@
 */
 
 - (void) refreshScreen;
+- (void) didRotate:(NSNotification *)notification;
 @end

@@ -11,6 +11,7 @@
 #import "ScreenView.h"
 #import "MTStatusBarOverlay.h"
 #import "SNESControllerViewController.h"
+#import "ScreenLayer.h"
 
 #import <pthread.h>
 #import <QuartzCore/QuartzCore.h>
@@ -124,10 +125,10 @@ void saveScreenshotToFile(char *filepath)
 - (void)loadView {
 	self.view = (UIView *)[[ScreenView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
-    /*if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+    if (ControllerAppDelegate().controllerType == SNESControllerTypeLocal) {
         [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didRotate:) name:@"UIDeviceOrientationDidChangeNotification" object:nil];
-    }*/
+    }
     
     /*if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
         UIButton *exitButton = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -153,6 +154,10 @@ void saveScreenshotToFile(char *filepath)
         [self.view addSubview:saveStateButton];
     }*/
     //Above methods were a replacement to the double-tapping to access these options, which sometimes crashes the app. Convering over to GCD appears to have fixed this crash, but I've left these here just in case.
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [self didRotate:[NSNull null]];
 }
 
 #pragma mark - Save States
@@ -224,22 +229,49 @@ void saveScreenshotToFile(char *filepath)
     }
 }
 
-- (void)didRotate:(NSNotification *)notification {
+- (void) didRotate:(NSNotification *)notification {
     UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
-    CGFloat rotationAngle = 0.0;
-    if (orientation == UIDeviceOrientationLandscapeLeft) {
-        rotationAngle = 90.0f;
-        self.view.bounds = CGRectMake(0, 0, 480, 320);
+    if (orientation == UIDeviceOrientationPortrait || orientation == UIDeviceOrientationLandscapeLeft || 
+        orientation == UIDeviceOrientationLandscapeRight) {
+        CGFloat rotationAngle = 0.0f;
+        //These coordinates take into considerationt the fact that the UIWindow is in portrait mode
+        if (orientation == UIDeviceOrientationPortrait) {
+            if (![AppDelegate().snesControllerViewController.imageName isEqualToString:@"portrait_controller"]) {
+                [AppDelegate().snesControllerViewController changeBackgroundImage:@"portrait_controller"];
+            }
+            rotationAngle = 0.0f;
+            self.view.superview.transform = CGAffineTransformRotate(CGAffineTransformIdentity, RADIANS(rotationAngle));
+            ((ScreenLayer *)self.view.layer).rotateTransform = CGAffineTransformRotate(CGAffineTransformIdentity, RADIANS(0.0));
+            self.view.bounds = CGRectMake(0, 0, 320, 240);
+            self.view.superview.bounds = CGRectMake(0, 0, 320, 480);
+            self.view.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
+            self.view.superview.frame = CGRectMake(0, 0, self.view.superview.frame.size.width, self.view.superview.frame.size.height);
+        }
+        else if (orientation == UIDeviceOrientationLandscapeLeft) {
+            if (![AppDelegate().snesControllerViewController.imageName isEqualToString:@"landscape_controller"]) {
+                [AppDelegate().snesControllerViewController changeBackgroundImage:@"landscape_controller"];
+            }
+            rotationAngle = 0.0f;
+            self.view.superview.transform = CGAffineTransformRotate(CGAffineTransformIdentity, RADIANS(rotationAngle));
+            ((ScreenLayer *)self.view.layer).rotateTransform = CGAffineTransformRotate(CGAffineTransformIdentity, RADIANS(90.0));
+            self.view.bounds = CGRectMake(0, 0, 480, 320);
+            self.view.superview.bounds = CGRectMake(0, 0, 320, 480);
+            self.view.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
+            self.view.superview.frame = CGRectMake(0, 0, self.view.superview.frame.size.width, self.view.superview.frame.size.height);
+        }
+        else if (orientation == UIDeviceOrientationLandscapeRight) {
+            if (![AppDelegate().snesControllerViewController.imageName isEqualToString:@"landscape_controller"]) {
+                [AppDelegate().snesControllerViewController changeBackgroundImage:@"landscape_controller"];
+            }
+            rotationAngle = 180.0f;
+            self.view.superview.transform = CGAffineTransformRotate(CGAffineTransformIdentity, RADIANS(rotationAngle));
+            ((ScreenLayer *)self.view.layer).rotateTransform = CGAffineTransformRotate(CGAffineTransformIdentity, RADIANS(90.0));
+            self.view.bounds = CGRectMake(0, 0, 480, 320);
+            self.view.superview.bounds = CGRectMake(0, 0, 320, 480);
+            self.view.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
+            self.view.superview.frame = CGRectMake(0, 0, self.view.superview.frame.size.width, self.view.superview.frame.size.height);
+        }
     }
-    else if (orientation == UIDeviceOrientationLandscapeRight) {
-        rotationAngle = 270.0f;
-        self.view.bounds = CGRectMake(0, 0, 480, 320);
-    }
-    else if (orientation == UIDeviceOrientationPortrait) {
-        rotationAngle = 0.0f;
-        self.view.bounds = CGRectMake(0, 0, 320, 240);
-    }
-    self.view.transform = CGAffineTransformRotate(CGAffineTransformIdentity, RADIANS(13.0));
 }
 
 - (void)didReceiveMemoryWarning {

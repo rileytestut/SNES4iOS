@@ -17,5 +17,6 @@
 -(void)loadBaseURL;
 -(void)startingDownload:(NSURLRequest*)request withType:(NSString*)type;
 -(void)startDownload;
+- (void)dismissWebController;
 
 @end

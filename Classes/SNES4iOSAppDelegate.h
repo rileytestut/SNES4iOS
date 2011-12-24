@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "SNESControllerAppDelegate.h"
+#import "SNESControllerViewController.h"
 
 @class EmulationViewController;
 @class RomSelectionViewController;

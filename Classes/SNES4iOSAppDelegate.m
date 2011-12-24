@@ -28,6 +28,7 @@ SNES4iOSAppDelegate *AppDelegate()
 @synthesize romDirectoryPath, saveDirectoryPath, snapshotDirectoryPath;
 @synthesize emulationViewController, webViewController, webNavController;
 @synthesize tabBarController;
+@synthesize snesControllerAppDelegate, snesControllerViewController;
 
 
 #pragma mark -
@@ -74,6 +75,9 @@ SNES4iOSAppDelegate *AppDelegate()
     
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         
+        self.snesControllerAppDelegate = [[SNESControllerAppDelegate alloc] init];
+        self.snesControllerViewController = [[SNESControllerViewController alloc] initWithNibName:@"SNESControllerViewController" bundle:[NSBundle mainBundle]];
+        self.snesControllerAppDelegate.viewController = self.snesControllerViewController;
         self.tabBarController = [[UITabBarController alloc] init];
         [self.tabBarController setViewControllers:[NSArray arrayWithObjects:masterNavigationController, nil]];
         self.window.rootViewController = self.tabBarController;
