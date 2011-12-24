@@ -31,9 +31,9 @@
 #endif
 }
 
-@property (nonatomic, retain) IBOutlet UIWindow *window;
-@property (nonatomic, retain) IBOutlet SNESControllerViewController *viewController;
-@property (nonatomic, retain) SessionController *sessionController;
+@property (nonatomic, strong) IBOutlet UIWindow *window;
+@property (nonatomic, strong) IBOutlet SNESControllerViewController *viewController;
+@property (nonatomic, strong) SessionController *sessionController;
 
 - (void) autosendStatus:(NSTimer *)timer;
 

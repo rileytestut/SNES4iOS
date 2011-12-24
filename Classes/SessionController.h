@@ -23,15 +23,15 @@
 	UIButton *disconnectButton;
 }
 
-@property (nonatomic, retain) GKSession *gkSession;
+@property (nonatomic, strong) GKSession *gkSession;
 @property (nonatomic, readonly) BOOL isConnected;
 @property (nonatomic, readonly) BOOL serversAvailable;
 
-@property (nonatomic, retain) IBOutlet UILabel *statusLabel;
-@property (nonatomic, retain) IBOutlet UIActivityIndicatorView *spinner;
-@property (nonatomic, retain) IBOutlet UITableView *serverListView;
-@property (nonatomic, retain) IBOutlet UIButton *cancelButton;
-@property (nonatomic, retain) IBOutlet UIButton *disconnectButton;
+@property (nonatomic, strong) IBOutlet UILabel *statusLabel;
+@property (nonatomic, strong) IBOutlet UIActivityIndicatorView *spinner;
+@property (nonatomic, strong) IBOutlet UITableView *serverListView;
+@property (nonatomic, strong) IBOutlet UIButton *cancelButton;
+@property (nonatomic, strong) IBOutlet UIButton *disconnectButton;
 
 - (void) searchForEmulators;
 - (void) stopSearching;

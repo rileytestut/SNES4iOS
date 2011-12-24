@@ -29,16 +29,6 @@
 	return self;
 }
 
-- (void) dealloc
-{
-	[super dealloc];
-	[gkSession release];
-	[availableServers release];
-	[serverPeerID release];
-	[statusLabel release];
-	[serverListView release];
-	[cancelButton release];
-}
 
 
 - (void) viewDidLoad
@@ -126,8 +116,6 @@
 - (void) disconnect
 {
 	[gkSession disconnectFromAllPeers];
-	[serverPeerID release];
-	[serverName release];
 	serverPeerID = nil;
 	serverName = nil;
 	[availableServers removeAllObjects];
@@ -206,8 +194,8 @@
 			}
 			break;
 		case GKPeerStateConnected:
-			serverPeerID = [peerID retain];
-			serverName = [[session displayNameForPeer:peerID] retain];
+			serverPeerID = peerID;
+			serverName = [session displayNameForPeer:peerID];
 			[self stopSearching];
 			[self dismissView];
 			[ControllerAppDelegate().viewController updateConnectionStatus];
@@ -242,7 +230,7 @@
 	cell = [tableView dequeueReusableCellWithIdentifier:@"labelCell"];
 	if (cell == nil) 
 	{
-		cell = [[[UITableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:@"labelCell"] autorelease];
+		cell = [[UITableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:@"labelCell"];
 		cell.textLabel.numberOfLines = 1;
 		cell.textLabel.adjustsFontSizeToFitWidth = YES;
 		cell.textLabel.minimumFontSize = 9.0f;

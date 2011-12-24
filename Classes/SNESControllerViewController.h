@@ -44,9 +44,9 @@
 	
 }
 
-@property (nonatomic, retain) IBOutlet UIImageView *imageView;
-@property (nonatomic, retain) IBOutlet UIButton *infoButton;
-@property (nonatomic, retain) IBOutlet UIButton *connectionButton;
+@property (nonatomic, strong) IBOutlet UIImageView *imageView;
+@property (nonatomic, strong) IBOutlet UIButton *infoButton;
+@property (nonatomic, strong) IBOutlet UIButton *connectionButton;
 
 - (IBAction) buttonPressed:(id)sender;
 - (void) getControllerCoords;

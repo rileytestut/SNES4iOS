@@ -117,11 +117,6 @@ void handle_event (void* target, void* refcon, IOHIDServiceRef service, IOHIDEve
 }
 #endif
 
-- (void)dealloc {
-    [viewController release];
-    [window release];
-    [super dealloc];
-}
 
 
 	

@@ -7,12 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1D3623260D0F684500981E51 /* SNES4iOSAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* SNES4iOSAppDelegate.m */; };
-		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
+		1D3623260D0F684500981E51 /* SNES4iOSAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* SNES4iOSAppDelegate.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
-		2804200B108E984D000629CD /* RomSelectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28042008108E984D000629CD /* RomSelectionViewController.m */; };
-		2804200C108E984D000629CD /* RomDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2804200A108E984D000629CD /* RomDetailViewController.m */; };
+		2804200B108E984D000629CD /* RomSelectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28042008108E984D000629CD /* RomSelectionViewController.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		2804200C108E984D000629CD /* RomDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2804200A108E984D000629CD /* RomDetailViewController.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		2892E4100DC94CBA00A64D0F /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */; };
 		6C3CE6EB135BCD0400D61F53 /* IOSurface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C3CE6EA135BCD0400D61F53 /* IOSurface.framework */; };
 		6CD00F45135FED04003E789A /* libpocketsnes.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CD00F44135FED04003E789A /* libpocketsnes.a */; };
@@ -28,15 +28,15 @@
 		BF7B7A3114A64DFE00014E61 /* grayButton.png in Resources */ = {isa = PBXBuildFile; fileRef = BF7B7A2E14A64DFE00014E61 /* grayButton.png */; };
 		BF7B7A3214A64DFE00014E61 /* NotConnectedIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = BF7B7A2F14A64DFE00014E61 /* NotConnectedIcon.png */; };
 		BF7B7A3414A64F8B00014E61 /* SessionController.xib in Resources */ = {isa = PBXBuildFile; fileRef = BF7B7A3314A64F8B00014E61 /* SessionController.xib */; };
-		BFA4D1B714A56B28008902AD /* MTStatusBarOverlay.m in Sources */ = {isa = PBXBuildFile; fileRef = BFA4D1B414A56B28008902AD /* MTStatusBarOverlay.m */; };
-		BFA4D1B814A56B28008902AD /* MTStatusBarTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = BFA4D1B614A56B28008902AD /* MTStatusBarTableViewCell.m */; };
+		BFA4D1B714A56B28008902AD /* MTStatusBarOverlay.m in Sources */ = {isa = PBXBuildFile; fileRef = BFA4D1B414A56B28008902AD /* MTStatusBarOverlay.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		BFA4D1B814A56B28008902AD /* MTStatusBarTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = BFA4D1B614A56B28008902AD /* MTStatusBarTableViewCell.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		BFD71BA014A5A2B100850EEE /* RomSelectionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = BFD71B9F14A5A2B100850EEE /* RomSelectionViewController.xib */; };
 		BFD71BAB14A5AC2F00850EEE /* landscape_controller.png in Resources */ = {isa = PBXBuildFile; fileRef = BFD71BA914A5AC2E00850EEE /* landscape_controller.png */; };
 		BFD71BAC14A5AC2F00850EEE /* portrait_controller.png in Resources */ = {isa = PBXBuildFile; fileRef = BFD71BAA14A5AC2F00850EEE /* portrait_controller.png */; };
 		BFD71BD414A5B23B00850EEE /* snes-1.png in Resources */ = {isa = PBXBuildFile; fileRef = BFD71BD114A5B23B00850EEE /* snes-1.png */; };
 		BFD71BD514A5B23B00850EEE /* landscape_controller.txt in Resources */ = {isa = PBXBuildFile; fileRef = BFD71BD214A5B23B00850EEE /* landscape_controller.txt */; };
 		BFD71BD614A5B23B00850EEE /* SNESControllerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = BFD71BD314A5B23B00850EEE /* SNESControllerViewController.xib */; };
-		CE43A4A5119DEA3C0007E399 /* EmulationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE43A4A4119DEA3C0007E399 /* EmulationViewController.m */; };
+		CE43A4A5119DEA3C0007E399 /* EmulationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE43A4A4119DEA3C0007E399 /* EmulationViewController.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		CE43A4B4119DF2B00007E399 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE43A4B3119DF2B00007E399 /* QuartzCore.framework */; };
 		CE43A4B6119DF2D80007E399 /* CoreSurface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE43A4B5119DF2D80007E399 /* CoreSurface.framework */; };
 		CE43A4DB119DFEF70007E399 /* cartridge.png in Resources */ = {isa = PBXBuildFile; fileRef = CE43A4CD119DFEF70007E399 /* cartridge.png */; };
@@ -53,17 +53,17 @@
 		CE43A4E6119DFEF70007E399 /* SaveStateSelectionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = CE43A4D8119DFEF70007E399 /* SaveStateSelectionViewController.xib */; };
 		CE43A4E7119DFEF70007E399 /* SettingsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = CE43A4D9119DFEF70007E399 /* SettingsViewController.xib */; };
 		CE43A4E8119DFEF70007E399 /* snapshot-test.png in Resources */ = {isa = PBXBuildFile; fileRef = CE43A4DA119DFEF70007E399 /* snapshot-test.png */; };
-		CEA57D651198B621004DCD60 /* SaveStateSelectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CEA57D631198B621004DCD60 /* SaveStateSelectionViewController.m */; };
-		CEA57E2B1198D3BC004DCD60 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CEA57E291198D3BC004DCD60 /* SettingsViewController.m */; };
-		CEA57F091198E5E8004DCD60 /* ControlPadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = CEA57F081198E5E8004DCD60 /* ControlPadManager.m */; };
+		CEA57D651198B621004DCD60 /* SaveStateSelectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CEA57D631198B621004DCD60 /* SaveStateSelectionViewController.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		CEA57E2B1198D3BC004DCD60 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CEA57E291198D3BC004DCD60 /* SettingsViewController.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		CEA57F091198E5E8004DCD60 /* ControlPadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = CEA57F081198E5E8004DCD60 /* ControlPadManager.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		CEA57F0B1198E6F8004DCD60 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEA57F0A1198E6F8004DCD60 /* GameKit.framework */; };
-		CEA57F111198ED61004DCD60 /* ControlPadConnectViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CEA57F0F1198ED61004DCD60 /* ControlPadConnectViewController.m */; };
-		CEE8574411AAA81100784F8D /* WebBrowserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE8574311AAA81100784F8D /* WebBrowserViewController.m */; };
+		CEA57F111198ED61004DCD60 /* ControlPadConnectViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CEA57F0F1198ED61004DCD60 /* ControlPadConnectViewController.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		CEE8574411AAA81100784F8D /* WebBrowserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE8574311AAA81100784F8D /* WebBrowserViewController.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		CEE8575411AAD27900784F8D /* WebBrowserViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = CEE8575311AAD27900784F8D /* WebBrowserViewController.xib */; };
 		CEE8575C11AADBE100784F8D /* ArrowBack.png in Resources */ = {isa = PBXBuildFile; fileRef = CEE8575A11AADBE100784F8D /* ArrowBack.png */; };
 		CEE8575D11AADBE100784F8D /* ArrowForward.png in Resources */ = {isa = PBXBuildFile; fileRef = CEE8575B11AADBE100784F8D /* ArrowForward.png */; };
-		CEEA77CE119F3F4400440258 /* ScreenView.m in Sources */ = {isa = PBXBuildFile; fileRef = CEEA77CD119F3F4400440258 /* ScreenView.m */; };
-		CEEA77D1119F3F6100440258 /* ScreenLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = CEEA77D0119F3F6100440258 /* ScreenLayer.m */; };
+		CEEA77CE119F3F4400440258 /* ScreenView.m in Sources */ = {isa = PBXBuildFile; fileRef = CEEA77CD119F3F4400440258 /* ScreenView.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		CEEA77D1119F3F6100440258 /* ScreenLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = CEEA77D0119F3F6100440258 /* ScreenLayer.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
