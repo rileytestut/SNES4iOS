@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:SNES4iPad.xcodeproj">
+      location = "self:SNES4iOS.xcodeproj">
    </FileRef>
 </Workspace>

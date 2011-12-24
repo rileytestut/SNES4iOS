@@ -578,13 +578,12 @@ kDetailViewWidth, kHistoryTableRowHeight*kMaxHistoryTableRowCount + kStatusBarHe
 
 - (void)removeMessageFromHistoryForKey:(id)key {
     NSUInteger count = [self.messageHistory count];
-    if (count == 0) return;
     BOOL successful = NO;
     if ([key isEqualToString:[[self.keyArray lastObject] objectForKey:@"key"]]) {
         [self removeMessageAtIndexFromHistory:515];
         successful = YES; 
     }
-    else {
+    else if (count > 0) {
         for (int i = count - 1; i >= 0; i--) {
             NSMutableDictionary *dictionary = [self.messageHistory objectAtIndex:i];
             NSString *compare = [dictionary objectForKey:key];
@@ -931,6 +930,7 @@ kDetailViewWidth, kHistoryTableRowHeight*kMaxHistoryTableRowCount + kStatusBarHe
 	}
 
 	CGFloat pi = (CGFloat)M_PI;
+    
 	if (orientation == UIDeviceOrientationPortrait) {
 		self.transform = CGAffineTransformIdentity;
 		self.frame = CGRectMake(0,0,kScreenWidth,kStatusBarHeight);
@@ -948,6 +948,7 @@ kDetailViewWidth, kHistoryTableRowHeight*kMaxHistoryTableRowCount + kStatusBarHe
 		self.frame = CGRectMake(0,kScreenHeight - kStatusBarHeight,kScreenWidth,kStatusBarHeight);
 		self.smallFrame = CGRectMake(self.frame.size.width - kWidthSmall, 0.0f, kWidthSmall, self.frame.size.height);
 	}
+    
     self.maskingLabel.center = CGPointMake(self.visibleStatusLabel.center.x, self.maskingLabel.center.y);
     [self setProgress:progress_ key:kSetProgressOnStatusBarKey];
     

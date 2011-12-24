@@ -6,9 +6,10 @@
 //  Copyright __MyCompanyName__ 2010. All rights reserved.
 //
 
-#import "SNES4iPadAppDelegate.h"
+#import "SNES4iOSAppDelegate.h"
 #import "RomSelectionViewController.h"
 #import "RomDetailViewController.h"
+#import "MTStatusBarOverlay.h"
 
 
 @implementation RomSelectionViewController
@@ -35,6 +36,9 @@
     
     UIBarButtonItem *refreshButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(rescanRomDirectory)];
     self.navigationItem.rightBarButtonItem = refreshButton;
+    
+    MTStatusBarOverlay *overlay = [MTStatusBarOverlay sharedOverlay];
+    overlay.animation = MTStatusBarOverlayAnimationFallDown;
 	
 	[self scanRomDirectory:[AppDelegate() romDirectoryPath]];
 }

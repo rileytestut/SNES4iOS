@@ -6,7 +6,7 @@
 //  Copyright 2010 __MyCompanyName__. All rights reserved.
 //
 
-#import "SNES4iPadAppDelegate.h"
+#import "SNES4iOSAppDelegate.h"
 #import "EmulationViewController.h"
 #import "ScreenView.h"
 #import "MTStatusBarOverlay.h"
@@ -150,14 +150,15 @@ void saveScreenshotToFile(char *filepath)
 - (void)saveState:(id)sender {
     UIButton *button = (UIButton *)sender;
     __emulation_saving = button.tag;
-    double delayInSeconds = 1.0;
+    double delayInSeconds = 0.1;
     dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
     dispatch_after(popTime, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
         NSString *message = @"Saved state!";
         if (button.tag == 1) {
             message = @"Saved new state!";
         }
-        [[MTStatusBarOverlay threadSafeSharedOverlay] postFinishMessage:message key:kSavedState duration:2.0];
+        [[MTStatusBarOverlay threadSafeSharedOverlay] setStatusBarStyleManually:UIStatusBarStyleBlackOpaque];
+        [[MTStatusBarOverlay threadSafeSharedOverlay] postMessage:message key:@"savedState" type:MTMessageTypePlain duration:1.0 animated:YES immediate:YES];
     });
 }
 
@@ -167,7 +168,7 @@ void saveScreenshotToFile(char *filepath)
 
 #pragma mark -
 
-- (void)exit {
+- (void)exit:(id)sender {
     __emulation_run = 0;
     [AppDelegate() showEmulator:NO];
 }

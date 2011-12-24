@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1D3623260D0F684500981E51 /* SNES4iPadAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* SNES4iPadAppDelegate.m */; };
+		1D3623260D0F684500981E51 /* SNES4iOSAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* SNES4iOSAppDelegate.m */; };
 		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
@@ -18,8 +18,8 @@
 		6CD00F45135FED04003E789A /* libpocketsnes.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CD00F44135FED04003E789A /* libpocketsnes.a */; };
 		6CD00F60135FEE9C003E789A /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CD00F5F135FEE9C003E789A /* AudioToolbox.framework */; };
 		6CD00F64135FEEBA003E789A /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CD00F63135FEEBA003E789A /* libz.dylib */; };
-		BFC0361214A50D3A00E49D8D /* MTStatusBarOverlay.m in Sources */ = {isa = PBXBuildFile; fileRef = BFC0360F14A50D3A00E49D8D /* MTStatusBarOverlay.m */; };
-		BFC0361314A50D3A00E49D8D /* MTStatusBarTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = BFC0361114A50D3A00E49D8D /* MTStatusBarTableViewCell.m */; };
+		BFA4D1B714A56B28008902AD /* MTStatusBarOverlay.m in Sources */ = {isa = PBXBuildFile; fileRef = BFA4D1B414A56B28008902AD /* MTStatusBarOverlay.m */; };
+		BFA4D1B814A56B28008902AD /* MTStatusBarTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = BFA4D1B614A56B28008902AD /* MTStatusBarTableViewCell.m */; };
 		CE43A4A5119DEA3C0007E399 /* EmulationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE43A4A4119DEA3C0007E399 /* EmulationViewController.m */; };
 		CE43A4B4119DF2B00007E399 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE43A4B3119DF2B00007E399 /* QuartzCore.framework */; };
 		CE43A4B6119DF2D80007E399 /* CoreSurface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE43A4B5119DF2D80007E399 /* CoreSurface.framework */; };
@@ -64,25 +64,25 @@
 
 /* Begin PBXFileReference section */
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		1D3623240D0F684500981E51 /* SNES4iPadAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNES4iPadAppDelegate.h; sourceTree = "<group>"; };
-		1D3623250D0F684500981E51 /* SNES4iPadAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SNES4iPadAppDelegate.m; sourceTree = "<group>"; };
-		1D6058910D05DD3D006BFB54 /* SNES4iPad.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SNES4iPad.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1D3623240D0F684500981E51 /* SNES4iOSAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNES4iOSAppDelegate.h; sourceTree = "<group>"; };
+		1D3623250D0F684500981E51 /* SNES4iOSAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SNES4iOSAppDelegate.m; sourceTree = "<group>"; };
+		1D6058910D05DD3D006BFB54 /* SNES4iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SNES4iOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		28042007108E984D000629CD /* RomSelectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RomSelectionViewController.h; sourceTree = "<group>"; };
 		28042008108E984D000629CD /* RomSelectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RomSelectionViewController.m; sourceTree = "<group>"; };
 		28042009108E984D000629CD /* RomDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RomDetailViewController.h; sourceTree = "<group>"; };
 		2804200A108E984D000629CD /* RomDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RomDetailViewController.m; sourceTree = "<group>"; };
 		2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		28A0AAE50D9B0CCF005BE974 /* SNES4iPad_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNES4iPad_Prefix.pch; sourceTree = "<group>"; };
+		28A0AAE50D9B0CCF005BE974 /* SNES4iOS_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNES4iOS_Prefix.pch; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		6C3CE6EA135BCD0400D61F53 /* IOSurface.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOSurface.framework; path = System/Library/PrivateFrameworks/IOSurface.framework; sourceTree = SDKROOT; };
 		6CD00F44135FED04003E789A /* libpocketsnes.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpocketsnes.a; path = src/snes4iphone_src/libpocketsnes.a; sourceTree = "<group>"; };
 		6CD00F5F135FEE9C003E789A /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		6CD00F63135FEEBA003E789A /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
-		BFC0360E14A50D3A00E49D8D /* MTStatusBarOverlay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTStatusBarOverlay.h; sourceTree = "<group>"; };
-		BFC0360F14A50D3A00E49D8D /* MTStatusBarOverlay.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTStatusBarOverlay.m; sourceTree = "<group>"; };
-		BFC0361014A50D3A00E49D8D /* MTStatusBarTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTStatusBarTableViewCell.h; sourceTree = "<group>"; };
-		BFC0361114A50D3A00E49D8D /* MTStatusBarTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTStatusBarTableViewCell.m; sourceTree = "<group>"; };
+		BFA4D1B314A56B28008902AD /* MTStatusBarOverlay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTStatusBarOverlay.h; sourceTree = "<group>"; };
+		BFA4D1B414A56B28008902AD /* MTStatusBarOverlay.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTStatusBarOverlay.m; sourceTree = "<group>"; };
+		BFA4D1B514A56B28008902AD /* MTStatusBarTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTStatusBarTableViewCell.h; sourceTree = "<group>"; };
+		BFA4D1B614A56B28008902AD /* MTStatusBarTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTStatusBarTableViewCell.m; sourceTree = "<group>"; };
 		CE43A4A3119DEA3C0007E399 /* EmulationViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmulationViewController.h; sourceTree = "<group>"; };
 		CE43A4A4119DEA3C0007E399 /* EmulationViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EmulationViewController.m; sourceTree = "<group>"; };
 		CE43A4B3119DF2B00007E399 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
@@ -102,7 +102,7 @@
 		CE43A4D9119DFEF70007E399 /* SettingsViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SettingsViewController.xib; sourceTree = "<group>"; };
 		CE43A4DA119DFEF70007E399 /* snapshot-test.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "snapshot-test.png"; sourceTree = "<group>"; };
 		CE43A50D119E01600007E399 /* CoreSurface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreSurface.h; sourceTree = "<group>"; };
-		CE43A516119E087E0007E399 /* SNES4iPad-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "SNES4iPad-Info.plist"; sourceTree = "<group>"; };
+		CE43A516119E087E0007E399 /* SNES4iOS-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "SNES4iOS-Info.plist"; sourceTree = "<group>"; };
 		CEA57D621198B621004DCD60 /* SaveStateSelectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SaveStateSelectionViewController.h; sourceTree = "<group>"; };
 		CEA57D631198B621004DCD60 /* SaveStateSelectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SaveStateSelectionViewController.m; sourceTree = "<group>"; };
 		CEA57E281198D3BC004DCD60 /* SettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsViewController.h; sourceTree = "<group>"; };
@@ -147,8 +147,8 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				1D3623240D0F684500981E51 /* SNES4iPadAppDelegate.h */,
-				1D3623250D0F684500981E51 /* SNES4iPadAppDelegate.m */,
+				1D3623240D0F684500981E51 /* SNES4iOSAppDelegate.h */,
+				1D3623250D0F684500981E51 /* SNES4iOSAppDelegate.m */,
 				28042007108E984D000629CD /* RomSelectionViewController.h */,
 				28042008108E984D000629CD /* RomSelectionViewController.m */,
 				28042009108E984D000629CD /* RomDetailViewController.h */,
@@ -169,7 +169,10 @@
 				CEEA77D0119F3F6100440258 /* ScreenLayer.m */,
 				CEE8574211AAA81100784F8D /* WebBrowserViewController.h */,
 				CEE8574311AAA81100784F8D /* WebBrowserViewController.m */,
-				BFC0361414A50D3E00E49D8D /* MTStatusBarOverlay */,
+				BFA4D1B314A56B28008902AD /* MTStatusBarOverlay.h */,
+				BFA4D1B414A56B28008902AD /* MTStatusBarOverlay.m */,
+				BFA4D1B514A56B28008902AD /* MTStatusBarTableViewCell.h */,
+				BFA4D1B614A56B28008902AD /* MTStatusBarTableViewCell.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -177,7 +180,7 @@
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1D6058910D05DD3D006BFB54 /* SNES4iPad.app */,
+				1D6058910D05DD3D006BFB54 /* SNES4iOS.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -198,8 +201,8 @@
 			isa = PBXGroup;
 			children = (
 				CE43A50C119E01600007E399 /* CoreSurface */,
-				28A0AAE50D9B0CCF005BE974 /* SNES4iPad_Prefix.pch */,
-				CE43A516119E087E0007E399 /* SNES4iPad-Info.plist */,
+				28A0AAE50D9B0CCF005BE974 /* SNES4iOS_Prefix.pch */,
+				CE43A516119E087E0007E399 /* SNES4iOS-Info.plist */,
 				29B97316FDCFA39411CA2CEA /* main.m */,
 				6CD00F44135FED04003E789A /* libpocketsnes.a */,
 			);
@@ -220,17 +223,6 @@
 				6CD00F63135FEEBA003E789A /* libz.dylib */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		BFC0361414A50D3E00E49D8D /* MTStatusBarOverlay */ = {
-			isa = PBXGroup;
-			children = (
-				BFC0360E14A50D3A00E49D8D /* MTStatusBarOverlay.h */,
-				BFC0360F14A50D3A00E49D8D /* MTStatusBarOverlay.m */,
-				BFC0361014A50D3A00E49D8D /* MTStatusBarTableViewCell.h */,
-				BFC0361114A50D3A00E49D8D /* MTStatusBarTableViewCell.m */,
-			);
-			name = MTStatusBarOverlay;
 			sourceTree = "<group>";
 		};
 		CE43A4CC119DFEF70007E399 /* Resources */ = {
@@ -268,9 +260,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		1D6058900D05DD3D006BFB54 /* SNES4iPad */ = {
+		1D6058900D05DD3D006BFB54 /* SNES4iOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "SNES4iPad" */;
+			buildConfigurationList = 1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "SNES4iOS" */;
 			buildPhases = (
 				1D60588D0D05DD3D006BFB54 /* Resources */,
 				1D60588E0D05DD3D006BFB54 /* Sources */,
@@ -281,9 +273,9 @@
 			);
 			dependencies = (
 			);
-			name = SNES4iPad;
+			name = SNES4iOS;
 			productName = SNES4iPad;
-			productReference = 1D6058910D05DD3D006BFB54 /* SNES4iPad.app */;
+			productReference = 1D6058910D05DD3D006BFB54 /* SNES4iOS.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -291,7 +283,7 @@
 /* Begin PBXProject section */
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
-			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "SNES4iPad" */;
+			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "SNES4iOS" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
@@ -306,7 +298,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				1D6058900D05DD3D006BFB54 /* SNES4iPad */,
+				1D6058900D05DD3D006BFB54 /* SNES4iOS */,
 			);
 		};
 /* End PBXProject section */
@@ -344,7 +336,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1D60589B0D05DD56006BFB54 /* main.m in Sources */,
-				1D3623260D0F684500981E51 /* SNES4iPadAppDelegate.m in Sources */,
+				1D3623260D0F684500981E51 /* SNES4iOSAppDelegate.m in Sources */,
 				2804200B108E984D000629CD /* RomSelectionViewController.m in Sources */,
 				2804200C108E984D000629CD /* RomDetailViewController.m in Sources */,
 				CEA57D651198B621004DCD60 /* SaveStateSelectionViewController.m in Sources */,
@@ -355,8 +347,8 @@
 				CEEA77CE119F3F4400440258 /* ScreenView.m in Sources */,
 				CEEA77D1119F3F6100440258 /* ScreenLayer.m in Sources */,
 				CEE8574411AAA81100784F8D /* WebBrowserViewController.m in Sources */,
-				BFC0361214A50D3A00E49D8D /* MTStatusBarOverlay.m in Sources */,
-				BFC0361314A50D3A00E49D8D /* MTStatusBarTableViewCell.m in Sources */,
+				BFA4D1B714A56B28008902AD /* MTStatusBarOverlay.m in Sources */,
+				BFA4D1B814A56B28008902AD /* MTStatusBarTableViewCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -380,14 +372,14 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = SNES4iPad_Prefix.pch;
+				GCC_PREFIX_HEADER = SNES4iOS_Prefix.pch;
 				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/\"";
-				INFOPLIST_FILE = "SNES4iPad-Info.plist";
+				INFOPLIST_FILE = "SNES4iOS-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/src/snes4iphone_src\"",
 				);
-				PRODUCT_NAME = SNES4iPad;
+				PRODUCT_NAME = SNES4iOS;
 				SDKROOT = iphoneos;
 				VALID_ARCHS = armv7;
 			};
@@ -408,14 +400,14 @@
 					"\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = SNES4iPad_Prefix.pch;
+				GCC_PREFIX_HEADER = SNES4iOS_Prefix.pch;
 				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/\"";
-				INFOPLIST_FILE = "SNES4iPad-Info.plist";
+				INFOPLIST_FILE = "SNES4iOS-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/src/snes4iphone_src\"",
 				);
-				PRODUCT_NAME = SNES4iPad;
+				PRODUCT_NAME = SNES4iOS;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 				VALID_ARCHS = armv7;
@@ -460,7 +452,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "SNES4iPad" */ = {
+		1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "SNES4iOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1D6058940D05DD3E006BFB54 /* Debug */,
@@ -469,7 +461,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C01FCF4E08A954540054247B /* Build configuration list for PBXProject "SNES4iPad" */ = {
+		C01FCF4E08A954540054247B /* Build configuration list for PBXProject "SNES4iOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C01FCF4F08A954540054247B /* Debug */,

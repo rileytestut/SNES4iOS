@@ -238,6 +238,8 @@ typedef enum MTMessageType {
 // clears the message queue and shows this message instantly
 - (void)postImmediateErrorMessage:(NSString *)message key:(NSString *)key duration:(NSTimeInterval)duration animated:(BOOL)animated;
 
+- (void)postMessage:(NSString *)message key:(NSString *)key type:(MTMessageType)messageType duration:(NSTimeInterval)duration animated:(BOOL)animated immediate:(BOOL)immediate;
+
 // hides the status bar overlay
 - (void)hide;
 

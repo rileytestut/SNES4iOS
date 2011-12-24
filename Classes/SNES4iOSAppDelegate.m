@@ -6,7 +6,7 @@
 //  Copyright __MyCompanyName__ 2010. All rights reserved.
 //
 
-#import "SNES4iPadAppDelegate.h"
+#import "SNES4iOSAppDelegate.h"
 
 #import "EmulationViewController.h"
 #import "RomSelectionViewController.h"
@@ -16,12 +16,12 @@
 #import "ControlPadManager.h"
 #import "WebBrowserViewController.h"
 
-SNES4iPadAppDelegate *AppDelegate()
+SNES4iOSAppDelegate *AppDelegate()
 {
-	return (SNES4iPadAppDelegate *)[[UIApplication sharedApplication] delegate];
+	return (SNES4iOSAppDelegate *)[[UIApplication sharedApplication] delegate];
 }
 
-@implementation SNES4iPadAppDelegate
+@implementation SNES4iOSAppDelegate
 
 @synthesize window, splitViewController, romSelectionViewController, romDetailViewController, settingsViewController;
 @synthesize controlPadConnectViewController, controlPadManager;
@@ -44,7 +44,7 @@ SNES4iPadAppDelegate *AppDelegate()
 	controlPadManager = [[ControlPadManager alloc] init];
 	
 
-	NSString *documentsPath = [SNES4iPadAppDelegate applicationDocumentsDirectory];
+	NSString *documentsPath = [SNES4iOSAppDelegate applicationDocumentsDirectory];
 //	romDirectoryPath = [[documentsPath stringByAppendingPathComponent:@"ROMs/SNES/"] retain];
 	romDirectoryPath = [documentsPath copy];
 	saveDirectoryPath = [romDirectoryPath stringByAppendingPathComponent:@"saves"];

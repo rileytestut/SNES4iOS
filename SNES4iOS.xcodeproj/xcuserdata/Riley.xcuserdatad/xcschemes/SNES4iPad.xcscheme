@@ -14,9 +14,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "1D6058900D05DD3D006BFB54"
-               BuildableName = "SNES4iPad.app"
-               BlueprintName = "SNES4iPad"
-               ReferencedContainer = "container:SNES4iPad.xcodeproj">
+               BuildableName = "SNES4iOS.app"
+               BlueprintName = "SNES4iOS"
+               ReferencedContainer = "container:SNES4iOS.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -28,20 +28,31 @@
       buildConfiguration = "Debug">
       <Testables>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "1D6058900D05DD3D006BFB54"
+            BuildableName = "SNES4iOS.app"
+            BlueprintName = "SNES4iOS"
+            ReferencedContainer = "container:SNES4iOS.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </TestAction>
    <LaunchAction
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.GDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.GDB"
       launchStyle = "0"
       useCustomWorkingDirectory = "NO"
-      buildConfiguration = "Debug">
+      buildConfiguration = "Debug"
+      debugDocumentVersioning = "YES"
+      allowLocationSimulation = "YES">
       <BuildableProductRunnable>
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "1D6058900D05DD3D006BFB54"
-            BuildableName = "SNES4iPad.app"
-            BlueprintName = "SNES4iPad"
-            ReferencedContainer = "container:SNES4iPad.xcodeproj">
+            BuildableName = "SNES4iOS.app"
+            BlueprintName = "SNES4iOS"
+            ReferencedContainer = "container:SNES4iOS.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -51,14 +62,15 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
-      buildConfiguration = "Release">
+      buildConfiguration = "Release"
+      debugDocumentVersioning = "YES">
       <BuildableProductRunnable>
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "1D6058900D05DD3D006BFB54"
-            BuildableName = "SNES4iPad.app"
-            BlueprintName = "SNES4iPad"
-            ReferencedContainer = "container:SNES4iPad.xcodeproj">
+            BuildableName = "SNES4iOS.app"
+            BlueprintName = "SNES4iOS"
+            ReferencedContainer = "container:SNES4iOS.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

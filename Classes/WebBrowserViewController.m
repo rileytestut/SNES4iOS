@@ -1,4 +1,4 @@
-#import "SNES4iPadAppDelegate.h"
+#import "SNES4iOSAppDelegate.h"
 #import "WebBrowserViewController.h"
 #import "RomSelectionViewController.h"
 

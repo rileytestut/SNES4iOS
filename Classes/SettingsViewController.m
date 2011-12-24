@@ -6,7 +6,7 @@
 //  Copyright 2010 __MyCompanyName__. All rights reserved.
 //
 
-#import "SNES4iPadAppDelegate.h"
+#import "SNES4iOSAppDelegate.h"
 #import "SettingsViewController.h"
 #import "RomDetailViewController.h"
 

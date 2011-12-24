@@ -17,7 +17,7 @@
 @class ControlPadManager;
 @class WebBrowserViewController;
 
-@interface SNES4iPadAppDelegate : NSObject <UIApplicationDelegate> {
+@interface SNES4iOSAppDelegate : NSObject <UIApplicationDelegate> {
     
     UIWindow *window;
     
@@ -32,7 +32,7 @@
 	WebBrowserViewController *webViewController;
 	UINavigationController *webNavController;
 	
-	NSString *romDirectoryPath, *__weak saveDirectoryPath, *__weak snapshotDirectoryPath;
+	NSString *romDirectoryPath, *saveDirectoryPath, *snapshotDirectoryPath;
 }
 
 @property (nonatomic, strong) IBOutlet UIWindow *window;
@@ -48,13 +48,13 @@
 @property (nonatomic, strong) WebBrowserViewController *webViewController;
 @property (nonatomic, strong) UINavigationController *webNavController;
 
-@property (nonatomic, readonly) NSString *romDirectoryPath;
-@property (nonatomic, readonly) NSString *saveDirectoryPath;
-@property (nonatomic, readonly) NSString *snapshotDirectoryPath;
+@property (nonatomic, strong) NSString *romDirectoryPath;
+@property (nonatomic, strong) NSString *saveDirectoryPath;
+@property (nonatomic, strong) NSString *snapshotDirectoryPath;
 
 - (void) showEmulator:(BOOL)showOrHide;
 //- (void) showEmulationMenu:(BOOL)showOrHide;
 + (NSString *) applicationDocumentsDirectory;
 @end
 
-extern SNES4iPadAppDelegate *AppDelegate();
+extern SNES4iOSAppDelegate *AppDelegate();

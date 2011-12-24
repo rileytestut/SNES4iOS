@@ -6,7 +6,7 @@
 //  Copyright __MyCompanyName__ 2010. All rights reserved.
 //
 
-#import "SNES4iPadAppDelegate.h"
+#import "SNES4iOSAppDelegate.h"
 #import "RomDetailViewController.h"
 #import "RomSelectionViewController.h"
 #import "SaveStateSelectionViewController.h"
@@ -14,6 +14,7 @@
 #import "ControlPadConnectViewController.h"
 #import "ControlPadManager.h"
 #import "EmulationViewController.h"
+#import "MTStatusBarOverlay.h"
 
 @interface RomDetailViewController ()
 @property (nonatomic, strong) UIPopoverController *splitViewPopoverController;
@@ -30,6 +31,7 @@
 @synthesize playerOneButton, playerTwoButton, playerThreeButton, playerFourButton, multiTapView;
 @synthesize settingsButton, searchButton, snapshotImageView;
 @synthesize saveStateSelectionViewController;
+@synthesize saveStatePath;
 
 - (void) viewDidLoad
 {
@@ -77,6 +79,7 @@
 		if (self.saveStateSelectionViewController.selectedSavePath != nil)
 		{
 			self.loadButton.hidden = NO;
+            self.saveStatePath = self.saveStateSelectionViewController.selectedSavePath;
 		}
 		if (self.saveStateSelectionViewController.selectedScreenshotPath != nil)
 		{
@@ -120,8 +123,8 @@
 		[AppDelegate() showEmulator:YES];
 	} else if (sender == loadButton) {
 		NSLog(@"load button pressed");
-		[AppDelegate().emulationViewController startWithRom:
-            self.saveStateSelectionViewController.selectedSavePath ];
+        NSLog(@"Path: %@", self.saveStatePath);
+		[AppDelegate().emulationViewController startWithRom:self.saveStatePath];
 		[AppDelegate() showEmulator:YES];
 	} else if (sender == ejectButton) {
 		self.detailItem = nil;

@@ -11,7 +11,7 @@
 #import "ScreenView.h"
 #import "ScreenLayer.h"
 #import "SettingsViewController.h"
-#import "SNES4iPadAppDelegate.h"
+#import "SNES4iOSAppDelegate.h"
 
 extern volatile int __emulation_run;
 extern volatile int __emulation_paused;

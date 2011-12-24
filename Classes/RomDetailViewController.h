@@ -58,6 +58,8 @@
 @property (nonatomic, strong) IBOutlet UIButton *playerThreeButton;
 @property (nonatomic, strong) IBOutlet UIButton *playerFourButton;
 
+@property (nonatomic, copy) NSString *saveStatePath;
+
 @property (nonatomic, strong) IBOutlet SaveStateSelectionViewController *saveStateSelectionViewController;
 
 - (IBAction) buttonPressed:(id)sender;
