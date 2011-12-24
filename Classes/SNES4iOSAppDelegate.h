@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-
+#import "SNESControllerAppDelegate.h"
 
 @class EmulationViewController;
 @class RomSelectionViewController;
@@ -47,6 +47,9 @@
 @property (nonatomic, strong) EmulationViewController *emulationViewController;
 @property (nonatomic, strong) WebBrowserViewController *webViewController;
 @property (nonatomic, strong) UINavigationController *webNavController;
+@property (strong, nonatomic) UITabBarController *tabBarController;
+@property (strong, nonatomic) SNESControllerAppDelegate *snesControllerAppDelegate;
+@property (strong, nonatomic) SNESControllerViewController *snesControllerViewController;
 
 @property (nonatomic, strong) NSString *romDirectoryPath;
 @property (nonatomic, strong) NSString *saveDirectoryPath;

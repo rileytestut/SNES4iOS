@@ -40,5 +40,6 @@ extern unsigned long padStatusForPadNumber(int which);
 - (unsigned long) statusForPadNumber:(NSUInteger)padNumber;
 - (NSString *) deviceNameForPadNumber:(NSUInteger)padNumber;
 - (NSString *) deviceNameForPendingConnection;
+- (void)convertData:(NSData *)data padNumber:(NSUInteger)padNumber;
 
 @end

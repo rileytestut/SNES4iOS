@@ -10,7 +10,10 @@
 #import "RomSelectionViewController.h"
 #import "RomDetailViewController.h"
 #import "MTStatusBarOverlay.h"
+#import "EmulationViewController.h"
+#import "SNESControllerViewController.h"
 
+#define RADIANS(degrees) ((degrees * M_PI) / 180.0)
 
 @implementation RomSelectionViewController
 
@@ -20,17 +23,16 @@
 #pragma mark -
 #pragma mark View lifecycle
 
-- (void) awakeFromNib {
-	arrayOfCharacters = [[NSMutableArray alloc] init];
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    arrayOfCharacters = [[NSMutableArray alloc] init];
 	objectsForCharacters = [[NSMutableDictionary alloc] init];
 	
 	alphabetIndex = [NSArray arrayWithArray:
-					  [@"A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|#"
-					   componentsSeparatedByString:@"|"]];
-}
-
-- (void)viewDidLoad {
-    [super viewDidLoad];
+                     [@"A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|#"
+                      componentsSeparatedByString:@"|"]];
+    
     self.clearsSelectionOnViewWillAppear = NO;
     self.contentSizeForViewInPopover = CGSizeMake(320.0, 600.0);
     
@@ -164,6 +166,8 @@
 	
 	
 	[(UITableView*)self.view reloadData];
+    
+    NSLog(@"Path to scan: %@", romDir);
     
 	self.navigationItem.prompt = romDir;  
 }
@@ -317,6 +321,22 @@
 	}
 	
 	self.romDetailViewController.detailItem = (id) romPath;
+    
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+        SNESControllerViewController *controller = [[SNESControllerViewController alloc] initWithNibName:@"SNESControllerViewController" bundle:[NSBundle mainBundle]];
+
+        [controller.view insertSubview:AppDelegate().emulationViewController.view atIndex:0];
+        controller.wantsFullScreenLayout = YES;
+        CGFloat rotationAngle = 90.0f;
+        AppDelegate().emulationViewController.view.bounds = CGRectMake(0, 0, 480, 320);
+        AppDelegate().emulationViewController.view.transform = CGAffineTransformRotate(CGAffineTransformIdentity, RADIANS(rotationAngle));
+        AppDelegate().emulationViewController.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
+        [UIApplication sharedApplication].statusBarHidden = YES;
+        [self presentViewController:controller animated:YES completion:^{
+            [AppDelegate().emulationViewController startWithRom:romPath];
+            [AppDelegate() showEmulator:YES];
+        }];
+    }
 	
 }
 

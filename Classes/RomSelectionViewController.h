@@ -10,7 +10,7 @@
 
 @class RomDetailViewController;
 
-@interface RomSelectionViewController : UITableViewController {
+@interface RomSelectionViewController : UITableViewController <UITableViewDataSource, UITableViewDelegate> {
     RomDetailViewController *romDetailViewController;
 	
 	NSMutableArray      *arrayOfCharacters;

@@ -106,8 +106,14 @@ unsigned long padStatusForPadNumber(int which)
 		return;
 	
 	NSUInteger padNumber = [controlPadPeerIDs indexOfObject:peer];
-	[data getBytes:&padStatus[padNumber]];
+    [self convertData:data padNumber:padNumber];
+    
 	//NSLog(@"recieved pad status for player %d: %X", padNumber + 1, padStatus[padNumber]);
+}
+
+- (void)convertData:(NSData *)data padNumber:(NSUInteger)padNumber {
+    
+	[data getBytes:&padStatus[padNumber]];
 }
 
 - (void) acceptPendingConnection

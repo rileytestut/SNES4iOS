@@ -17,16 +17,11 @@
 #pragma mark -
 #pragma mark View lifecycle
 
-- (void) awakeFromNib
-{
-	saveFiles = [[NSMutableArray alloc] init];
-	
-}
-
 
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+    saveFiles = [[NSMutableArray alloc] init];
 	CGRect tableFrame = self.view.bounds;
 	tableFrame.size.height -= 44;
 	tableFrame.origin.y += 44;

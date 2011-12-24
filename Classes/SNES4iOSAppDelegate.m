@@ -27,6 +27,7 @@ SNES4iOSAppDelegate *AppDelegate()
 @synthesize controlPadConnectViewController, controlPadManager;
 @synthesize romDirectoryPath, saveDirectoryPath, snapshotDirectoryPath;
 @synthesize emulationViewController, webViewController, webNavController;
+@synthesize tabBarController;
 
 
 #pragma mark -
@@ -65,13 +66,39 @@ SNES4iOSAppDelegate *AppDelegate()
 	// And put it in a navigation controller with back/forward buttons
 	webNavController = [[UINavigationController alloc] initWithRootViewController:webViewController];
 	webNavController.navigationBar.barStyle = UIBarStyleBlack;
+    
+    
+    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    self.romSelectionViewController = [[RomSelectionViewController alloc] initWithNibName:@"RomSelectionViewController" bundle:[NSBundle mainBundle]];
+    UINavigationController *masterNavigationController = [[UINavigationController alloc] initWithRootViewController:self.romSelectionViewController];
+    
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+        
+        self.tabBarController = [[UITabBarController alloc] init];
+        [self.tabBarController setViewControllers:[NSArray arrayWithObjects:masterNavigationController, nil]];
+        self.window.rootViewController = self.tabBarController;
+    } else {
+    	self.romDetailViewController = [[RomDetailViewController alloc] initWithNibName:@"DetailView" bundle:[NSBundle mainBundle]];
+        self.romSelectionViewController.romDetailViewController = self.romDetailViewController;
+        self.splitViewController = [[UISplitViewController alloc] init];
+        self.splitViewController.delegate = self.romDetailViewController;
+        self.splitViewController.viewControllers = [NSArray arrayWithObjects:masterNavigationController, self.romDetailViewController, nil];
+        
+        self.window.rootViewController = self.splitViewController;
+    }
+    [self.window makeKeyAndVisible];
 	
     
 	// Add the split view controller's view to the window and display.
-    [window addSubview:splitViewController.view];
+    //[window addSubview:splitViewController.view];
 	
 	// Add the emulation view in its hidden state.
-	[window addSubview:emulationViewController.view];
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+        [window addSubview:emulationViewController.view];
+    }
+    else {
+        emulationViewController.view.hidden = NO;
+    }
 	
     [window makeKeyAndVisible];
     

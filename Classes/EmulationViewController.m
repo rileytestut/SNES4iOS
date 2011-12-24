@@ -10,11 +10,14 @@
 #import "EmulationViewController.h"
 #import "ScreenView.h"
 #import "MTStatusBarOverlay.h"
+#import "SNESControllerViewController.h"
 
 #import <pthread.h>
 #import <QuartzCore/QuartzCore.h>
 
 #define kSavedState @"savedState"
+
+#define RADIANS(degrees) ((degrees * M_PI) / 180.0)
 
 
 volatile int __emulation_run;
@@ -121,28 +124,34 @@ void saveScreenshotToFile(char *filepath)
 - (void)loadView {
 	self.view = (UIView *)[[ScreenView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
-    UIButton *exitButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    exitButton.frame = CGRectMake(0, 0, 100, 100);
-    [exitButton addTarget:self action:@selector(exit:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:exitButton];
+    /*if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+        [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didRotate:) name:@"UIDeviceOrientationDidChangeNotification" object:nil];
+    }*/
     
-    UIButton *loadStateButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    loadStateButton.frame = CGRectMake(self.view.bounds.size.width - 100, 0, 100, 100);
-    [loadStateButton addTarget:self action:@selector(loadState:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:loadStateButton];
-    
-    UIButton *saveNewStateButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    saveNewStateButton.frame = CGRectMake(0, self.view.bounds.size.height - 100, 100, 100);
-    saveNewStateButton.tag = 1;
-    [saveNewStateButton addTarget:self action:@selector(saveState:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:saveNewStateButton];
-    
-    UIButton *saveStateButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    saveStateButton.frame = CGRectMake(self.view.bounds.size.width - 100, self.view.bounds.size.height - 100, 100, 100);
-    saveStateButton.tag = 2;
-    [saveStateButton addTarget:self action:@selector(saveState:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:saveStateButton];
-	
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+        UIButton *exitButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        exitButton.frame = CGRectMake(0, 0, 100, 100);
+        [exitButton addTarget:self action:@selector(exit:) forControlEvents:UIControlEventTouchUpInside];
+        [self.view addSubview:exitButton];
+        
+        UIButton *loadStateButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        loadStateButton.frame = CGRectMake(self.view.bounds.size.width - 100, 0, 100, 100);
+        [loadStateButton addTarget:self action:@selector(loadState:) forControlEvents:UIControlEventTouchUpInside];
+        [self.view addSubview:loadStateButton];
+        
+        UIButton *saveNewStateButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        saveNewStateButton.frame = CGRectMake(0, self.view.bounds.size.height - 100, 100, 100);
+        saveNewStateButton.tag = 1;
+        [saveNewStateButton addTarget:self action:@selector(saveState:) forControlEvents:UIControlEventTouchUpInside];
+        [self.view addSubview:saveNewStateButton];
+        
+        UIButton *saveStateButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        saveStateButton.frame = CGRectMake(self.view.bounds.size.width - 100, self.view.bounds.size.height - 100, 100, 100);
+        saveStateButton.tag = 2;
+        [saveStateButton addTarget:self action:@selector(saveState:) forControlEvents:UIControlEventTouchUpInside];
+        [self.view addSubview:saveStateButton];
+    }
 }
 
 #pragma mark - Save States
@@ -196,10 +205,33 @@ void saveScreenshotToFile(char *filepath)
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
     // Return YES for supported orientations
-    return (interfaceOrientation == UIInterfaceOrientationLandscapeLeft ||
-			interfaceOrientation == UIInterfaceOrientationLandscapeRight);
+    
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+        return (interfaceOrientation == UIInterfaceOrientationLandscapeLeft ||
+                interfaceOrientation == UIInterfaceOrientationLandscapeRight);
+    }
+    else {
+        return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    }
 }
 
+- (void)didRotate:(NSNotification *)notification {
+    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+    CGFloat rotationAngle = 0.0;
+    if (orientation == UIDeviceOrientationLandscapeLeft) {
+        rotationAngle = 90.0f;
+        self.view.bounds = CGRectMake(0, 0, 480, 320);
+    }
+    else if (orientation == UIDeviceOrientationLandscapeRight) {
+        rotationAngle = 270.0f;
+        self.view.bounds = CGRectMake(0, 0, 480, 320);
+    }
+    else if (orientation == UIDeviceOrientationPortrait) {
+        rotationAngle = 0.0f;
+        self.view.bounds = CGRectMake(0, 0, 320, 240);
+    }
+    self.view.transform = CGAffineTransformRotate(CGAffineTransformIdentity, RADIANS(13.0));
+}
 
 - (void)didReceiveMemoryWarning {
     // Releases the view if it doesn't have a superview.
