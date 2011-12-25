@@ -9,7 +9,6 @@
 #import "SNES4iOSAppDelegate.h"
 #import "EmulationViewController.h"
 #import "ScreenView.h"
-#import "MTStatusBarOverlay.h"
 #import "SNESControllerViewController.h"
 #import "ScreenLayer.h"
 
@@ -19,6 +18,7 @@
 #define kSavedState @"savedState"
 
 #define RADIANS(degrees) ((degrees * M_PI) / 180.0)
+#define DEGREES(radians) (radians * 180.0/M_PI)
 
 
 volatile int __emulation_run;
@@ -110,7 +110,7 @@ void saveScreenshotToFile(char *filepath)
 }
 
 @implementation EmulationViewController
-
+@synthesize pauseAlert;
 /*
  // The designated initializer.  Override if you create the controller programmatically and want to perform customization that is not appropriate for viewDidLoad.
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
@@ -157,7 +157,7 @@ void saveScreenshotToFile(char *filepath)
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    [self didRotate:[NSNull null]];
+    [self didRotate:[NSNotification notificationWithName:@"RotateNotification" object:nil]];
 }
 
 #pragma mark - Save States
@@ -172,8 +172,6 @@ void saveScreenshotToFile(char *filepath)
         if (button.tag == 1) {
             message = @"Saved new state!";
         }
-        [[MTStatusBarOverlay threadSafeSharedOverlay] setStatusBarStyleManually:UIStatusBarStyleBlackOpaque];
-        [[MTStatusBarOverlay threadSafeSharedOverlay] postMessage:message key:@"savedState" type:MTMessageTypePlain duration:1.0 animated:YES immediate:YES];
     });
 }
 
@@ -231,18 +229,24 @@ void saveScreenshotToFile(char *filepath)
 
 - (void) didRotate:(NSNotification *)notification {
     UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
-    if (orientation == UIDeviceOrientationPortrait || orientation == UIDeviceOrientationLandscapeLeft || 
-        orientation == UIDeviceOrientationLandscapeRight) {
+    if ((orientation == UIDeviceOrientationPortrait || orientation == UIDeviceOrientationLandscapeLeft || 
+        orientation == UIDeviceOrientationLandscapeRight) && ![(UIAlertView *)self.pauseAlert isVisible] && self.view.superview != nil) {
         CGFloat rotationAngle = 0.0f;
+        CGPoint anchorPoint = CGPointMake(0.0, 0.0);
         //These coordinates take into considerationt the fact that the UIWindow is in portrait mode
         if (orientation == UIDeviceOrientationPortrait) {
             if (![AppDelegate().snesControllerViewController.imageName isEqualToString:@"portrait_controller"]) {
                 [AppDelegate().snesControllerViewController changeBackgroundImage:@"portrait_controller"];
+                AppDelegate().snesControllerViewController.imageView.frame = CGRectMake(0, 240, 320, 240);
             }
+            [UIApplication sharedApplication].statusBarOrientation = UIInterfaceOrientationPortrait;
             rotationAngle = 0.0f;
             self.view.superview.transform = CGAffineTransformRotate(CGAffineTransformIdentity, RADIANS(rotationAngle));
-            ((ScreenLayer *)self.view.layer).rotateTransform = CGAffineTransformRotate(CGAffineTransformIdentity, RADIANS(0.0));
+            self.view.transform = CGAffineTransformRotate(CGAffineTransformIdentity, RADIANS(0.0));
             self.view.bounds = CGRectMake(0, 0, 320, 240);
+            ScreenLayer *layer = (ScreenLayer *)self.view.layer;
+            layer.anchorPoint = anchorPoint;
+            layer.rotateTransform = CGAffineTransformRotate(CGAffineTransformIdentity, RADIANS(0.0));
             self.view.superview.bounds = CGRectMake(0, 0, 320, 480);
             self.view.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
             self.view.superview.frame = CGRectMake(0, 0, self.view.superview.frame.size.width, self.view.superview.frame.size.height);
@@ -250,28 +254,115 @@ void saveScreenshotToFile(char *filepath)
         else if (orientation == UIDeviceOrientationLandscapeLeft) {
             if (![AppDelegate().snesControllerViewController.imageName isEqualToString:@"landscape_controller"]) {
                 [AppDelegate().snesControllerViewController changeBackgroundImage:@"landscape_controller"];
+                AppDelegate().snesControllerViewController.imageView.frame = CGRectMake(0, 0, 320, 480);
             }
+            [UIApplication sharedApplication].statusBarOrientation = UIInterfaceOrientationLandscapeRight;
+            //UIDeviceOrientationLandscapeLeft and UIInterfaceOrientationLandscapeLeft are NOT the same
+            
             rotationAngle = 0.0f;
-            self.view.superview.transform = CGAffineTransformRotate(CGAffineTransformIdentity, RADIANS(rotationAngle));
-            ((ScreenLayer *)self.view.layer).rotateTransform = CGAffineTransformRotate(CGAffineTransformIdentity, RADIANS(90.0));
+            self.view.superview.transform = CGAffineTransformIdentity;
             self.view.bounds = CGRectMake(0, 0, 480, 320);
+            ScreenLayer *layer = (ScreenLayer *)self.view.layer;
+            layer.anchorPoint = anchorPoint;
+            layer.rotateTransform = CGAffineTransformRotate(CGAffineTransformIdentity, RADIANS(90.0));
             self.view.superview.bounds = CGRectMake(0, 0, 320, 480);
-            self.view.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
+            self.view.frame = CGRectMake(320, 0, self.view.frame.size.width, self.view.frame.size.height);
             self.view.superview.frame = CGRectMake(0, 0, self.view.superview.frame.size.width, self.view.superview.frame.size.height);
         }
         else if (orientation == UIDeviceOrientationLandscapeRight) {
             if (![AppDelegate().snesControllerViewController.imageName isEqualToString:@"landscape_controller"]) {
                 [AppDelegate().snesControllerViewController changeBackgroundImage:@"landscape_controller"];
+                AppDelegate().snesControllerViewController.imageView.frame = CGRectMake(0, 0, 320, 480);
             }
+            [UIApplication sharedApplication].statusBarOrientation = UIInterfaceOrientationLandscapeLeft;
             rotationAngle = 180.0f;
+            self.view.superview.transform = CGAffineTransformIdentity;
             self.view.superview.transform = CGAffineTransformRotate(CGAffineTransformIdentity, RADIANS(rotationAngle));
-            ((ScreenLayer *)self.view.layer).rotateTransform = CGAffineTransformRotate(CGAffineTransformIdentity, RADIANS(90.0));
-            self.view.bounds = CGRectMake(0, 0, 480, 320);
+            self.view.bounds = CGRectMake(160, 0, 480, 320);
+            ScreenLayer *layer = (ScreenLayer *)self.view.layer;
+            layer.anchorPoint = anchorPoint;
+            layer.rotateTransform = CGAffineTransformRotate(CGAffineTransformIdentity, RADIANS(90.0));
             self.view.superview.bounds = CGRectMake(0, 0, 320, 480);
-            self.view.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
+            self.view.frame = CGRectMake(320, 0, self.view.frame.size.width, self.view.frame.size.height);
             self.view.superview.frame = CGRectMake(0, 0, self.view.superview.frame.size.width, self.view.superview.frame.size.height);
         }
     }
+}
+
+- (void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+	UITouch *touch = [touches anyObject];
+	if (touch.tapCount == 2) {
+        CGPoint touchPoint = [(UITouch *)touch locationInView:self.view];
+        CGRect rect = CGRectMake(touchPoint.x, touchPoint.y, 60, 60);
+		[self showPauseDialogFromRect:rect];
+	}
+}
+
+- (void) showPauseDialogFromRect:(CGRect)rect {
+    NSString *title = @"Select an option";
+    NSString *destructiveButtonTitle = @"Quit Game";
+    NSString *button1Title = @"Save State";
+    NSString *button2Title = @"Save State to New File";
+    __emulation_paused = 1;
+    //clearFramebuffer();
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+        self.pauseAlert = (id)[[UIActionSheet alloc] initWithTitle:title
+                                                           delegate:self
+                                                  cancelButtonTitle:nil destructiveButtonTitle:destructiveButtonTitle
+                                                  otherButtonTitles:button1Title, button2Title, nil];
+        
+        [(UIActionSheet *)self.pauseAlert showFromRect:rect inView:self.view animated:YES];
+    }
+    else {
+        //purposely leave title off
+        self.pauseAlert = [[UIAlertView alloc] initWithTitle:nil
+                                                        message:nil 
+                                                       delegate:self 
+                                              cancelButtonTitle:destructiveButtonTitle 
+                                              otherButtonTitles:button1Title, button2Title, @"Cancel", nil];
+        /*CGFloat rotation = DEGREES(atan2(self.view.superview.transform.b, self.view.superview.transform.a));
+        CGFloat rotationAngle = 0.0;
+        if (rotation >= -5 && rotation <= 5) {//Gives us a margin of error of 10, even though we shouldn't need it
+            if (AppDelegate().snesControllerViewController.imageView.frame.size.height > 321) {
+                rotationAngle = 90.0;
+            }
+        }
+        else if (rotation >= 175 && rotation <= 185) {
+            rotationAngle = 270.0;
+        }
+        alert.transform = CGAffineTransformRotate(CGAffineTransformIdentity, rotationAngle);*/
+        [(UIAlertView *)self.pauseAlert show];
+    }
+}
+
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{	
+	[self object:actionSheet clickedButtonAtIndex:buttonIndex];
+	
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+    [self object:alertView clickedButtonAtIndex:buttonIndex];
+}
+
+- (void)object:(id)object clickedButtonAtIndex:(NSInteger)buttonIndex {
+    NSInteger quitIndex = 0;
+    NSInteger saveCurrentIndex = 1;
+	NSInteger saveNewIndex = 2;
+	
+	if (buttonIndex == quitIndex) {
+        NSLog(@"Quit button clicked");
+		__emulation_run = 0;
+		[AppDelegate() showEmulator:NO];
+	} else if (buttonIndex == saveCurrentIndex) {
+		NSLog(@"save to current file button clicked");
+		__emulation_saving = 2;
+	} else if (buttonIndex == saveNewIndex) {
+		NSLog(@"save to new file button clicked");
+		__emulation_saving = 1;
+	}
+    __emulation_paused = 0;
 }
 
 - (void)didReceiveMemoryWarning {

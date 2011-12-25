@@ -122,6 +122,9 @@ SNES4iOSAppDelegate *AppDelegate()
 		[[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
 	} else {
         self.emulationViewController.view.hidden = YES;
+        if (self.emulationViewController.view.superview != nil) {
+            [self.emulationViewController.view removeFromSuperview];
+        }
         self.splitViewController.view.hidden = NO;
 		[[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
 	}

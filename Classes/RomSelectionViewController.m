@@ -9,7 +9,6 @@
 #import "SNES4iOSAppDelegate.h"
 #import "RomSelectionViewController.h"
 #import "RomDetailViewController.h"
-#import "MTStatusBarOverlay.h"
 #import "EmulationViewController.h"
 #import "SNESControllerViewController.h"
 #import "ScreenLayer.h"
@@ -40,10 +39,10 @@
     UIBarButtonItem *refreshButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(rescanRomDirectory)];
     self.navigationItem.rightBarButtonItem = refreshButton;
     
-    UIBarButtonItem *searchButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSearch target:self action:@selector(getMoreRoms)];
-    
-    MTStatusBarOverlay *overlay = [MTStatusBarOverlay sharedOverlay];
-    overlay.animation = MTStatusBarOverlayAnimationFallDown;
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+        UIBarButtonItem *searchButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSearch target:self action:@selector(getMoreRoms)];
+        self.navigationItem.leftBarButtonItem = searchButton;
+    }
 	
 	[self scanRomDirectory:[AppDelegate() romDirectoryPath]];
 }

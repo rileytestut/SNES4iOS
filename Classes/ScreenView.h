@@ -8,9 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ScreenView : UIView <UIActionSheetDelegate> {
+@interface ScreenView : UIView {
 
 }
-
 
 @end

@@ -8,8 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
-@interface EmulationViewController : UIViewController {
+@interface EmulationViewController : UIViewController <UIActionSheetDelegate, UIAlertViewDelegate> {
 }
+
+@property (strong, nonatomic) id pauseAlert;
 
 - (void) startWithRom:(NSString *)romFile;
 
@@ -23,4 +25,7 @@
 
 - (void) refreshScreen;
 - (void) didRotate:(NSNotification *)notification;
+- (void) showPauseDialogFromRect:(CGRect)rect;
+- (void)object:(id)object clickedButtonAtIndex:(NSInteger)buttonIndex;
+
 @end

@@ -14,7 +14,6 @@
 #import "ControlPadConnectViewController.h"
 #import "ControlPadManager.h"
 #import "EmulationViewController.h"
-#import "MTStatusBarOverlay.h"
 
 @interface RomDetailViewController ()
 @property (nonatomic, strong) UIPopoverController *splitViewPopoverController;

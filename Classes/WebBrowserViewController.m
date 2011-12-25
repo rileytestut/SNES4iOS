@@ -265,7 +265,10 @@
     self.navigationItem.title = title;
 	
 	self.navigationItem.leftBarButtonItem.enabled = aWebView.canGoBack;
-	self.navigationItem.rightBarButtonItem.enabled = aWebView.canGoForward;
+    
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+        self.navigationItem.rightBarButtonItem.enabled = aWebView.canGoForward;
+    }
 }
 
 

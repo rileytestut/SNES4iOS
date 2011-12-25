@@ -31,8 +31,6 @@
 		BF7B7A3114A64DFE00014E61 /* grayButton.png in Resources */ = {isa = PBXBuildFile; fileRef = BF7B7A2E14A64DFE00014E61 /* grayButton.png */; };
 		BF7B7A3214A64DFE00014E61 /* NotConnectedIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = BF7B7A2F14A64DFE00014E61 /* NotConnectedIcon.png */; };
 		BF7B7A3414A64F8B00014E61 /* SessionController.xib in Resources */ = {isa = PBXBuildFile; fileRef = BF7B7A3314A64F8B00014E61 /* SessionController.xib */; };
-		BFA4D1B714A56B28008902AD /* MTStatusBarOverlay.m in Sources */ = {isa = PBXBuildFile; fileRef = BFA4D1B414A56B28008902AD /* MTStatusBarOverlay.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		BFA4D1B814A56B28008902AD /* MTStatusBarTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = BFA4D1B614A56B28008902AD /* MTStatusBarTableViewCell.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		BFD71BA014A5A2B100850EEE /* RomSelectionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = BFD71B9F14A5A2B100850EEE /* RomSelectionViewController.xib */; };
 		BFD71BAB14A5AC2F00850EEE /* landscape_controller.png in Resources */ = {isa = PBXBuildFile; fileRef = BFD71BA914A5AC2E00850EEE /* landscape_controller.png */; };
 		BFD71BAC14A5AC2F00850EEE /* portrait_controller.png in Resources */ = {isa = PBXBuildFile; fileRef = BFD71BAA14A5AC2F00850EEE /* portrait_controller.png */; };
@@ -135,10 +133,6 @@
 		BF7B7A2E14A64DFE00014E61 /* grayButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = grayButton.png; sourceTree = "<group>"; };
 		BF7B7A2F14A64DFE00014E61 /* NotConnectedIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = NotConnectedIcon.png; sourceTree = "<group>"; };
 		BF7B7A3314A64F8B00014E61 /* SessionController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SessionController.xib; sourceTree = "<group>"; };
-		BFA4D1B314A56B28008902AD /* MTStatusBarOverlay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTStatusBarOverlay.h; sourceTree = "<group>"; };
-		BFA4D1B414A56B28008902AD /* MTStatusBarOverlay.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTStatusBarOverlay.m; sourceTree = "<group>"; };
-		BFA4D1B514A56B28008902AD /* MTStatusBarTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTStatusBarTableViewCell.h; sourceTree = "<group>"; };
-		BFA4D1B614A56B28008902AD /* MTStatusBarTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTStatusBarTableViewCell.m; sourceTree = "<group>"; };
 		BFD71B9F14A5A2B100850EEE /* RomSelectionViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RomSelectionViewController.xib; sourceTree = "<group>"; };
 		BFD71BA914A5AC2E00850EEE /* landscape_controller.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = landscape_controller.png; sourceTree = "<group>"; };
 		BFD71BAA14A5AC2F00850EEE /* portrait_controller.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = portrait_controller.png; sourceTree = "<group>"; };
@@ -234,7 +228,6 @@
 				CEE8574211AAA81100784F8D /* WebBrowserViewController.h */,
 				CEE8574311AAA81100784F8D /* WebBrowserViewController.m */,
 				BF7B7A0C14A64BEE00014E61 /* SNES Controller */,
-				BF7B7A0214A64B4A00014E61 /* MTStatusBarOverlay */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -288,17 +281,6 @@
 				6CD00F63135FEEBA003E789A /* libz.dylib */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		BF7B7A0214A64B4A00014E61 /* MTStatusBarOverlay */ = {
-			isa = PBXGroup;
-			children = (
-				BFA4D1B314A56B28008902AD /* MTStatusBarOverlay.h */,
-				BFA4D1B414A56B28008902AD /* MTStatusBarOverlay.m */,
-				BFA4D1B514A56B28008902AD /* MTStatusBarTableViewCell.h */,
-				BFA4D1B614A56B28008902AD /* MTStatusBarTableViewCell.m */,
-			);
-			name = MTStatusBarOverlay;
 			sourceTree = "<group>";
 		};
 		BF7B7A0C14A64BEE00014E61 /* SNES Controller */ = {
@@ -525,8 +507,6 @@
 				CEEA77CE119F3F4400440258 /* ScreenView.m in Sources */,
 				CEEA77D1119F3F6100440258 /* ScreenLayer.m in Sources */,
 				CEE8574411AAA81100784F8D /* WebBrowserViewController.m in Sources */,
-				BFA4D1B714A56B28008902AD /* MTStatusBarOverlay.m in Sources */,
-				BFA4D1B814A56B28008902AD /* MTStatusBarTableViewCell.m in Sources */,
 				BF7B7A0914A64BEA00014E61 /* SessionController.m in Sources */,
 				BF7B7A0A14A64BEA00014E61 /* SNESControllerAppDelegate.m in Sources */,
 				BF7B7A0B14A64BEA00014E61 /* SNESControllerViewController.m in Sources */,
