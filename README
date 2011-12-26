@@ -38,6 +38,8 @@ If you want to contribute…
 
 The actual emulator code seems to crash for various reasons, and I haven’t had time to look through it all. The compiled emulator code the app uses is located in /src/snes4iphone_src/. I’ve included the original src files before I compiled them using the “make” command in /original_src/snes4iphone_src. If you want to change the code there, cd into that folder in Terminal and type “make” without the quotes. NOTE: To compile it you MUST have the iOS SDK 4.3 or lower installed at /Developer/ on your mac  (but you only have to have it located there for the compiling, a simple renaming of folders can achieve this). Making the emulator code requires GCC 4.2.1 which Apple no longer includes with the iOS5+ sdks.
 
+Thanks again to Spencer Nielsen for writing the patch to allow this to work on non-jailbroken devices. Without him, none of this would have happened :)
+
 SNES4iOS is free for non-commercial use, in keeping with the original Snes9x licence, reproduced below:
 
 /*
