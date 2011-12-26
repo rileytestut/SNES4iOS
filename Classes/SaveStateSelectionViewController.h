@@ -26,6 +26,7 @@
 @property (nonatomic, copy) NSString *selectedScreenshotPath;
 @property (nonatomic, strong) IBOutlet UITableView *saveTableView;
 @property (nonatomic, strong) IBOutlet UIBarButtonItem *editButton;
+@property (strong, nonatomic) NSArray *saveFiles;
 
 - (void) scanSaveDirectory;
 - (IBAction) buttonPressed:(id)sender;

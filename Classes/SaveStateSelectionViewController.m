@@ -12,7 +12,7 @@
 
 @implementation SaveStateSelectionViewController
 
-@synthesize romFilter, selectedSavePath, selectedScreenshotPath, saveTableView, editButton;
+@synthesize romFilter, selectedSavePath, selectedScreenshotPath, saveTableView, editButton, saveFiles;
 
 #pragma mark -
 #pragma mark View lifecycle
@@ -21,7 +21,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    saveFiles = [[NSMutableArray alloc] init];
+    self.saveFiles = [[NSMutableArray alloc] init];
 	CGRect tableFrame = self.view.bounds;
 	tableFrame.size.height -= 44;
 	tableFrame.origin.y += 44;
@@ -113,7 +113,7 @@
 	
 	// sort the array by decending filename (reverse chronological order, since the date is in the filename)
 	NSSortDescriptor *sorter = [[NSSortDescriptor alloc] initWithKey:@"description" ascending:NO];
-	saveFiles = [saveArray sortedArrayUsingDescriptors:[NSArray arrayWithObject:sorter]];
+	self.saveFiles = [saveArray sortedArrayUsingDescriptors:[NSArray arrayWithObject:sorter]];
 	
 	[self.saveTableView reloadData];
     
@@ -137,7 +137,7 @@
 - (void) deleteSaveAtIndex:(NSUInteger)saveIndex 
 {
 	NSString *savePath = [[AppDelegate() saveDirectoryPath] stringByAppendingPathComponent:
-						  [saveFiles objectAtIndex:saveIndex]];
+						  [self.saveFiles objectAtIndex:saveIndex]];
 	NSString *screenshotPath = [savePath stringByAppendingPathExtension:@"png"];
 	
 	NSFileManager *fileManager = [NSFileManager defaultManager];
@@ -150,10 +150,10 @@
 	}
 	
 	if (!error) {
-		NSMutableArray *mutableSaves = [saveFiles mutableCopy];
+		NSMutableArray *mutableSaves = [self.saveFiles mutableCopy];
 
 		[mutableSaves removeObjectAtIndex:saveIndex];
-		saveFiles = [[NSArray alloc] initWithArray:mutableSaves];
+		self.saveFiles = [[NSArray alloc] initWithArray:mutableSaves];
 		
 		NSIndexPath *indexPath = [NSIndexPath indexPathForRow:saveIndex inSection:0];
 		[saveTableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:YES];
@@ -169,12 +169,12 @@
 
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-	if([saveFiles count] <= 0)
+	if([self.saveFiles count] <= 0)
 	{
 		return 0;
 	}
 	
-	return [saveFiles count];
+	return [self.saveFiles count];
 }
 
 
@@ -195,13 +195,13 @@
 	
 	cell.accessoryType = UITableViewCellAccessoryNone;				
 	
-	if([saveFiles count] <= 0)
+	if([self.saveFiles count] <= 0)
 	{
 		cell.textLabel.text = @"";
 		return cell;
 	}
 	
-	NSString *saveName = [saveFiles objectAtIndex:indexPath.row];
+	NSString *saveName = [self.saveFiles objectAtIndex:indexPath.row];
 	NSString *dateString = [saveName substringFromIndex:[self.romFilter length]];
 	NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
 	[dateFormatter setDateFormat:@"'-'yyMMdd-HHmmss'.sv'"];
@@ -261,13 +261,13 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath 
 {	
-	if([saveFiles count] <= 0)
+	if([self.saveFiles count] <= 0)
 	{
 		return;
 	}
 	
 	NSString *listingsPath = AppDelegate().saveDirectoryPath;
-	NSString *saveFile = [saveFiles objectAtIndex:indexPath.row];
+	NSString *saveFile = [self.saveFiles objectAtIndex:indexPath.row];
 	
 	NSString *savePath = [listingsPath stringByAppendingPathComponent:saveFile];
 	

@@ -4,8 +4,39 @@ This port is a modified version of SNES--HD- by WoozleWrangler, found here:
 
 https://github.com/WoozleWrangler/SNES--HD-
 
-This provided the mast ma
+This provided the vast majority of the Objective-C code. Some improvements found in this version include:
 
+•iTunes FIle Sharing support
+•Universal app to support iPhone in addition to the already included iPad.
+•Incorporates the functionality of ControlPad (http://github.com/WoozleWrangler/ControlPad) into the same binary, so you don’t need to keep track of two apps.
+
+But skipping past all that, here are the big features of this port at this time:
+•Universal app to play all SNES ROMs on your iPhone and iPad.
+•When playing on your iPad, you use an iPhone/iPod Touch to control it.
+•Load ROMs through iTunes File Sharing, or by downloading them from within the app.
+•Saves your ROM data through .srm files.
+•iPhone/iPod Touch offers two orientations to control game: portrait and landscape (iPad is only landscape).
+•Save states available for iPad (coming soon to iPhone/iPod Touch)
+
+Known issues:
+•Although saving states is supported on the iPhone, there’s no way to load them at this time.
+•Quitting a ROM crashes the app (but if you’re quitting the ROM, surely this doesn’t matter that much right? :P)
+•Occasionally crashes upon launching a ROM. Just relaunch the app and keep trying until it works.
+•The iPad can only connect to the iPhone the first time the connection popover appears. Any subsequent times for some reason can’t find the phone.
+•Same with the iPhone, only the first time the popup appears on the controller view can you connect with the iPad.
+•There’s an iCloud toggle in the iPad app, but it doesn’t do anything since I haven’t added iCloud support yet.
+
+Features to come:
+•iCloud support, so you can sync your game saved data across devices :)
+•Ability to control the iPad without having to use an iPhone/iPod Touch.
+•Save states for iPhone/iPod Touch.
+•Ability to load a save state from within the ROM.
+
+So for now get to compiling and enjoy your SNES emulator without having to jailbreak!
+
+If you want to contribute…
+
+The actual emulator code seems to crash for various reasons, and I haven’t had time to look through it all. The compiled emulator code the app uses is located in /src/snes4iphone_src/. I’ve included the original src files before I compiled them using the “make” command in /original_src/snes4iphone_src. If you want to change the code there, cd into that folder in Terminal and type “make” without the quotes. NOTE: To compile it you MUST have the iOS SDK 4.3 or lower installed at /Developer/ on your mac  (but you only have to have it located there for the compiling, a simple renaming of folders can achieve this). Making the emulator code requires GCC 4.2.1 which Apple no longer includes with the iOS5+ sdks.
 
 SNES4iOS is free for non-commercial use, in keeping with the original Snes9x licence, reproduced below:
 
