@@ -1,0 +1,10203 @@
+# 1 "os9x_65c816.S"
+# 1 "<built-in>"
+# 1 "<command-line>"
+# 1 "os9x_65c816.S"
+.text
+
+
+ .align 4
+
+    @ notaz
+# 83 "os9x_65c816.S"
+@ #include "os9x_65c816_mac_gen.h"
+# 102 "os9x_65c816.S"
+@#define rpc_ofs 22
+# 141 "os9x_65c816.S"
+@ notaz
+# 153 "os9x_65c816.S"
+.macro prepare_c_call
+  str r9,[r14,#124]
+  ldr r9,[r14,#128]
+ stmfd r13!,{r12,r14}
+.endm
+.macro prepare_c_call_r0
+  str r9,[r14,#124]
+  ldr r9,[r14,#128]
+ stmfd r13!,{r0,r12,r14}
+.endm
+.macro prepare_c_call_r0r1
+  str r9,[r14,#124]
+  ldr r9,[r14,#128]
+ stmfd r13!,{r0,r1,r12,r14}
+.endm
+.macro prepare_c_call_light
+  str r9,[r14,#124]
+  ldr r9,[r14,#128]
+ stmfd r13!,{r14}
+.endm
+.macro prepare_c_call_lightr12
+  str r9,[r14,#124]
+  ldr r9,[r14,#128]
+ stmfd r13!,{r12,r14}
+.endm
+
+.macro restore_c_call
+ ldmfd r13!,{r12,r14}
+ ldr r9,[r14,#124]
+.endm
+.macro restore_c_call_r0
+ ldmfd r13!,{r0,r12,r14}
+ ldr r9,[r14,#124]
+.endm
+.macro restore_c_call_r1
+ ldmfd r13!,{r1,r12,r14}
+ ldr r9,[r14,#124]
+.endm
+.macro restore_c_call_r0r1
+ ldmfd r13!,{r0,r1,r12,r14}
+ ldr r9,[r14,#124]
+.endm
+.macro restore_c_call_light
+ ldmfd r13!,{r14}
+ ldr r9,[r14,#124]
+.endm
+.macro restore_c_call_lightr12
+ ldmfd r13!,{r12,r14}
+ ldr r9,[r14,#124]
+.endm
+
+
+@ --------------
+.macro load_regs
+    @ notaz
+    add r0,r14,#8
+    ldmia r0,{r1,r5,r7,r9,r10,r11,r12}
+    @ r4 (p) & r4
+    mov r4,r1,lsl #16
+    mov r4,r4,lsr #24
+    mov r0,r1,lsr #16
+ orrs r4, r4, r0,lsl #24 @ 24
+ @ if carry set, then emulation bit was set
+ orrcs r4,r4,#(1<<(24 -1))
+    @ r6 & r6
+    mov r6,r5,lsr #16
+    mov r6,r6,lsl #8
+    orr r6,r6,r1,lsl #24
+    mov r6,r6,ror #24 @ 0xdddd00pb
+    @ r7, r8
+    mov r8,r7,lsr #16
+ @ shift x,y & a according to the current mode (index, memory bits)
+ tst r4,#(16<<(24)) @ 4 @ 1
+ movne r7,r7,lsl #24
+ movne r9,r9,lsl #24
+ moveq r7,r7,lsl #16
+ moveq r9,r9,lsl #16
+ tst r4,#(32<<(24)) @ 5 @ 2
+ movne r5,r5,lsl #24
+ moveq r5,r5,lsl #16
+.endm
+
+
+.macro save_regs
+    @ notaz
+    @ r6, r4 and r4
+    mov r1, r4, lsr #16
+    orr r1, r1, r6, lsl #24
+ movs r1, r1, lsr #8
+ orrcs r1, r1, #0x100 @ emulation bit
+    orr r1, r1, r4, lsl #24
+    mov r1, r1, ror #16
+    @ r5, r6
+ tst r4,#(32<<(24)) @ 5 @ 2
+ ldrneh r0, [r14,#12]
+ bicne r0, r0,#0xff
+ orrne r5, r0, r5,lsr #24
+ moveq r5, r5, lsr #16
+    mov r6, r6, lsr #16
+ orr r5, r5, r6, lsl #16
+ @ shift x&y according to the current mode (index, memory bits)
+ tst r4,#(16<<(24)) @ 4 @ 1
+ movne r7,r7,lsr #24
+ movne r9,r9,lsr #24
+ moveq r7,r7,lsr #16
+ moveq r9,r9,lsr #16
+    @ r7, r8
+ orr r7, r7, r8, lsl #16
+    @ store
+    add r0,r14,#8
+    stmia r0,{r1,r5,r7,r9,r10,r11,r12}
+# 297 "os9x_65c816.S"
+.endm
+
+
+.macro add1cycle
+  add r11,r11, #6
+.endm
+.macro add1cyclene
+  addne r11,r11, #6
+.endm
+.macro add1cycleeq
+  addeq r11,r11, #6
+.endm
+
+.macro add2cycle
+  add r11,r11, #12
+.endm
+.macro add2cyclene
+  addne r11,r11, #12
+.endm
+.macro add2cycle2mem
+  ldr r0,[r14,#56]
+  add r11,r11, #12
+  add r11, r11, r0, lsl #1
+.endm
+.macro add2cycle1mem
+  ldr r0,[r14,#56]
+  add r11,r11, #12
+  add r11, r11, r0
+.endm
+
+.macro add3cycle
+  add r11,r11, #18
+.endm
+
+.macro add1cycle1mem
+  ldr r0,[r14,#56]
+  add r11,r11, #6
+  add r11, r11, r0
+.endm
+
+.macro add1cycle2mem
+  ldr r0,[r14,#56]
+  add r11,r11, #6
+  add r11, r11, r0, lsl #1
+.endm
+
+.macro add1mem
+  ldr r0,[r14,#56]
+  add r11, r11, r0
+.endm
+
+.macro add2mem
+  ldr r0,[r14,#56]
+  add r11, r11, r0, lsl #1
+.endm
+
+.macro add3mem
+  ldr r0,[r14,#56]
+  add r11, r0, r11
+  add r11, r11, r0, lsl #1
+.endm
+
+
+.macro cleardecimal
+  bic r4,r4,#(8<<(24)) @ 3
+.endm
+.macro setdecimal
+  orr r4,r4,#(8<<(24)) @ 3
+.endm
+.macro setirq
+  orr r4,r4,#(4<<(24)) @ 2
+.endm
+.macro clearirq
+  bic r4,r4,#(4<<(24)) @ 2
+.endm
+
+.macro cpushutdown
+@ if (settings.shutdown && cpu.pc == cpu.waitaddress)
+  ldr r0,[r14,#40]
+  cmp r10,r0
+  bne 5431f
+@ if (cpu.waitcounter == 0 && !(cpu.flags & ((1 << 11) | (1 << 7))))
+  ldr r0,[r14,#0]
+  ldr r1,[r14,#44]
+  tst r0,#2176
+  bne 5432f
+  movs r1,r1
+  bne 5432f
+@ cpu.waitaddress = null;
+  mov r0,#0
+  str r0,[r14,#40]
+@ if (settings.sa1)
+@ s9xsa1executeduringsleep (); : todo
+
+@ cpu.cycles = cpu.nextevent;
+  ldr r11,[r14,#48]
+  ldrb r0,[r14,#122]
+  movs r0,r0
+  beq 5431f
+@ if (iapu.apuexecuting)
+# 406 "os9x_65c816.S"
+  asmapu_execute2
+  b 5431f
+@@.pool
+5432:
+
+
+
+
+
+
+  cmp r1,#1
+  movhi r1,#1
+  @ subls r1,r1,#1
+  movls r1,#0
+  str r1,[r14,#44]
+5431:
+
+.endm
+.macro branchcheck0
+
+
+  ldrb r1,[r14,#4]
+  movs r1,r1
+  beq 1110f
+  mov r1,#0
+  strb r1,[r14,#4]
+  sub r1,r10,r12
+  @ if( cpu.pc - cpu.pcbase > opaddress) return;
+  cmp r1,r0
+  bhi 1111f
+1110:
+.endm
+.macro branchcheck1
+
+
+  ldrb r1,[r14,#4]
+  movs r1,r1
+  beq 1110f
+  mov r1,#0
+  strb r1,[r14,#4]
+  sub r1,r10,r12
+  @ if( cpu.pc - cpu.pcbase > opaddress) return;
+  cmp r1,r0
+  bhi 1111f
+1110:
+.endm
+.macro branchcheck2
+
+
+  ldrb r1,[r14,#4]
+  movs r1,r1
+  beq 1110f
+  mov r1,#0
+  strb r1,[r14,#4]
+  sub r1,r10,r12
+  @ if( cpu.pc - cpu.pcbase > opaddress) return;
+  cmp r1,r0
+  bhi 1111f
+1110:
+.endm
+
+.macro s9xsetpcbase
+  @ in : r0 (0x00hhmmll)
+  prepare_c_call
+  bl _asm_S9xSetPCBase
+  restore_c_call
+  ldr r10,[r14,#24]
+  ldr r12,[r14,#32]
+.endm
+
+.macro s9xfixcycles
+  tst r4, #(1<<(24 -1))
+  ldrne r0, [r14,#136]
+  bne 991111f
+  @ emulation=0
+  tst r4,#(32<<(24)) @ 5 @ 2
+  beq 991112f
+  @ memory=1
+  tst r4,#(16<<(24)) @ 4 @ 1
+  @ index=1 @ mode 0 : m=1,x=1
+  ldrne r0, [r14,#136]
+  @ index=0 @ mode 1 : m=1,x=0
+  ldreq r0, [r14,#140]
+  b 991111f
+991112: @ memory=0
+  tst r4,#(16<<(24)) @ 4 @ 1
+  @ index=1 @ mode 3 : m=0,x=1
+  ldrne r0, [r14,#148]
+  @ index=0 @ mode 2 : m=0,x=0
+  ldreq r0, [r14,#144]
+991111:
+  str r0,[r14,#88]
+.endm
+
+.macro s9xdohblankprocessing
+  save_regs
+  prepare_c_call_light
+@ bl asm_s9xdohblankprocessing
+  bl _S9xDoHBlankProcessing @ let's go straight to number one
+  restore_c_call_light
+  load_regs
+.endm
+
+.macro testmod
+save_regs
+prepare_c_call
+mov r0, pc
+bl _test_print
+restore_c_call
+load_regs
+.endm
+
+.macro testmod1 num
+save_regs
+prepare_c_call
+mov r0, #$0
+bl _test_print
+restore_c_call
+load_regs
+.endm
+
+
+.macro exec_op
+  ldr r1,[r14,#88]
+  str r10,[r14,#36]
+  add1mem
+  ldrb r0, [r10], #1
+  ldr pc, [r1,r0, lsl #2]
+.endm
+.macro nextopcode
+  ldr r0,[r14,#48]
+  cmp r11,r0
+  blt mainloop
+    s9xdohblankprocessing
+  b mainloop
+.endm
+
+.macro asmapu_execute
+  ldrb r0,[r14,#122]
+  cmp r0,#1 @ spc700 enabled, hack mode off
+  bne 43210f
+  ldr r0,[r14,#132]
+        subs r0,r11,r0
+        bmi 43210f
+.if 0
+  prepare_c_call_lightr12
+  bl _spc700_execute
+  restore_c_call_lightr12
+        sub r0,r11,r0 @ sub cycles left
+  str r0,[r14,#132]
+.else
+        @ save_regs
+  str r11,[r14,#28]
+  prepare_c_call_lightr12
+  bl _asm_APU_EXECUTE
+  restore_c_call_lightr12
+  ldr r11,[r14,#28]
+.endif
+        @ load_regs
+  @ s9xfixcycles
+43210:
+.endm
+
+.macro asmapu_execute2
+.if 0
+  ldrb r0,[r14,#122]
+  cmp r0,#1 @ spc700 enabled, hack mode off
+  bne 43211f
+  ldr r0,[r14,#132]
+        subs r0,r11,r0 @ r11 == nextevent
+        ble 43211f
+  prepare_c_call_lightr12
+  bl _spc700_execute
+  restore_c_call_lightr12
+        sub r0,r11,r0 @ sub cycles left
+  str r0,[r14,#132]
+43211:
+.else
+  @ save_regs
+  str r11,[r14,#28]
+  prepare_c_call_lightr12
+  bl _asm_APU_EXECUTE2
+  restore_c_call_lightr12
+  ldr r11,[r14,#28]
+  @ load_regs
+.endif
+.endm
+
+@ #include "os9x_65c816_mac_mem.h"
+.macro s9xgetword
+  @ in : r0 (0x00hhmmll)
+  @ out : r0 (0xhhll0000)
+  stmfd r13!,{pc} @ push return address
+  b _asms9xgetword
+  mov r0,r0
+  mov r0, r0, lsl #16
+.endm
+.macro s9xgetwordlow
+  @ in : r0 (0x00hhmmll)
+  @ out : r0 (0x0000hhll)
+  stmfd r13!,{pc} @ push return address
+  b _asms9xgetword
+  mov r0,r0
+.endm
+.macro s9xgetwordregstatus reg
+  @ in : r0 (0x00hhmmll)
+  @ out : reg (0xhhll0000)
+  @ flags have to be updated with read value
+  stmfd r13!,{pc} @ push return address
+  b _asms9xgetword
+  mov r0,r0
+  movs $0, r0, lsl #16
+.endm
+.macro s9xgetwordregns reg
+  @ in : r0 (0x00hhmmll)
+  @ out : reg (0xhhll0000)
+  @ does not destroy r0 (r0)
+  stmfd r13!,{r0}
+  stmfd r13!,{pc} @ push return address
+  b _asms9xgetword
+  mov r0,r0
+  mov $0, r0, lsl #16
+  ldmfd r13!,{r0}
+.endm
+.macro s9xgetwordlowregns reg
+  @ in : r0 (0x00hhmmll)
+  @ out : reg (0xhhll0000)
+  @ does not destroy r0 (r0)
+  stmfd r13!,{r0}
+  stmfd r13!,{pc} @ push return address
+  b _asms9xgetword
+  mov r0,r0
+  mov $0, r0
+  ldmfd r13!,{r0}
+.endm
+
+.macro s9xgetbyte
+  @ in : r0 (0x00hhmmll)
+  @ out : r0 (0xll000000)
+  stmfd r13!,{pc} @ push return address
+  b _asms9xgetbyte
+  mov r0,r0
+  mov r0, r0, lsl #24
+.endm
+.macro s9xgetbytelow
+  @ in : r0 (0x00hhmmll)
+  @ out : r0 (0x000000ll)
+  stmfd r13!,{pc}
+  b _asms9xgetbyte
+  mov r0,r0
+.endm
+.macro s9xgetbyteregstatus reg
+  @ in : r0 (0x00hhmmll)
+  @ out : reg (0xll000000)
+  @ flags have to be updated with read value
+  stmfd r13!,{pc} @ push return address
+  b _asms9xgetbyte
+  mov r0,r0
+  movs $0, r0, lsl #24
+.endm
+.macro s9xgetbyteregns reg
+  @ in : r0 (0x00hhmmll)
+  @ out : reg (0xll000000)
+  @ does not destroy r0 (r0)
+  stmfd r13!,{r0}
+  stmfd r13!,{pc} @ push return address
+  b _asms9xgetbyte
+  mov r0,r0
+  movs $0, r0, lsl #24
+  ldmfd r13!,{r0}
+.endm
+.macro s9xgetbytelowregns reg
+  @ in : r0 (0x00hhmmll)
+  @ out : reg (0x000000ll)
+  @ does not destroy r0 (r0)
+  stmfd r13!,{r0}
+  stmfd r13!,{pc} @ push return address
+  b _asms9xgetbyte
+  mov r0,r0
+  movs $0, r0
+  ldmfd r13!,{r0}
+.endm
+
+.macro s9xsetword regvalue
+  @ in : regvalue (0xhhll0000)
+  @ in : r0=address (0x00hhmmll)
+  stmfd r13!,{pc} @ push return address
+  mov r1,$0, lsr #16
+  b _asms9xsetword
+  mov r0,r0
+.endm
+.macro s9xsetwordzero
+  @ in : r0=address (0x00hhmmll)
+  stmfd r13!,{pc} @ push return address
+  mov r1,#0
+  b _asms9xsetword
+  mov r0,r0
+.endm
+.macro s9xsetwordlow regvalue
+  @ in : regvalue (0x0000hhll)
+  @ in : r0=address (0x00hhmmll)
+  stmfd r13!,{pc} @ push return address
+  mov r1,$0
+  b _asms9xsetword
+  mov r0,r0
+.endm
+.macro s9xsetbyte regvalue
+  @ in : regvalue (0xll000000)
+  @ in : r0=address (0x00hhmmll)
+  stmfd r13!,{pc} @ push return address
+  mov r1,$0, lsr #24
+  b _asms9xsetbyte
+  mov r0,r0
+.endm
+.macro s9xsetbytezero
+  @ in : r0=address (0x00hhmmll)
+  stmfd r13!,{pc} @ push return address
+  mov r1,#0
+  b _asms9xsetbyte
+  mov r0,r0
+.endm
+.macro s9xsetbytelow regvalue
+  @ in : regvalue (0x000000ll)
+  @ in : r0=address (0x00hhmmll)
+  stmfd r13!,{pc} @ push return address
+  mov r1,$0
+  b _asms9xsetbyte
+  mov r0,r0
+.endm
+
+
+@ ===========================================
+@ ===========================================
+@ adressing mode
+@ ===========================================
+@ ===========================================
+
+
+.macro absolute
+  add2mem
+  ldrb r1 , [r10, #1]
+  ldrb r0 , [r10],#2
+  orr r0 , r0, r1, lsl #8
+  orr r0 , r0, r4, lsl #16
+.endm
+.macro absoluteindexedindirectx0
+  add2mem
+  ldrb r1 , [r10, #1]
+  ldrb r0 , [r10], #2
+  orr r0 , r0, r1, lsl #8
+  add r0 , r7, r0, lsl #16
+  mov r0 , r0, lsr #16
+  orr r0 , r0, r6, lsl #16
+  s9xgetwordlow
+
+.endm
+.macro absoluteindexedindirectx1
+  add2mem
+  ldrb r1 , [r10, #1]
+  ldrb r0 , [r10], #2
+  orr r0 , r0, r1, lsl #8
+  add r0 , r0, r7, lsr #24
+  bic r0 , r0, #0x00ff0000
+  orr r0 , r0, r6, lsl #16
+  s9xgetwordlow
+
+.endm
+.macro absoluteindirectlong
+  add2mem
+  ldrb r1 , [r10, #1]
+  ldrb r0 , [r10], #2
+  orr r0 , r0, r1, lsl #8
+  s9xgetwordlowregns r1
+  add r0 , r0, #2
+  stmfd r13!,{r1}
+  s9xgetbytelow
+  ldmfd r13!,{r1}
+  orr r0 , r1, r0, lsl #16
+.endm
+.macro absoluteindirect
+  add2mem
+  ldrb r1 , [r10,#1]
+  ldrb r0 , [r10], #2
+  orr r0 , r0, r1, lsl #8
+  s9xgetwordlow
+  orr r0 , r0, r6, lsl #16
+.endm
+.macro absoluteindexedx0
+  add2mem
+  ldrb r1 , [r10, #1]
+  ldrb r0 , [r10], #2
+  orr r0 , r0, r1, lsl #8
+  orr r0 , r0, r4, lsl #16
+  add r0 , r0, r7, lsr #16
+.endm
+.macro absoluteindexedx1
+  add2mem
+  ldrb r1 , [r10, #1]
+  ldrb r0 , [r10], #2
+  orr r0 , r0, r1, lsl #8
+  orr r0 , r0, r4, lsl #16
+  add r0 , r0, r7, lsr #24
+.endm
+
+
+.macro absoluteindexedy0
+  add2mem
+  ldrb r1 , [r10, #1]
+  ldrb r0 , [r10], #2
+  orr r0 , r0, r1, lsl #8
+  orr r0 , r0, r4, lsl #16
+  add r0 , r0, r9, lsr #16
+.endm
+.macro absoluteindexedy1
+  add2mem
+  ldrb r1 , [r10, #1]
+  ldrb r0 , [r10], #2
+  orr r0 , r0, r1, lsl #8
+  orr r0 , r0, r4, lsl #16
+  add r0 , r0, r9, lsr #24
+.endm
+.macro absolutelong
+  add3mem
+  ldrb r1 , [r10, #1]
+  ldrb r0 , [r10], #2
+  orr r0 , r0, r1, lsl #8
+  ldrb r1 , [r10], #1
+  orr r0 , r0, r1, lsl #16
+.endm
+
+
+.macro absolutelongindexedx0
+  add3mem
+  ldrb r1 , [r10, #1]
+  ldrb r0 , [r10], #2
+  orr r0 , r0, r1, lsl #8
+  ldrb r1 , [r10], #1
+  orr r0 , r0, r1, lsl #16
+  add r0 , r0, r7, lsr #16
+  bic r0, r0, #0xff000000
+.endm
+.macro absolutelongindexedx1
+  add3mem
+  ldrb r1 , [r10, #1]
+  ldrb r0 , [r10], #2
+  orr r0 , r0, r1, lsl #8
+  ldrb r1 , [r10], #1
+  orr r0 , r0, r1, lsl #16
+  add r0 , r0, r7, lsr #24
+  bic r0, r0, #0xff000000
+.endm
+.macro direct
+  add1mem
+  ldrb r0 , [r10], #1
+  add r0 , r6, r0, lsl #16
+  mov r0, r0, lsr #16
+.endm
+.macro directindirect
+  add1mem
+  ldrb r0 , [r10], #1
+  add r0 , r6, r0, lsl #16
+  mov r0, r0, lsr #16
+  s9xgetwordlow
+  orr r0 , r0, r4, lsl #16
+.endm
+.macro directindirectlong
+  add1mem
+  ldrb r0 , [r10], #1
+  add r0 , r6, r0, lsl #16
+  mov r0, r0, lsr #16
+  s9xgetwordlowregns r1
+  add r0 , r0,#2
+  stmfd r13!,{r1}
+  s9xgetbytelow
+  ldmfd r13!,{r1}
+  orr r0 , r1, r0, lsl #16
+.endm
+.macro directindirectindexed0
+  add1mem
+  ldrb r0 , [r10], #1
+  add r0 , r6, r0, lsl #16
+  mov r0, r0, lsr #16
+  s9xgetwordlow
+  orr r0, r0,r4, lsl #16
+  add r0, r0,r9, lsr #16
+.endm
+.macro directindirectindexed1
+  add1mem
+  ldrb r0 , [r10], #1
+  add r0 , r6, r0, lsl #16
+  mov r0, r0, lsr #16
+  s9xgetwordlow
+  orr r0, r0,r4, lsl #16
+  add r0, r0,r9, lsr #24
+.endm
+.macro directindirectindexedlong0
+  add1mem
+  ldrb r0 , [r10], #1
+  add r0 , r6, r0, lsl #16
+  mov r0, r0, lsr #16
+  s9xgetwordlowregns r1
+  add r0 , r0,#2
+  stmfd r13!,{r1}
+  s9xgetbytelow
+  ldmfd r13!,{r1}
+  orr r0 , r1, r0, lsl #16
+  add r0, r0,r9, lsr #16
+.endm
+.macro directindirectindexedlong1
+  add1mem
+  ldrb r0 , [r10], #1
+  add r0 , r6, r0, lsl #16
+  mov r0, r0, lsr #16
+  s9xgetwordlowregns r1
+  add r0 , r0,#2
+  stmfd r13!,{r1}
+  s9xgetbytelow
+  ldmfd r13!,{r1}
+  orr r0 , r1, r0, lsl #16
+  add r0, r0,r9, lsr #24
+.endm
+.macro directindexedindirect0
+  add1cycle1mem
+  ldrb r0 , [r10], #1
+  add r1 , r6 , r7
+  add r0 , r1 , r0, lsl #16
+  mov r0, r0, lsr #16
+  s9xgetwordlow
+  orr r0 , r0 , r4, lsl #16
+.endm
+.macro directindexedindirect1
+  add1cycle1mem
+  ldrb r0 , [r10], #1
+  add r1 , r6 , r7, lsr #8
+  add r0 , r1 , r0, lsl #16
+  mov r0, r0, lsr #16
+  s9xgetwordlow
+  orr r0 , r0 , r4, lsl #16
+.endm
+.macro directindexedx0
+  add1cycle1mem
+  ldrb r0 , [r10], #1
+  add r1 , r6 , r7
+  add r0 , r1 , r0, lsl #16
+  mov r0, r0, lsr #16
+.endm
+.macro directindexedx1
+  add1cycle1mem
+  ldrb r0 , [r10], #1
+  add r1 , r6 , r7, lsr #8
+  add r0 , r1 , r0, lsl #16
+  mov r0, r0, lsr #16
+.endm
+.macro directindexedy0
+  add1cycle1mem
+  ldrb r0 , [r10], #1
+  add r1 , r6 , r9
+  add r0 , r1 , r0, lsl #16
+  mov r0, r0, lsr #16
+.endm
+.macro directindexedy1
+  add1cycle1mem
+  ldrb r0 , [r10], #1
+  add r1 , r6 , r9, lsr #8
+  add r0 , r1 , r0, lsl #16
+  mov r0, r0, lsr #16
+.endm
+.macro immediate8
+  add r0, r10, r6, lsl #16
+  sub r0, r0, r12
+  add r10, r10, #1
+.endm
+.macro immediate16
+  add r0, r10, r6, lsl #16
+  sub r0, r0, r12
+  add r10, r10, #2
+.endm
+.macro asmrelative
+  add1mem
+  ldrsb r0 , [r10],#1
+  add r0 , r0 , r10
+  sub r0 , r0, r12
+  bic r0,r0,#0x00ff0000
+  bic r0,r0,#0xff000000
+.endm
+.macro asmrelativelong
+  add1cycle2mem
+  ldrb r1 , [r10, #1]
+  ldrb r0 , [r10], #2
+  orr r0 , r0, r1, lsl #8
+  sub r1 , r10, r12
+  add r0 , r1, r0
+  bic r0,r0,#0x00ff0000
+.endm
+
+
+.macro stackasmrelative
+  add1cycle1mem
+  ldrb r0 , [r10], #1
+  add r0 , r0, r8
+  bic r0,r0,#0x00ff0000
+.endm
+.macro stackasmrelativeindirectindexed0
+  add2cycle1mem
+  ldrb r0 , [r10], #1
+  add r0 , r0, r8
+  bic r0,r0,#0x00ff0000
+  s9xgetwordlow
+  orr r0 , r0, r4, lsl #16
+  add r0 , r0, r9, lsr #16
+  bic r0, r0, #0xff000000
+.endm
+.macro stackasmrelativeindirectindexed1
+  add2cycle1mem
+  ldrb r0 , [r10], #1
+  add r0 , r0, r8
+  bic r0,r0,#0x00ff0000
+  s9xgetwordlow
+  orr r0 , r0, r4, lsl #16
+  add r0 , r0, r9, lsr #24
+  bic r0, r0, #0xff000000
+.endm
+
+
+
+.macro pushb reg
+  mov r0,r8
+  s9xsetbyte $0
+  sub r8,r8,#1
+.endm
+.macro pushblow reg
+  mov r0,r8
+  s9xsetbytelow $0
+  sub r8,r8,#1
+.endm
+.macro pushwlow reg
+  sub r0,r8,#1
+  s9xsetwordlow $0
+  sub r8,r8,#2
+.endm
+.macro pushwrlow
+  mov r1,r0
+  sub r0,r8,#1
+  s9xsetwordlow r1
+  sub r8,r8,#2
+.endm
+.macro pushw reg
+  sub r0,r8,#1
+  s9xsetword $0
+  sub r8,r8,#2
+.endm
+
+
+
+.macro pullb reg
+  add r0,r8,#1
+  s9xgetbytelow
+  add r8,r8,#1
+  mov $0,r0,lsl #24
+.endm
+.macro pullbr
+  add r0,r8,#1
+  s9xgetbyte
+  add r8,r8,#1
+.endm
+.macro pullblow reg
+  add r0,r8,#1
+  s9xgetbytelow
+  add r8,r8,#1
+  mov $0,r0
+.endm
+.macro pullbrlow
+  add r0,r8,#1
+  s9xgetbytelow
+  add r8,r8,#1
+.endm
+.macro pullw reg
+  add r0,r8,#1
+  s9xgetwordlow
+  add r8,r8,#2
+  mov $0,r0,lsl #16
+.endm
+
+.macro pullwlow reg
+  add r0,r8,#1
+  s9xgetwordlow
+  add r8,r8,#2
+  mov $0,r0
+.endm
+
+
+
+.macro pullbs reg
+  add r0,r8,#1
+  s9xgetbytelow
+  add r8,r8,#1
+  movs $0,r0,lsl #24
+.endm
+.macro pullbrs
+  add r0,r8,#1
+  s9xgetbytelow
+  add r8,r8,#1
+  movs r0,r0,lsl #24
+.endm
+.macro pullblows reg
+  add r0,r8,#1
+  s9xgetbytelow
+  add r8,r8,#1
+  movs $0,r0
+.endm
+.macro pullbrlows
+  add r0,r8,#1
+  s9xgetbytelow
+  add r8,r8,#1
+  movs r0,r0
+.endm
+.macro pullws reg
+  add r0,r8,#1
+  s9xgetwordlow
+  add r8,r8,#2
+  movs $0,r0, lsl #16
+.endm
+.macro pullwrs
+  add r0,r8,#1
+  s9xgetwordlow
+  add r8,r8,#2
+  movs r0,r0, lsl #16
+.endm
+.macro pullwlows reg
+  add r0,r8,#1
+  s9xgetwordlow
+  add r8,r8,#2
+  movs $0,r0
+.endm
+.macro pullwrlows
+  add r0,r8,#1
+  s9xgetwordlow
+  add r8,r8,#2
+  movs r0,r0
+.endm
+
+
+.globl _asms9xgetbyte
+.globl _asms9xgetword
+.globl _asms9xsetbyte
+.globl _asms9xsetword
+
+@ uint8 aas9xgetbyte(uint32 address);
+_asms9xgetbyte:
+ @ in : r0 = 0x00hhmmll
+ @ out : r0 = 0x000000ll
+ @ destroyed : r1,r2,r3
+ @ update : r11
+ @ r1 <= block
+ mov r1,r0,lsr #12
+ @ 12 is 12, address is 0xffffffff at max, so
+ @ r1 is maxed by 0x000fffff, (0xfff) is 0x1000-1=0xfff
+ @ so and (0xfff) is bic 0xff000
+ bic r1,r1,#0xff000
+ @ r2 <= map[block] (getaddress)
+ ldr r2,[r14,#96]
+ ldr r2,[r2,r1,lsl #2]
+ cmp r2,#12
+ blo gbspecial @ special
+ @ direct rom/ram acess
+ @ r2 <= getaddress + address & 0xffff
+ @ r3 <= memoryspeed[block]
+ ldr r3,[r14,#104]
+ mov r0,r0,lsl #16
+ ldrb r3,[r3,r1]
+ add r2,r2,r0,lsr #16
+ @ update cpu.cycles
+ add r11,r11,r3
+ @ r3 = blockisram[block]
+ ldr r3,[r14,#108]
+ @ get value to return
+ ldrb r0,[r2]
+ ldrb r3,[r3,r1]
+ movs r3,r3
+ @ if blockisram => update for cpushutdown
+ ldrne r1,[r14,#36]
+ strne r1,[r14,#40]
+
+ ldmfd r13!,{pc} @ return
+gbspecial:
+
+ ldr pc,[pc,r2,lsl #2]
+ mov r0,r0 @ nop, for align
+ .long gbppu
+ .long gbcpu
+ .long gbdsp
+ .long gblsram
+ .long gbhsram
+ .long gbnone
+ .long gbdebug
+ .long gbc4
+ .long gbbwram
+ .long gbnone
+ .long gbnone
+ .long gbnone
+
+
+
+gbppu:
+ @ indma ?
+ ldrb r1,[r14,#84]
+ movs r1,r1
+ addeq r11,r11,#6 @ no -> update cycles
+ mov r0,r0,lsl #16 @ s9xgetppu(address&0xffff);
+ str r11,[r14,#28] @ save cycles
+ mov r0,r0,lsr #16
+  prepare_c_call
+ bl _S9xGetPPU
+  restore_c_call
+ ldr r11,[r14,#28] @ load cycles
+ ldmfd r13!,{pc} @ return
+gbcpu:
+ add r11,r11,#6 @ update cycles
+ mov r0,r0,lsl #16 @ s9xgetcpu(address&0xffff);
+ str r11,[r14,#28] @ save cycles
+ mov r0,r0,lsr #16
+  prepare_c_call
+ bl _S9xGetCPU
+  restore_c_call
+ ldr r11,[r14,#28] @ load cycles
+ ldmfd r13!,{pc} @ return
+gbdsp:
+ add r11,r11,#8 @ update cycles
+ mov r0,r0,lsl #16 @ s9xgetcpu(address&0xffff);
+ str r11,[r14,#28] @ save cycles
+ mov r0,r0,lsr #16
+  prepare_c_call
+ bl _S9xGetDSP
+  restore_c_call
+ ldr r11,[r14,#28] @ load cycles
+ ldmfd r13!,{pc} @ return
+gblsram:
+ add r11,r11,#8 @ update cycles
+ ldrh r2,[r14,#120]
+ ldr r1,[r14,#112]
+ and r0,r2,r0 @ address&120
+ ldrb r0,[r1,r0] @ *memory. 112 + address&120
+ ldmfd r13!,{pc}
+gb7srm:
+gbhsram:
+ add r11,r11,#8 @ update cycles
+
+ mov r1,r0,lsl #17
+ and r2,r0,#0xf0000
+ mov r1,r1,lsr #17 @ address&0x7fff
+ mov r2,r2,lsr #3 @ (address&0xf0000 >> 3)
+ add r0,r2,r1
+ ldrh r2,[r14,#120]
+ sub r0,r0,#0x6000 @ ((address & 0x7fff) - 0x6000 + ((address & 0xf0000) >> 3))
+ ldr r1,[r14,#112]
+ and r0,r2,r0 @ address&120
+ ldrb r0,[r1,r0] @ *memory. 112 + address&120
+ ldmfd r13!,{pc} @ return
+gb7rom:
+gb7ram:
+gbnone:
+ mov r0,r0,lsr #8
+ add r11,r11,#8 @ update cycles
+ and r0,r0,#0xff
+ ldmfd r13!,{pc}
+@ gbdebug:
+
+
+
+gbc4:
+ add r11,r11,#8 @ update cycles
+ mov r0,r0,lsl #16 @ s9xgetc4(address&0xffff);
+ str r11,[r14,#28] @ save cycles
+ mov r0,r0,lsr #16
+  prepare_c_call
+ bl _S9xGetC4
+  restore_c_call
+ ldr r11,[r14,#28] @ load cycles
+ ldmfd r13!,{pc} @ return
+gbdebug:
+gbbwram:
+ mov r0,r0,lsl #17
+ add r11,r11,#8 @ update cycles
+ mov r0,r0,lsr #17 @ address&0x7fff
+ ldr r1,[r14,#116]
+ sub r0,r0,#0x6000 @ ((address & 0x7fff) - 0x6000)
+ ldrb r0,[r0,r1] @ *memory. 116 + ((address & 0x7fff) - 0x6000)
+ ldmfd r13!,{pc}
+
+
+@ uint16 aas9xgetword(uint32 address);
+_asms9xgetword:
+ @ in : r0 = 0x00hhmmll
+ @ out : r0 = 0x000000ll
+ @ destroyed : r1,r2,r3
+ @ update : r11
+
+
+ mov r1,r0,lsl #19
+ adds r1,r1,#0x80000
+ @ if = 0x1fff => 0
+ bne gw_notboundary
+
+ stmfd r13!,{r0}
+  stmfd r13!,{pc}
+ b _asms9xgetbyte
+  mov r0,r0
+ ldmfd r13!,{r1}
+ stmfd r13!,{r0}
+ add r0,r1,#1
+  stmfd r13!,{pc}
+ b _asms9xgetbyte
+  mov r0,r0
+ ldmfd r13!,{r1}
+ orr r0,r1,r0,lsl #8
+ ldmfd r13!,{pc}
+
+gw_notboundary:
+
+ @ r1 <= block
+ mov r1,r0,lsr #12
+ @ 12 is 12, address is 0xffffffff at max, so
+ @ r1 is maxed by 0x000fffff, (0xfff) is 0x1000-1=0xfff
+ @ so and (0xfff) is bic 0xff000
+ bic r1,r1,#0xff000
+ @ r2 <= map[block] (getaddress)
+ ldr r2,[r14,#96]
+ ldr r2,[r2,r1,lsl #2]
+ cmp r2,#12
+ blo gwspecial @ special
+ @ direct rom/ram acess
+
+ tst r0,#1
+ bne gw_not_aligned1
+ @ r2 <= getaddress + address & 0xffff
+ @ r3 <= memoryspeed[block]
+ ldr r3,[r14,#104]
+ mov r0,r0,lsl #16
+ ldrb r3,[r3,r1]
+ mov r0,r0,lsr #16
+ @ update cpu.cycles
+ add r11,r11,r3, lsl #1
+ @ r3 = blockisram[block]
+ ldr r3,[r14,#108]
+ @ get value to return
+ ldrh r0,[r2,r0]
+ ldrb r3,[r3,r1]
+ movs r3,r3
+ @ if blockisram => update for cpushutdown
+ ldrne r1,[r14,#36]
+ strne r1,[r14,#40]
+
+ ldmfd r13!,{pc} @ return
+gw_not_aligned1:
+
+ mov r0,r0,lsl #16
+ add r3,r0,#0x10000
+ ldrb r3,[r2,r3,lsr #16] @ getaddress+ (address+1)&0xffff
+ ldrb r0,[r2,r0,lsr #16] @ getaddress+ address&0xffff
+ orr r0,r0,r3,lsl #8
+
+ @ if blockisram => update for cpushutdown
+ ldr r3,[r14,#108]
+ ldr r2,[r14,#104]
+ ldrb r3,[r3,r1] @ r3 = blockisram[block]
+ ldrb r2,[r2,r1] @ r2 <= memoryspeed[block]
+ movs r3,r3 @ isram ? cpushutdown stuff
+ ldrne r1,[r14,#36]
+ strne r1,[r14,#40]
+ add r11,r11,r2, lsl #1 @ update cpu.cycles
+ ldmfd r13!,{pc} @ return
+gwspecial:
+ ldr pc,[pc,r2,lsl #2]
+ mov r0,r0 @ nop, for align
+ .long gwppu
+ .long gwcpu
+ .long gwdsp
+ .long gwlsram
+ .long gwhsram
+ .long gwnone
+ .long gwdebug
+ .long gwc4
+ .long gwbwram
+ .long gwnone
+ .long gwnone
+ .long gwnone
+
+
+
+
+
+
+
+gwppu:
+ @ indma ?
+ ldrb r1,[r14,#84]
+ movs r1,r1
+ addeq r11,r11,#12 @ no -> update cycles
+ mov r0,r0,lsl #16 @ s9xgetppu(address&0xffff);
+ str r11,[r14,#28] @ save cycles
+ mov r0,r0,lsr #16
+  prepare_c_call_r0
+ bl _S9xGetPPU
+ ldmfd r13!,{r1}
+ stmfd r13!,{r0}
+ add r0,r1,#1
+ @ bic r0,r0,#0x10000
+ bl _S9xGetPPU
+  restore_c_call_r1
+ orr r0,r1,r0,lsl #8
+ ldr r11,[r14,#28] @ load cycles
+ ldmfd r13!,{pc} @ return
+gwcpu:
+ add r11,r11,#12 @ update cycles
+ mov r0,r0,lsl #16 @ s9xgetcpu(address&0xffff);
+ str r11,[r14,#28] @ save cycles
+ mov r0,r0,lsr #16
+  prepare_c_call_r0
+ bl _S9xGetCPU
+ ldmfd r13!,{r1}
+ stmfd r13!,{r0}
+ add r0,r1,#1
+ @ bic r0,r0,#0x10000
+ bl _S9xGetCPU
+  restore_c_call_r1
+ orr r0,r1,r0,lsl #8
+ ldr r11,[r14,#28] @ load cycles
+ ldmfd r13!,{pc} @ return
+gwdsp:
+ add r11,r11,#16 @ update cycles
+ mov r0,r0,lsl #16 @ s9xgetcpu(address&0xffff);
+ str r11,[r14,#28] @ save cycles
+ mov r0,r0,lsr #16
+  prepare_c_call_r0
+ bl _S9xGetDSP
+ ldmfd r13!,{r1}
+ stmfd r13!,{r0}
+ add r0,r1,#1
+ @ bic r0,r0,#0x10000
+ bl _S9xGetDSP
+  restore_c_call_r1
+ orr r0,r1,r0,lsl #8
+ ldr r11,[r14,#28] @ load cycles
+ ldmfd r13!,{pc} @ return
+gwlsram:
+ add r11,r11,#16 @ update cycles
+
+ tst r0,#1
+ bne gw_not_aligned2
+ ldrh r2,[r14,#120]
+ ldr r1,[r14,#112]
+ and r3,r2,r0 @ address&120
+ ldrh r0,[r3,r1] @ *memory. 112 + address&120
+ ldmfd r13!,{pc} @ return
+gw_not_aligned2:
+ ldrh r2,[r14,#120]
+ ldr r1,[r14,#112]
+ and r3,r2,r0 @ address&120
+ add r0,r0,#1
+ and r2,r0,r2 @ address&120
+ ldrb r3,[r1,r3] @ *memory. 112 + address&120
+ ldrb r2,[r1,r2] @ *memory. 112 + address&120
+ orr r0,r3,r2,lsl #8
+ ldmfd r13!,{pc} @ return
+gw7srm:
+gwhsram:
+ add r11,r11,#16 @ update cycles
+
+ tst r0,#1
+ bne gw_not_aligned3
+
+ mov r1,r0,lsl #17
+ and r2,r0,#0xf0000
+ mov r1,r1,lsr #17 @ address&0x7fff
+ mov r2,r2,lsr #3 @ (address&0xf0000 >> 3)
+ add r0,r2,r1
+ ldrh r2,[r14,#120]
+ sub r0,r0,#0x6000 @ ((address & 0x7fff) - 0x6000 + ((address & 0xf0000) >> 3))
+ ldr r1,[r14,#112]
+ and r0,r2,r0 @ address&120
+ ldrh r0,[r1,r0] @ *memory. 112 + address&120
+ ldmfd r13!,{pc} @ return
+
+gw_not_aligned3:
+ mov r3,r0,lsl #17
+ and r2,r0,#0xf0000
+ mov r3,r3,lsr #17 @ address&0x7fff
+ mov r2,r2,lsr #3 @ (address&0xf0000 >> 3)
+ add r2,r2,r3
+ add r0,r0,#1
+ sub r2,r2,#0x6000 @ ((address & 0x7fff) - 0x6000 + ((address & 0xf0000) >> 3))
+ mov r3,r0,lsl #17
+ and r0,r0,#0xf0000
+ mov r3,r3,lsr #17 @ (address+1)&0x7fff
+ mov r0,r0,lsr #3 @ ((address+1)&0xf0000 >> 3)
+ add r0,r0,r3
+ ldrh r3,[r14,#120] @ reload mask
+ sub r0,r0,#0x6000 @ (((address+1) & 0x7fff) - 0x6000 + (((address+1) & 0xf0000) >> 3))
+ and r2,r3,r2 @ address...&120
+ and r0,r3,r0 @ (address+1...)&120
+
+ ldr r3,[r14,#112]
+ ldrb r0,[r0,r3] @ *memory. 112 + (address...)&120
+ ldrb r2,[r2,r3] @ *memory. 112 + (address+1...)&120
+ orr r0,r2,r0,lsl #8
+
+ ldmfd r13!,{pc} @ return
+gw7rom:
+gw7ram:
+gwnone:
+ mov r0,r0,lsl #16
+ add r11,r11,#16 @ update cycles
+ mov r0,r0,lsr #24
+ orr r0,r0,r0,lsl #8
+ ldmfd r13!,{pc}
+gwdebug:
+ add r11,r11,#16 @ update cycles
+ mov r0,#0
+ ldmfd r13!,{pc}
+gwc4:
+ add r11,r11,#16 @ update cycles
+ mov r0,r0,lsl #16 @ s9xgetc4(address&0xffff);
+ str r11,[r14,#28] @ save cycles
+ mov r0,r0,lsr #16
+  prepare_c_call_r0
+ bl _S9xGetC4
+ ldmfd r13!,{r1}
+ stmfd r13!,{r0}
+ add r0,r1,#1
+ @ bic r0,r0,#0x10000
+ bl _S9xGetC4
+  restore_c_call_r1
+ orr r0,r1,r0,lsl #8
+ ldr r11,[r14,#28] @ load cycles
+ ldmfd r13!,{pc} @ return
+gwbwram:
+ tst r0,#1
+ bne gw_not_aligned4
+ mov r0,r0,lsl #17
+ add r11,r11,#16 @ update cycles
+ mov r0,r0,lsr #17 @ address&0x7fff
+ ldr r1,[r14,#116]
+ sub r0,r0,#0x6000 @ ((address & 0x7fff) - 0x6000)
+ ldrh r0,[r1,r0] @ *memory. 116 + ((address & 0x7fff) - 0x6000)
+ ldmfd r13!,{pc} @ return
+gw_not_aligned4:
+ mov r0,r0,lsl #17
+ add r11,r11,#16 @ update cycles
+ add r3,r0,#0x20000
+ mov r0,r0,lsr #17 @ address&0x7fff
+ mov r3,r3,lsr #17 @ (address+1)&0x7fff
+ ldr r1,[r14,#116]
+ sub r0,r0,#0x6000 @ ((address & 0x7fff) - 0x6000)
+ sub r3,r3,#0x6000 @ (((address+1) & 0x7fff) - 0x6000)
+ ldrb r0,[r1,r0] @ *memory. 116 + ((address & 0x7fff) - 0x6000)
+ ldrb r3,[r1,r3] @ *memory. 116 + (((address+1) & 0x7fff) - 0x6000)
+ orr r0,r0,r3,lsl #8
+ ldmfd r13!,{pc} @ return
+
+
+
+
+@ void aas9xsetbyte(uint32 address,uint8 val);
+_asms9xsetbyte:
+ @ in : r0=0x00hhmmll r1=0x000000ll
+ @ destroyed : r0,r1,r2,r3
+ @ update : r11
+ @ cpu shutdown
+ mov r2,#0
+ str r2,[r14,#40]
+ @
+
+ @ r3 <= block
+ mov r3,r0,lsr #12
+ @ 12 is 12, address is 0xffffffff at max, so
+ @ r0 is maxed by 0x000fffff, (0xfff) is 0x1000-1=0xfff
+ @ so and (0xfff) is bic 0xff000
+ bic r3,r3,#0xff000
+ @ r2 <= map[block] (setaddress)
+ ldr r2,[r14,#100]
+ ldr r2,[r2,r3,lsl #2]
+ cmp r2,#12
+ blo sbspecial @ special
+ @ direct rom/ram acess
+
+ @ r2 <= setaddress + address & 0xffff
+ mov r0,r0,lsl #16
+ add r2,r2,r0,lsr #16
+ ldr r0,[r14,#104]
+ @ set byte
+ strb r1,[r2]
+ @ r0 <= memoryspeed[block]
+ ldrb r0,[r0,r3]
+ @ update cpu.cycles
+ add r11,r11,r0
+ @ cpushutdown
+ @ only sa1 here : todo
+ @ return
+ ldmfd r13!,{pc}
+sbspecial:
+ ldr pc,[pc,r2,lsl #2]
+ mov r0,r0 @ nop, for align
+ .long sbppu
+ .long sbcpu
+ .long sbdsp
+ .long sblsram
+ .long sbhsram
+ .long sbnone
+ .long sbdebug
+ .long sbc4
+ .long sbbwram
+ .long sbnone
+ .long sbnone
+ .long sbnone
+
+
+
+sbppu:
+ @ indma ?
+ ldrb r2,[r14,#84]
+ movs r2,r2
+ addeq r11,r11,#6 @ no -> update cycles
+ mov r0,r0,lsl #16
+ str r11,[r14,#28] @ save cycles
+ mov r0,r0,lsr #16
+  prepare_c_call
+ mov r12,r0
+ mov r0,r1
+ mov r1,r12
+ bl _S9xSetPPU
+  restore_c_call
+ ldr r11,[r14,#28] @ load cycles
+ ldmfd r13!,{pc} @ return
+sbcpu:
+ add r11,r11,#6 @ update cycles
+ mov r0,r0,lsl #16
+ str r11,[r14,#28] @ save cycles
+ mov r0,r0,lsr #16 @ address&0xffff
+  prepare_c_call
+ mov r12,r0
+ mov r0,r1
+ mov r1,r12
+ bl _S9xSetCPU
+  restore_c_call
+ ldr r11,[r14,#28] @ load cycles
+ ldmfd r13!,{pc} @ return
+sbdsp:
+ add r11,r11,#8 @ update cycles
+ mov r0,r0,lsl #16
+ str r11,[r14,#28] @ save cycles
+ mov r0,r0,lsr #16 @ address&0xffff
+  prepare_c_call
+ mov r12,r0
+ mov r0,r1
+ mov r1,r12
+ bl _S9xSetDSP
+  restore_c_call
+ ldr r11,[r14,#28] @ load cycles
+ ldmfd r13!,{pc} @ return
+sblsram:
+ add r11,r11,#8 @ update cycles
+ ldrh r2,[r14,#120]
+ movs r2,r2
+ ldmeqfd r13!,{pc} @ return if 120=0
+ ldr r3,[r14,#112]
+ and r0,r2,r0 @ address&120
+ strb r1,[r0,r3] @ *memory. 112 + address&120
+
+ mov r0,#1
+ strb r0,[r14,#86]
+ ldmfd r13!,{pc} @ return
+sb7srm:
+sbhsram:
+ add r11,r11,#8 @ update cycles
+
+ mov r3,r0,lsl #17
+ and r2,r0,#0xf0000
+ mov r3,r3,lsr #17 @ address&0x7fff
+ mov r2,r2,lsr #3 @ (address&0xf0000 >> 3)
+ add r0,r2,r3
+
+ ldrh r2,[r14,#120]
+ movs r2,r2
+ ldmeqfd r13!,{pc} @ return if 120=0
+
+ sub r0,r0,#0x6000 @ ((address & 0x7fff) - 0x6000 + ((address & 0xf0000) >> 3))
+ ldr r3,[r14,#112]
+ and r0,r2,r0 @ address&120
+ strb r1,[r0,r3] @ *memory. 112 + address&120
+
+ mov r0,#1
+ strb r0,[r14,#86]
+ ldmfd r13!,{pc} @ return
+sb7rom:
+sb7ram:
+sbnone:
+sbdebug:
+ add r11,r11,#8 @ update cycles
+ ldmfd r13!,{pc}
+sbc4:
+ add r11,r11,#8 @ update cycles
+ mov r0,r0,lsl #16
+ str r11,[r14,#28] @ save cycles
+ mov r0,r0,lsr #16 @ address&0xffff
+  prepare_c_call
+ mov r12,r0
+ mov r0,r1
+ mov r1,r12
+ bl _S9xSetC4
+  restore_c_call
+ ldr r11,[r14,#28] @ load cycles
+ ldmfd r13!,{pc} @ return
+sbbwram:
+ mov r0,r0,lsl #17
+ add r11,r11,#8 @ update cycles
+ mov r0,r0,lsr #17 @ address&0x7fff
+ ldr r2,[r14,#116]
+ sub r0,r0,#0x6000 @ ((address & 0x7fff) - 0x6000)
+ strb r1,[r0,r2] @ *memory. 116 + ((address & 0x7fff) - 0x6000)
+
+ mov r0,#1
+ strb r0,[r14,#86]
+
+ ldmfd r13!,{pc}
+
+
+
+@ void aas9xsetword(uint32 address,uint16 val);
+_asms9xsetword:
+ @ in : r0 = 0x00hhmmll r1=0x0000hhll
+ @ destroyed : r0,r1,r2,r3
+ @ update : r11
+ @ r1 <= block
+
+ mov r2,r0,lsl #19
+ adds r2,r2,#0x80000
+ @ if = 0x1fff => 0
+ bne sw_notboundary
+
+ stmfd r13!,{r0,r1}
+  stmfd r13!,{pc}
+ b _asms9xsetbyte
+  mov r0,r0
+ ldmfd r13!,{r0,r1}
+ add r0,r0,#1
+ mov r1,r1,lsr #8
+  stmfd r13!,{pc}
+ b _asms9xsetbyte
+  mov r0,r0
+
+ ldmfd r13!,{pc}
+
+sw_notboundary:
+
+ mov r2,#0
+ str r2,[r14,#40]
+ @
+ @ r3 <= block
+ mov r3,r0,lsr #12
+ @ 12 is 12, address is 0xffffffff at max, so
+ @ r1 is maxed by 0x000fffff, (0xfff) is 0x1000-1=0xfff
+ @ so and (0xfff) is bic 0xff000
+ bic r3,r3,#0xff000
+ @ r2 <= map[block] (setaddress)
+ ldr r2,[r14,#100]
+ ldr r2,[r2,r3,lsl #2]
+ cmp r2,#12
+ blo swspecial @ special
+ @ direct rom/ram acess
+
+
+ @ check if address is 16bits aligned or not
+ tst r0,#1
+ bne sw_not_aligned1
+ @ aligned
+ mov r0,r0,lsl #16
+ add r2,r2,r0,lsr #16 @ address & 0xffff + setaddress
+ ldr r0,[r14,#104]
+ @ set word
+ strh r1,[r2]
+ @ r1 <= memoryspeed[block]
+ ldrb r0,[r0,r3]
+ @ update cpu.cycles
+ add r11,r11,r0, lsl #1
+ @ cpushutdown
+ @ only sa1 here : todo
+ @ return
+ ldmfd r13!,{pc}
+
+sw_not_aligned1:
+ @ r1 = (address&0xffff)<<16
+ mov r0,r0,lsl #16
+ @ first write @address
+ strb r1,[r2,r0,lsr #16]
+ add r0,r0,#0x10000
+ mov r1,r1,lsr #8
+ @ second write @address+1
+ strb r1,[r2,r0,lsr #16]
+ @ r1 <= memoryspeed[block]
+ ldr r0,[r14,#104]
+ ldrb r0,[r0,r3]
+ @ update cpu.cycles
+ add r11,r11,r0,lsl #1
+ @ cpushutdown
+ @ only sa1 here : todo
+ @ return
+ ldmfd r13!,{pc}
+swspecial:
+ ldr pc,[pc,r2,lsl #2]
+ mov r0,r0 @ nop, for align
+ .long swppu
+ .long swcpu
+ .long swdsp
+ .long swlsram
+ .long swhsram
+ .long swnone
+ .long swdebug
+ .long swc4
+ .long swbwram
+ .long swnone
+ .long swnone
+ .long swnone
+
+
+
+swppu:
+ @ indma ?
+ ldrb r2,[r14,#84]
+ movs r2,r2
+ addeq r11,r11,#12 @ no -> update cycles
+ mov r0,r0,lsl #16
+ str r11,[r14,#28] @ save cycles
+ mov r0,r0,lsr #16
+ mov r2,r1
+ mov r1,r0
+ mov r0,r2
+  prepare_c_call_r0r1
+ bl _S9xSetPPU
+ ldmfd r13!,{r0,r1}
+ add r1,r1,#1
+ mov r0,r0,lsr #8
+ bic r1,r1,#0x10000
+ bl _S9xSetPPU
+  restore_c_call
+ ldr r11,[r14,#28] @ load cycles
+ ldmfd r13!,{pc} @ return
+swcpu:
+ add r11,r11,#12 @ update cycles
+ mov r0,r0,lsl #16
+ str r11,[r14,#28] @ save cycles
+ mov r0,r0,lsr #16 @ address&0xffff
+ mov r2,r1
+ mov r1,r0
+ mov r0,r2
+  prepare_c_call_r0r1
+ bl _S9xSetCPU
+ ldmfd r13!,{r0,r1}
+ add r1,r1,#1
+ mov r0,r0,lsr #8
+ bic r1,r1,#0x10000
+ bl _S9xSetCPU
+  restore_c_call
+ ldr r11,[r14,#28] @ load cycles
+ ldmfd r13!,{pc} @ return
+swdsp:
+ add r11,r11,#8 @ update cycles
+ mov r0,r0,lsl #16
+ str r11,[r14,#28] @ save cycles
+ mov r0,r0,lsr #16 @ address&0xffff
+ mov r2,r1
+ mov r1,r0
+ mov r0,r2
+  prepare_c_call_r0r1
+ bl _S9xSetDSP
+ ldmfd r13!,{r0,r1}
+ add r1,r1,#1
+ mov r0,r0,lsr #8
+ bic r1,r1,#0x10000
+ bl _S9xSetDSP
+  restore_c_call
+ ldr r11,[r14,#28] @ load cycles
+ ldmfd r13!,{pc} @ return
+swlsram:
+ add r11,r11,#16 @ update cycles
+ ldrh r2,[r14,#120]
+ movs r2,r2
+ ldmeqfd r13!,{pc} @ return if 120=0
+
+ and r3,r2,r0 @ address&120
+ tst r0,#1
+ bne sw_not_aligned2
+ @ aligned
+ ldr r0,[r14,#112]
+ strh r1,[r0,r3] @ *memory. 112 + address&120
+ mov r0,#1
+ strb r0,[r14,#86]
+ ldmfd r13!,{pc} @ return
+sw_not_aligned2:
+
+ add r0,r0,#1
+ and r2,r2,r0 @ (address+1)&120
+ ldr r0,[r14,#112]
+ strb r1,[r0,r3] @ *memory. 112 + address&120
+ mov r1,r1,lsr #8
+ strb r1,[r0,r2] @ *memory. 112 + (address+1)&120
+ mov r0,#1
+ strb r0,[r14,#86]
+ ldmfd r13!,{pc} @ return
+sw7srm:
+swhsram:
+ add r11,r11,#16 @ update cycles
+
+ ldrh r2,[r14,#120]
+ movs r2,r2
+ ldmeqfd r13!,{pc} @ return if 120=0
+
+ tst r0,#1
+ bne sw_not_aligned3
+ @ aligned
+ mov r3,r0,lsl #17
+ and r2,r0,#0xf0000
+ mov r3,r3,lsr #17 @ address&0x7fff
+ mov r2,r2,lsr #3 @ (address&0xf0000 >> 3)
+ add r0,r2,r3
+ sub r0,r0,#0x6000 @ ((address & 0x7fff) - 0x6000 + ((address & 0xf0000) >> 3))
+ ldrh r2,[r14,#120]
+ ldr r3,[r14,#112]
+ and r0,r2,r0 @ address&120
+ strh r1,[r0,r3] @ *memory. 112 + address&120
+ mov r0,#1
+ strb r0,[r14,#86]
+ ldmfd r13!,{pc} @ return
+sw_not_aligned3:
+ mov r3,r0,lsl #17
+ and r2,r0,#0xf0000
+ mov r3,r3,lsr #17 @ address&0x7fff
+ mov r2,r2,lsr #3 @ (address&0xf0000 >> 3)
+ add r2,r2,r3
+ sub r2,r2,#0x6000 @ ((address & 0x7fff) - 0x6000 + ((address & 0xf0000) >> 3))
+
+ add r0,r0,#1
+ mov r3,r0,lsl #17
+ and r0,r0,#0xf0000
+ mov r3,r3,lsr #17 @ (address+1)&0x7fff
+ mov r0,r0,lsr #3 @ ((address+1)&0xf0000 >> 3)
+ add r0,r0,r3
+ ldrh r3,[r14,#120] @ reload mask
+ sub r0,r0,#0x6000 @ (((address+1) & 0x7fff) - 0x6000 + (((address+1) & 0xf0000) >> 3))
+ and r2,r3,r2 @ address...&120
+ and r0,r3,r0 @ (address+1...)&120
+
+ ldr r3,[r14,#112]
+ strb r1,[r2,r3] @ *memory. 112 + (address...)&120
+ mov r1,r1,lsr #8
+ strb r1,[r0,r3] @ *memory. 112 + (address+1...)&120
+
+ mov r0,#1
+ strb r0,[r14,#86]
+ ldmfd r13!,{pc} @ return
+sw7rom:
+sw7ram:
+swnone:
+swdebug:
+ add r11,r11,#16 @ update cycles
+ ldmfd r13!,{pc} @ return
+swc4:
+ add r11,r11,#16 @ update cycles
+ mov r0,r0,lsl #16
+ str r11,[r14,#28] @ save cycles
+ mov r0,r0,lsr #16 @ address&0xffff
+ mov r2,r1
+ mov r1,r0
+ mov r0,r2
+  prepare_c_call_r0r1
+ bl _S9xSetC4
+ ldmfd r13!,{r0,r1}
+ add r1,r1,#1
+ mov r0,r0,lsr #8
+ bic r1,r1,#0x10000
+ bl _S9xSetC4
+  restore_c_call
+ ldr r11,[r14,#28] @ load cycles
+ ldmfd r13!,{pc} @ return
+swbwram:
+ add r11,r11,#16 @ update cycles
+ tst r0,#1
+ bne sw_not_aligned4
+ @ aligned
+ mov r0,r0,lsl #17
+ ldr r2,[r14,#116]
+ mov r0,r0,lsr #17 @ address&0x7fff
+ sub r0,r0,#0x6000 @ ((address & 0x7fff) - 0x6000)
+ mov r3,#1
+ strh r1,[r0,r2] @ *memory. 116 + ((address & 0x7fff) - 0x6000)
+ strb r3,[r14,#86]
+ ldmfd r13!,{pc} @ return
+sw_not_aligned4:
+ mov r0,r0,lsl #17
+ add r3,r0,#0x20000
+ mov r0,r0,lsr #17 @ address&0x7fff
+ mov r3,r3,lsr #17 @ (address+1)&0x7fff
+ ldr r2,[r14,#116]
+ sub r0,r0,#0x6000 @ ((address & 0x7fff) - 0x6000)
+ sub r3,r3,#0x6000 @ (((address+1) & 0x7fff) - 0x6000)
+ strb r1,[r2,r0] @ *memory. 116 + ((address & 0x7fff) - 0x6000)
+ mov r1,r1,lsr #8
+ strb r1,[r2,r3] @ *memory. 116 + (((address+1) & 0x7fff) - 0x6000)
+ mov r0,#1
+ strb r0,[r14,#86]
+ ldmfd r13!,{pc} @ return
+# 2025 "os9x_65c816.S"
+.macro update_c
+  @ cc : arm carry clear
+  biccc r4, r4, #(1<<(24)) @ 0 @ 0 : and mask 11111011111 : set c to zero
+  @ cs : arm carry set
+  orrcs r4, r4, #(1<<(24)) @ 0 @ 1 : or mask 00000100000 : set c to one
+.endm
+.macro update_z
+  @ ne : arm zero clear
+  bicne r4, r4, #(2<<(24)) @ 1 @ 0 : and mask 11111011111 : set z to zero
+  @ eq : arm zero set
+  orreq r4, r4, #(2<<(24)) @ 1 @ 1 : or mask 00000100000 : set z to one
+.endm
+.macro update_zn
+  @ ne : arm zero clear
+  bicne r4, r4, #(2<<(24)) @ 1 @ 0 : and mask 11111011111 : set z to zero
+  @ eq : arm zero set
+  orreq r4, r4, #(2<<(24)) @ 1 @ 1 : or mask 00000100000 : set z to one
+  @ pl : arm neg clear
+  bicpl r4, r4, #(128<<(24))@ 7 @ 8 @ 0 : and mask 11111011111 : set n to zero
+  @ mi : arm neg set
+  orrmi r4, r4, #(128<<(24))@ 7 @ 8 @ 1 : or mask 00000100000 : set n to one
+.endm
+# 2055 "os9x_65c816.S"
+.macro adc8
+  tst r4, #(8<<(24)) @ 3
+  beq 1111f
+  s9xgetbyte
+
+
+         stmfd r13!,{r0}
+  mov r3,#0x0f000000
+  @ r1=xxw1xxxxxxxxxxxx
+  and r1, r0, r3
+  @ r0=xxw2xxxxxxxxxxxx
+  and r0, r3, r0, lsr #4
+  @ r2=xxa2xxxxxxxxxxxx
+  and r2, r3, r5, lsr #4
+  @ r3=xxa1xxxxxxxxxxxx
+  and r3,r5,r3
+  @ r1=a1+w1+carry
+  tst r4, #(1<<(24)) @ 0
+  addne r1, r1, #0x01000000
+  add r1,r1,r3
+  @ if r1 > 9
+  cmp r1, #0x09000000
+  @ then r1 -= 10
+  subgt r1, r1, #0x0a000000
+  @ then a2++
+  addgt r2, r2, #0x01000000
+  @ r2 = a2+w2
+  add r2, r2, r0
+  @ if r2 > 9
+  cmp r2, #0x09000000
+  @ then r2 -= 10@
+  subgt r2, r2, #0x0a000000
+  @ then setcarry()
+  orrgt r4, r4, #(1<<(24)) @ 0 @ 1 : or mask 00000100000 : set c to one
+  @ else clearcarry()
+  bicle r4, r4, #(1<<(24)) @ 0 @ 0 : and mask 11111011111 : set c to zero
+  @ gather r2 and r1 into ans8
+  @ r2 : 0r2000000
+  @ r1 : 0r1000000
+  @ -> 0xr2r1000000
+  orr r1, r1, r2, lsl #4
+  ldmfd r13!,{r0}
+  @ only last bit
+  and r0,r0,#0x80000000
+  @ (register.al ^ work8)
+  eors r2, r5, r0
+  bicne r4, r4, #(64<<(24)) @ 6 @ 4 @ 0 : and mask 11111011111 : set v to zero
+  bne 1112f
+  @ (work8 ^ ans8)
+  eors r2, r1, r0
+  @ & 0x80
+  tstne r2,#0x80000000
+  biceq r4, r4, #(64<<(24)) @ 6 @ 4 @ 0 : and mask 11111011111 : set v to zero
+  orrne r4, r4, #(64<<(24)) @ 6 @ 4 @ 1 : or mask 00000100000 : set v to one
+1112:
+  movs r5, r1
+  update_zn
+  b 1113f
+1111:
+  s9xgetbytelow
+  movs r1, r4, lsr #(24 +1)
+  subcs r0, r0, #0x100
+  adcs r5, r5, r0, ror #8
+  @ overflow
+  orrvs r4, r4, #(64<<(24)) @ 6 @ 4
+  bicvc r4, r4, #(64<<(24)) @ 6 @ 4
+  @ carry
+  update_c
+  @ clear lower part
+  ands r5, r5, #0xff000000
+  @ update flag
+  update_zn
+1113:
+.endm
+
+.macro adc16
+  tst r4, #(8<<(24)) @ 3
+  beq 1111f
+  s9xgetword
+
+  @ r0 = w3w2w1w0........
+  @ PATCH ldr r3, = 0x0f0f0000
+  mov r3, #0x0f0000
+  orr r3, r3, #0x0f000000
+  @ r1 = xxw2xxw0xxxxxx
+  @ r2 = xxw3xxw1xxxxxx
+  and r1, r3, r0
+  and r2, r3, r0, lsr #4
+  @ r1 = xxw3xxw1xxw2xxw0
+  orr r1, r2, r1, lsr #16
+  @ r2 = xxa2xxa0xxxxxx
+  @ r3 = xxa3xxa1xxxxxx
+  @ r1 = xxa3xxa1xxa2xxa0
+  and r2, r3, r5
+  and r3, r3, r5, lsr #4
+  orr r2, r3, r2, lsr #16
+  add r1, r2, r1
+  @ PATCH ldr r3, = 0x0f0f0000
+  mov r3, #0x0f0000
+  orr r3, r3, #0x0f000000
+  @ r1 = a + w
+  tst r4, #(1<<(24)) @ 0
+  addne r1, r1, #0x1
+  @ r1 = a + w + c
+  @ a0
+  and r2, r1, #0x0000001f
+  cmp r2, #0x00000009
+  addhi r1, r1, #0x00010000
+  subhi r1, r1, #0x0000000a
+  @ a1
+  and r2, r1, #0x001f0000
+  cmp r2, #0x00090000
+  addhi r1, r1, #0x00000100
+  subhi r1, r1, #0x000a0000
+  @ a2
+  and r2, r1, #0x00001f00
+  cmp r2, #0x00000900
+  subhi r1, r1, #0x00000a00
+  addhi r1, r1, #0x01000000
+  @ a3
+  and r2, r1, #0x1f000000
+  cmp r2, #0x09000000
+  subhi r1, r1, #0x0a000000
+  @ setcarry
+  orrhi r4, r4, #(1<<(24)) @ 0
+  @ clearcarry
+  bicls r4, r4, #(1<<(24)) @ 0
+  @ r1 = xxr3xxr1xxr2xxr0
+  @ pack result
+  @ r2 = xxr3xxr1xxxxxxxx
+  and r2, r3, r1
+  @ r1 = xxr2xxr0xxxxxxxx
+  and r1, r3, r1,lsl #16
+  @ r1 = r3r2r1r0xxxxxxxx
+  orr r1, r1,r2,lsl #4
+@ only last bit
+  and r0,r0,#0x80000000
+  @ (register.al ^ work8)
+  eors r2, r5, r0
+  bicne r4, r4, #(64<<(24)) @ 6 @ 4 @ 0 : and mask 11111011111 : set v to zero
+  bne 1112f
+  @ (work8 ^ ans8)
+  eors r2, r1, r0
+  tstne r2,#0x80000000
+  biceq r4, r4, #(64<<(24)) @ 6 @ 4 @ 0 : and mask 11111011111 : set v to zero
+  orrne r4, r4, #(64<<(24)) @ 6 @ 4 @ 1 : or mask 00000100000 : set v to one
+1112:
+  movs r5, r1
+  update_zn
+  b 1113f
+1111:
+  s9xgetwordlow
+  movs r1, r4, lsr #(24 +1)
+  subcs r0, r0, #0x10000
+  adcs r5, r5,r0, ror #16
+  @ overflow
+  orrvs r4, r4, #(64<<(24)) @ 6 @ 4
+  bicvc r4, r4, #(64<<(24)) @ 6 @ 4
+  mov r5, r5, lsr #16
+  @ carry
+  update_c
+  @ clear lower parts
+  movs r5, r5, lsl #16
+  @ update flag
+  update_zn
+1113:
+.endm
+
+
+.macro and16
+  s9xgetword
+  ands r5, r5, r0
+  update_zn
+.endm
+.macro and8
+  s9xgetbyte
+  ands r5, r5, r0
+  update_zn
+.endm
+.macro a_asl8
+  @ 7 instr
+  movs r5, r5, lsl #1
+  update_c
+  update_zn
+  add1cycle
+.endm
+.macro a_asl16
+  @ 7 instr
+  movs r5, r5, lsl #1
+  update_c
+  update_zn
+  add1cycle
+.endm
+.macro asl16
+  s9xgetwordregns r1 @ do not destroy opadress in r0
+  movs r1, r1, lsl #1
+  update_c
+  update_zn
+  s9xsetword r1
+  add1cycle
+.endm
+.macro asl8
+  s9xgetbyteregns r1 @ do not destroy opadress in r0
+  movs r1, r1, lsl #1
+  update_c
+  update_zn
+  s9xsetbyte r1
+  add1cycle
+.endm
+.macro bit8
+  s9xgetbyte
+  movs r1, r0, lsl #1
+  @ trick in asm : shift one more bit : arm c = snes n
+  @ arm n = snes v
+  @ if carry set, then set neg in snes
+  biccc r4, r4, #(128<<(24))@ 7 @ 8 @ 0 : and mask 11111011111 : set c to zero
+  orrcs r4, r4, #(128<<(24))@ 7 @ 8 @ 1 : or mask 00000100000 : set c to one
+  @ if neg set, then set overflow in snes
+  bicpl r4, r4, #(64<<(24)) @ 6 @ 4 @ 0 : and mask 11111011111 : set n to zero
+  orrmi r4, r4, #(64<<(24)) @ 6 @ 4 @ 1 : or mask 00000100000 : set n to one
+
+  @ now do a real and with a register
+  @ set zero flag, bit test
+  ands r1, r5, r0
+  bicne r4, r4, #(2<<(24)) @ 1 @ 0 : and mask 11111011111 : set z to zero
+  orreq r4, r4, #(2<<(24)) @ 1 @ 1 : or mask 00000100000 : set z to one
+.endm
+
+.macro bit16
+  s9xgetword
+  movs r1, r0, lsl #1
+  @ trick in asm : shift one more bit : arm c = snes n
+  @ arm n = snes v
+  @ if carry set, then set neg in snes
+  biccc r4, r4, #(128<<(24))@ 7 @ 8 @ 0 : and mask 11111011111 : set n to zero
+  orrcs r4, r4, #(128<<(24))@ 7 @ 8 @ 1 : or mask 00000100000 : set n to one
+  @ if neg set, then set overflow in snes
+  bicpl r4, r4, #(64<<(24)) @ 6 @ 4 @ 0 : and mask 11111011111 : set v to zero
+  orrmi r4, r4, #(64<<(24)) @ 6 @ 4 @ 1 : or mask 00000100000 : set v to one
+  @ now do a real and with a register
+  @ set zero flag, bit test
+  ands r1, r5, r0
+  @ bit set ->z=0->xxxne clear flag
+  bicne r4, r4, #(2<<(24)) @ 1 @ 0 : and mask 11111011111 : set z to zero
+  @ bit clear->z=1->xxxeq set flag
+  orreq r4, r4, #(2<<(24)) @ 1 @ 1 : or mask 00000100000 : set z to one
+.endm
+.macro cmp8
+  s9xgetbyte
+  subs r1,r5,r0
+  biccc r4, r4, #(1<<(24)) @ 0
+  orrcs r4, r4, #(1<<(24)) @ 0
+  update_zn
+
+.endm
+.macro cmp16
+  s9xgetword
+  subs r1,r5,r0
+  biccc r4, r4, #(1<<(24)) @ 0
+  orrcs r4, r4, #(1<<(24)) @ 0
+  update_zn
+
+.endm
+.macro cmx16
+  s9xgetword
+  subs r1,r7,r0
+  biccc r4, r4, #(1<<(24)) @ 0
+  orrcs r4, r4, #(1<<(24)) @ 0
+  update_zn
+.endm
+.macro cmx8
+  s9xgetbyte
+  subs r1,r7,r0
+  biccc r4, r4, #(1<<(24)) @ 0
+  orrcs r4, r4, #(1<<(24)) @ 0
+  update_zn
+.endm
+.macro cmy16
+  s9xgetword
+  subs r1,r9,r0
+  biccc r4, r4, #(1<<(24)) @ 0
+  orrcs r4, r4, #(1<<(24)) @ 0
+  update_zn
+.endm
+.macro cmy8
+  s9xgetbyte
+  subs r1,r9,r0
+  biccc r4, r4, #(1<<(24)) @ 0
+  orrcs r4, r4, #(1<<(24)) @ 0
+  update_zn
+.endm
+.macro a_dec8
+  mov r0,#0
+  subs r5, r5, #0x01000000
+  str r0,[r14,#40]
+  update_zn
+  add1cycle
+.endm
+.macro a_dec16
+  mov r0,#0
+  subs r5, r5, #0x00010000
+  str r0,[r14,#40]
+  update_zn
+  add1cycle
+.endm
+.macro dec16
+  s9xgetwordregns r1 @ do not destroy opadress in r0
+  mov r2,#0
+  subs r1, r1, #0x00010000
+  str r2,[r14,#40]
+  update_zn
+  s9xsetword r1
+  add1cycle
+.endm
+.macro dec8
+  s9xgetbyteregns r1 @ do not destroy opadress in r0
+  mov r2,#0
+  subs r1, r1, #0x01000000
+  str r2,[r14,#40]
+  update_zn
+  s9xsetbyte r1
+  add1cycle
+.endm
+.macro eor16
+  s9xgetword
+  eors r5, r5, r0
+  update_zn
+.endm
+.macro eor8
+  s9xgetbyte
+  eors r5, r5, r0
+  update_zn
+.endm
+.macro a_inc8
+  mov r2,#0
+  adds r5, r5, #0x01000000
+  str r2,[r14,#40]
+  update_zn
+  add1cycle
+.endm
+.macro a_inc16
+  mov r2,#0
+  adds r5, r5, #0x00010000
+  str r2,[r14,#40]
+  update_zn
+  add1cycle
+.endm
+.macro inc16
+  s9xgetwordregns r1
+  mov r2,#0
+  adds r1, r1, #0x00010000
+  str r2,[r14,#40]
+  update_zn
+  s9xsetword r1
+  add1cycle
+.endm
+.macro inc8
+  s9xgetbyteregns r1
+  mov r2,#0
+  adds r1, r1, #0x01000000
+  str r2,[r14,#40]
+  update_zn
+  s9xsetbyte r1
+  add1cycle
+.endm
+.macro lda16
+  s9xgetwordregstatus r5
+  update_zn
+.endm
+.macro lda8
+  s9xgetbyteregstatus r5
+  update_zn
+.endm
+.macro ldx16
+  s9xgetwordregstatus r7
+  update_zn
+.endm
+.macro ldx8
+  s9xgetbyteregstatus r7
+  update_zn
+.endm
+.macro ldy16
+  s9xgetwordregstatus r9
+  update_zn
+.endm
+.macro ldy8
+  s9xgetbyteregstatus r9
+  update_zn
+.endm
+.macro a_lsr16
+  bic r4, r4, #(128<<(24))@ 7 @ 8 @ 0 : and mask 11111011111 : set n to zero
+  movs r5, r5, lsr #17 @ hhhhhhhh llllllll 00000000 00000000 -> 00000000 00000000 0hhhhhhh hlllllll
+  @ update zero
+  bicne r4, r4, #(2<<(24)) @ 1 @ 0 : and mask 11111011111 : set z to zero
+  mov r5, r5, lsl #16 @ -> 0lllllll 00000000 00000000 00000000
+  orreq r4, r4, #(2<<(24)) @ 1 @ 1 : or mask 00000100000 : set z to one
+  @ note : the two mov are included between instruction, to optimize
+  @ the pipeline.
+  update_c
+  add1cycle
+.endm
+.macro a_lsr8
+  bic r4, r4, #(128<<(24))@ 7 @ 8 @ 0 : and mask 11111011111 : set n to zero
+  movs r5, r5, lsr #25 @ llllllll 00000000 00000000 00000000 -> 00000000 00000000 00000000 0lllllll
+  @ update zero
+  bicne r4, r4, #(2<<(24)) @ 1 @ 0 : and mask 11111011111 : set z to zero
+  mov r5, r5, lsl #24 @ -> 00000000 00000000 00000000 0lllllll
+  orreq r4, r4, #(2<<(24)) @ 1 @ 1 : or mask 00000100000 : set z to one
+  @ note : the two mov are included between instruction, to optimize
+  @ the pipeline.
+  update_c
+  add1cycle
+.endm
+.macro lsr16
+  s9xgetwordregns r1
+  @ n set to zero by >> 1 lsr
+  bic r4, r4, #(128<<(24))@ 7 @ 8 @ 0 : and mask 11111011111 : set n to zero
+  movs r1, r1, lsr #17 @ llllllll 00000000 00000000 00000000 -> 00000000 00000000 00000000 0lllllll
+  @ update carry
+  biccc r4, r4, #(1<<(24)) @ 0 @ 0 : and mask 11111011111 : set c to zero
+  orrcs r4, r4, #(1<<(24)) @ 0 @ 1 : or mask 00000100000 : set c to one
+  @ update zero
+  bicne r4, r4, #(2<<(24)) @ 1 @ 0 : and mask 11111011111 : set z to zero
+  orreq r4, r4, #(2<<(24)) @ 1 @ 1 : or mask 00000100000 : set z to one
+  s9xsetwordlow r1
+  add1cycle
+.endm
+.macro lsr8
+  s9xgetbyteregns r1
+  @ n set to zero by >> 1 lsr
+  bic r4, r4, #(128<<(24))@ 7 @ 8 @ 0 : and mask 11111011111 : set n to zero
+  movs r1, r1, lsr #25 @ llllllll 00000000 00000000 00000000 -> 00000000 00000000 00000000 0lllllll
+  @ update carry
+  biccc r4, r4, #(1<<(24)) @ 0 @ 0 : and mask 11111011111 : set c to zero
+  orrcs r4, r4, #(1<<(24)) @ 0 @ 1 : or mask 00000100000 : set c to one
+  @ update zero
+  bicne r4, r4, #(2<<(24)) @ 1 @ 0 : and mask 11111011111 : set z to zero
+  orreq r4, r4, #(2<<(24)) @ 1 @ 1 : or mask 00000100000 : set z to one
+  s9xsetbytelow r1
+  add1cycle
+.endm
+.macro ora8
+  s9xgetbyte
+  orrs r5, r5, r0
+  update_zn
+.endm
+.macro ora16
+  s9xgetword
+  orrs r5, r5, r0
+  update_zn
+.endm
+.macro a_rol16
+  tst r4, #(1<<(24)) @ 0
+  orrne r5, r5, #0x00008000
+  movs r5, r5, lsl #1
+  update_zn
+  update_c
+  add1cycle
+.endm
+.macro a_rol8
+  tst r4, #(1<<(24)) @ 0
+  orrne r5, r5, #0x00800000
+  movs r5, r5, lsl #1
+  update_zn
+  update_c
+  add1cycle
+.endm
+.macro rol16
+  s9xgetwordregns r1
+  tst r4, #(1<<(24)) @ 0
+  orrne r1, r1, #0x00008000
+  movs r1, r1, lsl #1
+  update_zn
+  update_c
+  s9xsetword r1
+  add1cycle
+.endm
+.macro rol8
+  s9xgetbyteregns r1
+  tst r4, #(1<<(24)) @ 0
+  orrne r1, r1, #0x00800000
+  movs r1, r1, lsl #1
+  update_zn
+  update_c
+  s9xsetbyte r1
+  add1cycle
+.endm
+.macro a_ror16
+  mov r5,r5, lsr #16
+  tst r4, #(1<<(24)) @ 0
+  orrne r5, r5, #0x00010000
+  orrne r4,r4,#(128<<(24))@ 7 @ 8
+  biceq r4,r4,#(128<<(24))@ 7 @ 8
+  movs r5,r5,lsr #1
+  update_c
+  update_z
+  mov r5,r5, lsl #16
+  add1cycle
+.endm
+.macro a_ror8
+  mov r5,r5, lsr #24
+  tst r4, #(1<<(24)) @ 0
+  orrne r5, r5, #0x00000100
+  orrne r4,r4,#(128<<(24))@ 7 @ 8
+  biceq r4,r4,#(128<<(24))@ 7 @ 8
+  movs r5,r5,lsr #1
+  update_c
+  update_z
+  mov r5,r5, lsl #24
+  add1cycle
+.endm
+.macro ror16
+  s9xgetwordlowregns r1
+  tst r4, #(1<<(24)) @ 0
+  orrne r1, r1, #0x00010000
+  orrne r4,r4,#(128<<(24))@ 7 @ 8
+  biceq r4,r4,#(128<<(24))@ 7 @ 8
+  movs r1,r1,lsr #1
+  update_c
+  update_z
+  s9xsetwordlow r1
+  add1cycle
+
+.endm
+.macro ror8
+  s9xgetbytelowregns r1
+  tst r4, #(1<<(24)) @ 0
+  orrne r1, r1, #0x00000100
+  orrne r4,r4,#(128<<(24))@ 7 @ 8
+  biceq r4,r4,#(128<<(24))@ 7 @ 8
+  movs r1,r1,lsr #1
+  update_c
+  update_z
+  s9xsetbytelow r1
+  add1cycle
+.endm
+
+.macro sbc16
+        tst r4, #(8<<(24)) @ 3
+  beq 1111f
+  @ todo
+  s9xgetword
+
+  stmfd r13!,{r10}
+  mov r10,#0x000f0000
+        @ r1 - result
+        @ r2 - scratch
+        @ r3 - scratch
+        @ r10 - pattern
+
+  and r1, r0, #0x000f0000
+  tst r4, #(1<<(24)) @ 0
+  addeq r1, r1, #0x00010000 @ w1=w1+!carry
+  and r3, r5, #0x000f0000
+        sub r1, r3,r1 @ r1=a1-w1-!carry
+  cmp r1, #0x00090000 @ if r1 > 9
+  addhi r1, r1, #0x000a0000 @ then r1 += 10
+  and r1, r1, #0x000f0000
+
+  and r2, r10, r0, lsr #4
+        addhi r2, r2, #0x00010000 @ then (w2++)
+
+  and r3, r10, r5, lsr #4
+        sub r2, r3, r2 @ r2=a2-w2
+  cmp r2, #0x00090000 @ if r2 > 9
+  addhi r2, r2, #0x000a0000 @ then r2 += 10
+  and r2, r2, #0x000f0000
+  orr r1, r1, r2,lsl #4
+
+  and r2, r10, r0, lsr #8
+        addhi r2, r2, #0x00010000 @ then (w3++)
+
+  and r3, r10, r5, lsr #8
+        sub r2, r3, r2 @ r3=a3-w3
+  cmp r2, #0x00090000 @ if r3 > 9
+  addhi r2, r2, #0x000a0000 @ then r3 += 10
+  and r2, r2, #0x000f0000
+  orr r1, r1, r2,lsl #8
+
+  and r2, r10, r0, lsr #12
+        addhi r2, r2, #0x00010000 @ then (w3++)
+
+  and r3, r10, r5, lsr #12
+        sub r2, r3, r2 @ r4=a4-w4
+  cmp r2, #0x00090000 @ if r4 > 9
+  addhi r2, r2, #0x000a0000 @ then r4 += 10
+  bichi r4, r4, #(1<<(24)) @ 0 @ then clearcarry
+  orrls r4, r4, #(1<<(24)) @ 0 @ else setcarry
+
+  and r2,r2,#0x000f0000
+  orr r1,r1,r2,lsl #12
+
+  ldmfd r13!,{r10}
+  @ only last bit
+  and r5,r5,#0x80000000
+  @ (register.a.w ^ work8)
+  eors r2, r5, r0
+  biceq r4, r4, #(64<<(24)) @ 6 @ 4 @ 0 : and mask 11111011111 : set v to zero
+  beq 1112f
+  @ (register.a.w ^ ans8)
+  eors r2, r5, r1
+  @ & 0x80
+  tstne r2,#0x80000000
+  biceq r4, r4, #(64<<(24)) @ 6 @ 4 @ 0 : and mask 11111011111 : set v to zero
+  orrne r4, r4, #(64<<(24)) @ 6 @ 4 @ 1 : or mask 00000100000 : set v to one
+1112:
+  movs r5, r1
+  update_zn
+  b 1113f
+1111:
+  s9xgetwordlow
+  movs r1,r4,lsr #(24 +1)
+  sbcs r5, r5, r0, lsl #16
+  @ overflow
+  orrvs r4, r4, #(64<<(24)) @ 6 @ 4
+  bicvc r4, r4, #(64<<(24)) @ 6 @ 4
+  mov r5, r5, lsr #16
+  @ carry
+  update_c
+  movs r5, r5, lsl #16
+  @ update flag
+  update_zn
+1113:
+.endm
+
+.macro sbc8
+  tst r4, #(8<<(24)) @ 3
+  beq 1111f
+  s9xgetbyte
+  stmfd r13!,{r0}
+  mov r3,#0x0f000000
+  @ r1=xxw1xxxxxxxxxxxx
+  and r1, r0, r3
+  @ r0=xxw2xxxxxxxxxxxx
+  and r0, r3, r0, lsr #4
+  @ r2=xxa2xxxxxxxxxxxx
+  and r2, r3, r5, lsr #4
+  @ r3=xxa1xxxxxxxxxxxx
+  and r3,r5,r3
+  @ r1=a1-w1-!carry
+  tst r4, #(1<<(24)) @ 0
+  addeq r1, r1, #0x01000000
+  sub r1,r3,r1
+  @ if r1 > 9
+  cmp r1, #0x09000000
+  @ then r1 += 10
+  addhi r1, r1, #0x0a000000
+  @ then a2-- (w2++)
+  addhi r0, r0, #0x01000000
+  @ r2=a2-w2
+  sub r2, r2, r0
+  @ if r2 > 9
+  cmp r2, #0x09000000
+  @ then r2 -= 10@
+  addhi r2, r2, #0x0a000000
+  @ then setcarry()
+  bichi r4, r4, #(1<<(24)) @ 0 @ 1 : or mask 00000100000 : set c to one
+  @ else clearcarry()
+  orrls r4, r4, #(1<<(24)) @ 0 @ 0 : and mask 11111011111 : set c to zero
+  @ gather r2 and r1 into ans8
+  and r2,r2,#0x0f000000
+  and r1,r1,#0x0f000000
+  @ r2 : 0r2000000
+  @ r1 : 0r1000000
+  @ -> 0xr2r1000000
+  orr r1, r1, r2, lsl #4
+  ldmfd r13!,{r0}
+  @ only last bit
+  and r5,r5,#0x80000000
+  @ (register.al ^ work8)
+  eors r2, r5, r0
+  biceq r4, r4, #(64<<(24)) @ 6 @ 4 @ 0 : and mask 11111011111 : set v to zero
+  beq 1112f
+  @ (register.al ^ ans8)
+  eors r2, r5, r1
+  @ & 0x80
+  tstne r2,#0x80000000
+  biceq r4, r4, #(64<<(24)) @ 6 @ 4 @ 0 : and mask 11111011111 : set v to zero
+  orrne r4, r4, #(64<<(24)) @ 6 @ 4 @ 1 : or mask 00000100000 : set v to one
+1112:
+  movs r5, r1
+  update_zn
+  b 1113f
+1111:
+  s9xgetbytelow
+  movs r1,r4,lsr #(24 +1)
+  sbcs r5, r5, r0, lsl #24
+  @ overflow
+  orrvs r4, r4, #(64<<(24)) @ 6 @ 4
+  bicvc r4, r4, #(64<<(24)) @ 6 @ 4
+  @ carry
+  update_c
+  @ update flag
+  ands r5, r5, #0xff000000
+  update_zn
+1113:
+.endm
+
+.macro sta16
+  s9xsetword r5
+.endm
+.macro sta8
+  s9xsetbyte r5
+.endm
+.macro stx16
+  s9xsetword r7
+.endm
+.macro stx8
+  s9xsetbyte r7
+.endm
+.macro sty16
+  s9xsetword r9
+.endm
+.macro sty8
+  s9xsetbyte r9
+.endm
+.macro stz16
+  s9xsetwordzero
+.endm
+.macro stz8
+  s9xsetbytezero
+.endm
+.macro tsb16
+  s9xgetwordregns r1
+  tst r5, r1
+  bicne r4, r4, #(2<<(24)) @ 1 @ 0 : and mask 11111011111 : set z to zero
+  orreq r4, r4, #(2<<(24)) @ 1 @ 1 : or mask 00000100000 : set z to one
+  orr r1, r5, r1
+  s9xsetword r1
+  add1cycle
+.endm
+.macro tsb8
+  s9xgetbyteregns r1
+  tst r5, r1
+  bicne r4, r4, #(2<<(24)) @ 1 @ 0 : and mask 11111011111 : set z to zero
+  orreq r4, r4, #(2<<(24)) @ 1 @ 1 : or mask 00000100000 : set z to one
+  orr r1, r5, r1
+  s9xsetbyte r1
+  add1cycle
+.endm
+.macro trb16
+  s9xgetwordregns r1
+  tst r5, r1
+  bicne r4, r4, #(2<<(24)) @ 1 @ 0 : and mask 11111011111 : set z to zero
+  orreq r4, r4, #(2<<(24)) @ 1 @ 1 : or mask 00000100000 : set z to one
+  mvn r2, r5
+  and r1, r2, r1
+  s9xsetword r1
+  add1cycle
+.endm
+.macro trb8
+  s9xgetbyteregns r1
+  tst r5, r1
+  bicne r4, r4, #(2<<(24)) @ 1 @ 0 : and mask 11111011111 : set z to zero
+  orreq r4, r4, #(2<<(24)) @ 1 @ 1 : or mask 00000100000 : set z to one
+  mvn r2, r5
+  and r1, r2, r1
+  s9xsetbyte r1
+  add1cycle
+.endm
+
+
+
+
+
+.macro op09m0
+  ldrb r1, [r10,#1]
+  ldrb r0, [r10], #2
+  orr r1,r0,r1,lsl #8
+  orrs r5,r5,r1,lsl #16
+  update_zn
+  add2mem
+.endm
+.macro op09m1
+  ldrb r0, [r10], #1
+  orrs r5,r5,r0,lsl #24
+  update_zn
+  add1mem
+.endm
+
+.macro op90
+  asmrelative
+  branchcheck0
+  tst r4, #(1<<(24)) @ 0
+  bne 1111f
+                add r10, r0, r12 @ r10 = opaddress +pcbase
+                add1cycle
+                cpushutdown
+1111:
+.endm
+.macro opb0
+  asmrelative
+  branchcheck0
+  tst r4, #(1<<(24)) @ 0
+  beq 1111f
+                add r10, r0, r12 @ r10 = opaddress +pcbase
+                add1cycle
+                cpushutdown
+1111:
+.endm
+.macro opf0
+  asmrelative
+  branchcheck2
+  tst r4, #(2<<(24)) @ 1
+  beq 1111f
+                add r10, r0, r12 @ r10 = opaddress +pcbase
+                add1cycle
+                cpushutdown
+1111:
+.endm
+.macro opd0
+  asmrelative
+  branchcheck1
+  tst r4, #(2<<(24)) @ 1
+  bne 1111f
+                add r10, r0, r12 @ r10 = opaddress +pcbase
+                add1cycle
+                cpushutdown
+1111:
+.endm
+.macro op30
+  asmrelative
+  branchcheck0
+  tst r4, #(128<<(24))@ 7 @ 8
+  beq 1111f
+                add r10, r0, r12 @ r10 = opaddress +pcbase
+                add1cycle
+                cpushutdown
+1111:
+.endm
+.macro op10
+  asmrelative
+  branchcheck1
+  tst r4, #(128<<(24))@ 7 @ 8 @ neg, z!=0, ne
+  bne 1111f
+                add r10, r0, r12 @ r10 = opaddress + pcbase
+                add1cycle
+                cpushutdown
+1111:
+.endm
+.macro op50
+  asmrelative
+  branchcheck0
+  tst r4, #(64<<(24)) @ 6 @ 4 @ neg, z!=0, ne
+  bne 1111f
+                add r10, r0, r12 @ r10 = opaddress + pcbase
+                add1cycle
+                cpushutdown
+1111:
+.endm
+.macro op70
+  asmrelative
+  branchcheck0
+  tst r4, #(64<<(24)) @ 6 @ 4 @ neg, z!=0, ne
+  beq 1111f
+                add r10, r0, r12 @ r10 = opaddress + pcbase
+                add1cycle
+                cpushutdown
+1111:
+.endm
+.macro op80
+  asmrelative
+                add r10, r0, r12 @ r10 = opaddress + pcbase
+                add1cycle
+                cpushutdown
+1111:
+.endm
+
+
+
+.macro op38
+  orr r4, r4, #(1<<(24)) @ 0 @ 1 : or mask 00000100000 : set c to one
+  add1cycle
+.endm
+.macro opf8
+  setdecimal
+  add1cycle
+.endm
+.macro op78
+  setirq
+  add1cycle
+.endm
+
+
+
+
+.macro op18
+  bic r4, r4, #(1<<(24)) @ 0
+  add1cycle
+.endm
+.macro opd8
+  cleardecimal
+  add1cycle
+.endm
+.macro op58
+  clearirq
+  add1cycle
+  @ check_for_irq
+.endm
+.macro opb8
+  bic r4, r4, #(64<<(24)) @ 6 @ 4
+  add1cycle
+.endm
+
+
+
+
+.macro opcax1
+  mov r2,#0
+  subs r7, r7, #0x01000000
+  str r2,[r14,#40]
+  update_zn
+  add1cycle
+.endm
+.macro opcax0
+  mov r2,#0
+  subs r7, r7, #0x00010000
+  str r2,[r14,#40]
+  update_zn
+  add1cycle
+.endm
+.macro op88x1
+  mov r2,#0
+  subs r9, r9, #0x01000000
+  str r2,[r14,#40]
+  update_zn
+  add1cycle
+.endm
+.macro op88x0
+  mov r2,#0
+  subs r9, r9, #0x00010000
+  str r2,[r14,#40]
+  update_zn
+  add1cycle
+.endm
+
+
+
+.macro ope8x1
+  mov r2,#0
+  adds r7, r7, #0x01000000
+  str r2,[r14,#40]
+  update_zn
+  add1cycle
+.endm
+.macro ope8x0
+  mov r2,#0
+  adds r7, r7, #0x00010000
+  str r2,[r14,#40]
+  update_zn
+  add1cycle
+.endm
+.macro opc8x1
+  mov r2,#0
+  adds r9, r9, #0x01000000
+  str r2,[r14,#40]
+  update_zn
+  add1cycle
+.endm
+.macro opc8x0
+  mov r2,#0
+  adds r9, r9, #0x00010000
+  str r2,[r14,#40]
+  update_zn
+  add1cycle
+.endm
+
+
+
+
+.macro opea
+  add1cycle
+.endm
+
+
+
+.macro opf4
+  absolute
+  pushwrlow
+.endm
+.macro opd4
+  directindirect
+  pushwrlow
+.endm
+.macro op62
+  asmrelativelong
+  pushwrlow
+.endm
+.macro op48m0
+  pushw r5
+  add1cycle
+.endm
+.macro op48m1
+  pushb r5
+  add1cycle
+.endm
+.macro op8b
+  and r1, r4, #0xff
+  pushblow r1
+  add1cycle
+.endm
+.macro op0b
+  pushw r6
+  add1cycle
+.endm
+.macro op4b
+  pushblow r6
+  add1cycle
+.endm
+.macro op08
+  pushb r4
+  add1cycle
+.endm
+.macro opdax1
+  pushb r7
+  add1cycle
+.endm
+.macro opdax0
+  pushw r7
+  add1cycle
+.endm
+.macro op5ax1
+  pushb r9
+  add1cycle
+.endm
+.macro op5ax0
+  pushw r9
+  add1cycle
+.endm
+
+
+.macro op68m1
+  pullbs r5
+  update_zn
+  add2cycle
+.endm
+.macro op68m0
+  pullws r5
+  update_zn
+  add2cycle
+.endm
+.macro opab
+  bic r4,r4, #0xff
+  pullbrs
+  orr r4,r4,r0, lsr #24
+  update_zn
+  add2cycle
+.endm
+.macro op2b
+  bic r6,r6, #0xff000000
+  bic r6,r6, #0x00ff0000
+  pullwrs
+  orr r6,r0,r6
+  update_zn
+  add2cycle
+.endm
+.macro op28x1m1
+  @ index set, memory set
+  bic r4,r4,#0xff000000
+  pullbr
+  orr r4,r0,r4
+  tst r4, #(16<<(24)) @ 4 @ 1
+  @ index clear & was set : 8->16
+  moveq r7,r7,lsr #8
+  moveq r9,r9,lsr #8
+  tst r4, #(32<<(24)) @ 5 @ 2
+  @ memory cleared & was set : 8->16
+  ldreqb r0,[r14,#13]
+  moveq r5,r5,lsr #8
+  orreq r5,r5,r0, lsl #24
+  s9xfixcycles
+  add2cycle
+.endm
+.macro op28x0m1
+  @ index cleared, memory set
+  bic r4,r4,#0xff000000
+  pullbr
+  orr r4,r0,r4
+  tst r4, #(16<<(24)) @ 4 @ 1
+  @ index set & was cleared : 16->8
+  movne r7,r7,lsl #8
+  movne r9,r9,lsl #8
+  tst r4, #(32<<(24)) @ 5 @ 2
+  @ memory cleared & was set : 8->16
+  ldreqb r0,[r14,#13]
+  moveq r5,r5,lsr #8
+  orreq r5,r5,r0, lsl #24
+  s9xfixcycles
+  add2cycle
+.endm
+.macro op28x1m0
+  @ index set, memory set
+  bic r4,r4,#0xff000000
+  pullbr
+  orr r4,r0,r4
+  tst r4, #(16<<(24)) @ 4 @ 1
+  @ index clear & was set : 8->16
+  moveq r7,r7,lsr #8
+  moveq r9,r9,lsr #8
+  tst r4, #(32<<(24)) @ 5 @ 2
+  @ memory set & was cleared : 16->8
+  movne r0,r5,lsr #24
+  movne r5,r5,lsl #8
+  strneb r0,[r14,#13]
+  s9xfixcycles
+  add2cycle
+.endm
+.macro op28x0m0
+  @ index set, memory set
+  bic r4,r4,#0xff000000
+  pullbr
+  orr r4,r0,r4
+  tst r4, #(16<<(24)) @ 4 @ 1
+  @ index set & was cleared : 16->8
+  movne r7,r7,lsl #8
+  movne r9,r9,lsl #8
+  tst r4, #(32<<(24)) @ 5 @ 2
+  @ memory set & was cleared : 16->8
+  movne r0,r5,lsr #24
+  movne r5,r5,lsl #8
+  strneb r0,[r14,#13]
+  s9xfixcycles
+  add2cycle
+.endm
+.macro opfax1
+  pullbs r7
+  update_zn
+  add2cycle
+.endm
+.macro opfax0
+  pullws r7
+  update_zn
+  add2cycle
+.endm
+.macro op7ax1
+  pullbs r9
+  update_zn
+  add2cycle
+.endm
+.macro op7ax0
+  pullws r9
+  update_zn
+  add2cycle
+.endm
+
+
+
+.macro opaax1m1
+  movs r7, r5
+  update_zn
+  add1cycle
+.endm
+.macro opaax0m1
+  ldrb r7, [r14,#13]
+  mov r7, r7,lsl #24
+  orrs r7, r7,r5, lsr #8
+  update_zn
+  add1cycle
+.endm
+.macro opaax1m0
+  movs r7, r5, lsl #8
+  update_zn
+  add1cycle
+.endm
+.macro opaax0m0
+  movs r7, r5
+  update_zn
+  add1cycle
+.endm
+.macro opa8x1m1
+  movs r9, r5
+  update_zn
+  add1cycle
+.endm
+.macro opa8x0m1
+  ldrb r9, [r14,#13]
+  mov r9, r9,lsl #24
+  orrs r9, r9,r5, lsr #8
+  update_zn
+  add1cycle
+.endm
+.macro opa8x1m0
+  movs r9, r5, lsl #8
+  update_zn
+  add1cycle
+.endm
+.macro opa8x0m0
+  movs r9, r5
+  update_zn
+  add1cycle
+.endm
+.macro op5bm1
+  ldrb r0, [r14,#13]
+  mov r6,r6,lsl #16
+  mov r0,r0,lsl #24
+  orrs r0,r0,r5, lsr #8
+  update_zn
+  orr r6,r0,r6,lsr #16
+  add1cycle
+.endm
+.macro op5bm0
+  mov r6,r6,lsl #16
+  movs r5,r5
+  update_zn
+  orr r6,r5,r6,lsr #16
+  add1cycle
+.endm
+.macro op1bm1
+  tst r4, #(1<<(24 -1))
+  movne r8, r5, lsr #24
+  orrne r8, r8, #0x100
+  ldreqb r8, [r14,#13]
+  orreq r8, r8, r5
+  moveq r8, r8, ror #24
+  add1cycle
+.endm
+.macro op1bm0
+  mov r8, r5, lsr #16
+  add1cycle
+.endm
+.macro op7bm1
+  movs r5, r6, asr #16
+  update_zn
+  mov r0,r5,lsr #8
+  mov r5,r5, lsl #24
+  strb r0, [r14,#13]
+  add1cycle
+.endm
+.macro op7bm0
+  movs r5, r6, asr #16
+  update_zn
+  mov r5,r5, lsl #16
+  add1cycle
+.endm
+.macro op3bm1
+  mov r0,r8, lsr #8
+  movs r5, r8, lsl #16
+  strb r0, [r14,#13]
+  update_zn
+  mov r5,r5, lsl #8
+  add1cycle
+.endm
+.macro op3bm0
+  movs r5, r8, lsl #16
+  update_zn
+  add1cycle
+.endm
+.macro opbax1
+  movs r7, r8, lsl #24
+  update_zn
+  add1cycle
+.endm
+.macro opbax0
+  movs r7, r8, lsl #16
+  update_zn
+  add1cycle
+.endm
+.macro op8am1x1
+  movs r5, r7
+  update_zn
+  add1cycle
+.endm
+.macro op8am1x0
+  movs r5, r7, lsl #8
+  update_zn
+  add1cycle
+.endm
+.macro op8am0x1
+  movs r5, r7, lsr #8
+  update_zn
+  add1cycle
+.endm
+.macro op8am0x0
+  movs r5, r7
+  update_zn
+  add1cycle
+.endm
+.macro op9ax1
+  mov r8, r7, lsr #24
+  tst r4, #(1<<(24 -1))
+  orrne r8, r8, #0x100
+  add1cycle
+.endm
+.macro op9ax0
+  mov r8, r7, lsr #16
+  add1cycle
+.endm
+.macro op9bx1
+  movs r9, r7
+  update_zn
+  add1cycle
+.endm
+.macro op9bx0
+  movs r9, r7
+  update_zn
+  add1cycle
+.endm
+.macro op98m1x1
+  movs r5, r9
+  update_zn
+  add1cycle
+.endm
+.macro op98m1x0
+  movs r5, r9, lsl #8
+  update_zn
+  add1cycle
+.endm
+.macro op98m0x1
+  movs r5, r9, lsr #8
+  update_zn
+  add1cycle
+.endm
+.macro op98m0x0
+  movs r5, r9
+  update_zn
+  add1cycle
+.endm
+.macro opbbx1
+  movs r7, r9
+  update_zn
+  add1cycle
+.endm
+.macro opbbx0
+  movs r7, r9
+  update_zn
+  add1cycle
+.endm
+
+
+
+
+.macro opfb
+    tst r4,#(1<<(24)) @ 0
+    beq 1111f
+    @ carry is set
+    tst r4,#(1<<(24 -1))
+    bne 1112f
+    @ emul is cleared
+    bic r4,r4,#(1<<(24)) @ 0
+    tst r4,#(16<<(24)) @ 4 @ 1
+    @ x & y were 16bits before
+    moveq r7,r7,lsl #8
+    moveq r9,r9,lsl #8
+    tst r4,#(32<<(24)) @ 5 @ 2
+    @ a was 16bits before
+    @ save ah
+    moveq r0,r5,lsr #24
+    streqb r0,[r14,#13]
+    moveq r5,r5,lsl #8
+    orr r4,r4,#813694976
+    and r8,r8,#0xff
+    orr r8,r8,#0x100
+    b 1113f
+1112:
+    @ emul is set
+    tst r4,#(16<<(24)) @ 4 @ 1
+    @ x & y were 16bits before
+    moveq r7,r7,lsl #8
+    moveq r9,r9,lsl #8
+    tst r4,#(32<<(24)) @ 5 @ 2
+    @ a was 16bits before
+    @ save ah
+    moveq r0,r5,lsr #24
+    streqb r0,[r14,#13]
+    moveq r5,r5,lsl #8
+    orr r4,r4,#822083584
+    and r8,r8,#0xff
+    orr r8,r8,#0x100
+    b 1113f
+1111:
+    @ carry is cleared
+    tst r4,#(1<<(24 -1))
+    beq 1115f
+    @ emul was set : x,y & a were 8bits
+    @ now have to check memory & index for potential conversions to 16bits
+    tst r4,#(16<<(24)) @ 4 @ 1
+    @ x & y are now 16bits
+    moveq r7,r7,lsr #8
+    moveq r9,r9,lsr #8
+    tst r4,#(32<<(24)) @ 5 @ 2
+    @ a is now 16bits
+    moveq r5,r5,lsr #8
+    @ restore ah
+    ldreqb r0,[r14,#13]
+    orreq r5,r5,r0,lsl #24
+1115:
+    bic r4,r4,#(1<<(24 -1))
+    orr r4,r4,#(1<<(24)) @ 0
+1113:
+    add1cycle
+    s9xfixcycles
+.endm
+
+
+
+.macro op00
+  mov r0,#1
+  strb r0,[r14,#87]
+
+  tst r4, #(1<<(24 -1))
+  @ eq is flag to zero (!checkemu)
+  bne 2001f@ elseop00
+  pushblow r6
+  sub r0, r10, r12
+  add r1, r0, #1
+  pushwlow r1
+  @ packstatus
+  pushb r4
+  cleardecimal
+  setirq
+  bic r6, r6, #0xff
+  mov r0, #0xe6
+  orr r0, r0, #0xff00
+  s9xgetwordlow
+  s9xsetpcbase
+  add2cycle
+  b 2002f@ endop00
+2001:@ elseop00
+  sub r1, r10, r12
+  pushwlow r1
+  @ packstatus
+  pushb r4
+  cleardecimal
+  setirq
+  bic r6,r6, #0xff
+  mov r0, #0xfe
+  orr r0, r0, #0xff00
+  s9xgetwordlow
+  s9xsetpcbase
+  add1cycle
+2002:@ endop00
+.endm
+
+
+
+
+.macro op82
+  asmrelativelong
+  orr r0, r0, r6, lsl #16
+  s9xsetpcbase
+.endm
+
+
+@ void s9xopcode_irq (void)
+.macro s9xopcode_irq @ irq
+  tst r4, #(1<<(24 -1))
+  @ eq is flag to zero (!checkemu)
+  bne 2121f@ elseop02
+  pushblow r6
+  sub r1, r10, r12
+  pushwlow r1
+  @ packstatus
+  pushb r4
+  cleardecimal
+  setirq
+  bic r6, r6,#0xff
+  mov r0, #0xee
+  orr r0, r0, #0xff00
+  s9xgetwordlow
+  s9xsetpcbase
+  add2cycle
+  b 2122f
+2121:@ else
+  sub r1, r10, r12
+  pushwlow r1
+  @ packstatus
+  pushb r4
+  cleardecimal
+  setirq
+  bic r6,r6, #0xff
+  mov r0, #0xfe
+  orr r0, r0, #0xff00
+  s9xgetwordlow
+  s9xsetpcbase
+  add1cycle
+2122:
+.endm
+# 3564 "os9x_65c816.S"
+@ void s9xopcode_nmi (void)
+.macro s9xopcode_nmi @ nmi
+  tst r4, #(1<<(24 -1))
+  @ eq is flag to zero (!checkemu)
+  bne 2123f@ elseop02
+  pushblow r6
+  sub r1, r10, r12
+  pushwlow r1
+  @ packstatus
+  pushb r4
+  cleardecimal
+  setirq
+  bic r6, r6,#0xff
+  mov r0, #0xea
+  orr r0, r0, #0xff00
+  s9xgetwordlow
+  s9xsetpcbase
+  add2cycle
+  b 2124f
+2123:@ else
+  sub r1, r10, r12
+  pushwlow r1
+  @ packstatus
+  pushb r4
+  cleardecimal
+  setirq
+  bic r6,r6, #0xff
+  mov r0, #0xfa
+  orr r0, r0, #0xff00
+  s9xgetwordlow
+  s9xsetpcbase
+  add1cycle
+2124:
+.endm
+# 3629 "os9x_65c816.S"
+.macro op02
+  tst r4, #(1<<(24 -1))
+  @ eq is flag to zero (!checkemu)
+  bne 2021f@ elseop02
+  pushblow r6
+  sub r0, r10, r12
+  add r1, r0, #1
+  pushwlow r1
+  @ packstatus
+  pushb r4
+  cleardecimal
+  setirq
+  bic r6, r6,#0xff
+  mov r0, #0xe4
+  orr r0, r0, #0xff00
+  s9xgetwordlow
+  s9xsetpcbase
+  add2cycle
+  b 2022f@ endop02
+2021:@ elseop02
+  sub r1, r10, r12
+  pushwlow r1
+  @ packstatus
+  pushb r4
+  cleardecimal
+  setirq
+  bic r6,r6, #0xff
+  mov r0, #0xf4
+  orr r0, r0, #0xff00
+  s9xgetwordlow
+  s9xsetpcbase
+  add1cycle
+2022:@ endop02
+.endm
+
+
+
+.macro opdc
+  absoluteindirectlong
+  bic r6,r6,#0xff
+  orr r6,r6, r0, lsr #16
+  s9xsetpcbase
+  add2cycle
+.endm
+.macro op5c
+  absolutelong
+  bic r6,r6,#0xff
+  orr r6,r6, r0, lsr #16
+  s9xsetpcbase
+.endm
+
+
+
+.macro op4c
+  absolute
+  bic r0, r0, #0xff0000
+  orr r0, r0, r6, lsl #16
+  s9xsetpcbase
+  cpushutdown
+.endm
+.macro op6c
+  absoluteindirect
+  bic r0, r0, #0xff0000
+  orr r0, r0, r6, lsl #16
+  s9xsetpcbase
+.endm
+.macro op7c
+  add r0, r0, r6, lsl #16
+  s9xsetpcbase
+  add1cycle
+.endm
+
+
+
+.macro op22
+  pushblow r6
+  sub r0, r10, r12
+  @ sub r1, r1, #1
+  add r1, r0, #2
+  pushwlow r1
+  absolutelong
+  bic r6,r6,#0xff
+  orr r6, r6, r0, lsr #16
+  s9xsetpcbase
+.endm
+.macro op6b
+  pullwlow r10
+  bic r6,r6,#0xff
+  pullbrlow
+  orr r6, r6, r0
+  add r0, r10, #1
+  bic r0, r0,#0xff0000
+  orr r0, r0, r6, lsl #16
+  s9xsetpcbase
+  add2cycle
+.endm
+
+
+.macro op20
+  sub r0, r10, r12
+  @ sub r1, r1, #1
+  add r1, r0, #1
+  pushwlow r1
+  absolute
+  bic r0, r0, #0xff0000
+  orr r0, r0, r6, lsl #16
+  s9xsetpcbase
+  add1cycle
+.endm
+.macro opfcx0
+  sub r0, r10, r12
+  @ sub r1, r1, #1
+  add r1, r0, #1
+  pushwlow r1
+  absoluteindexedindirectx0
+  orr r0, r0, r6, lsl #16
+  s9xsetpcbase
+  add1cycle
+.endm
+.macro opfcx1
+  sub r0, r10, r12
+  @ sub r1, r1, #1
+  add r1, r0, #1
+  pushwlow r1
+  absoluteindexedindirectx1
+  orr r0, r0, r6, lsl #16
+  s9xsetpcbase
+  add1cycle
+.endm
+.macro op60
+  pullwlow r10
+  add r0, r10, #1
+  bic r0, r0,#0x10000
+  orr r0, r0, r6, lsl #16
+  s9xsetpcbase
+  add3cycle
+.endm
+
+
+
+.macro op54x1m1
+  @ save regstatus = r4 >> 24
+  mov r0, r4, lsr #16
+                ldrb r4 , [r10], #1
+  ldrb r1 , [r10], #1
+  @ restore regstatus = r4 >> 24
+  orr r4, r4, r0, lsl #16
+  mov r0 , r7, lsr #24
+                orr r0 , r0, r1, lsl #16
+  s9xgetbytelow
+  mov r1, r0
+  mov r0 , r9, lsr #24
+  orr r0 , r0, r4, lsl #16
+  s9xsetbytelow r1
+  @ load 16bits a
+  ldrb r0,[r14,#13]
+  mov r5,r5,lsr #8
+  orr r5,r5,r0, lsl #24
+  add r7, r7, #0x01000000
+  sub r5, r5, #0x00010000
+  add r9, r9, #0x01000000
+                cmp r5, #0xffff0000
+                subne r10, r10, #3
+                @ update ah
+                mov r0, r5, lsr #24
+                mov r5,r5,lsl #8
+                strb r0,[r14,#13]
+                add2cycle2mem
+.endm
+.macro op54x1m0
+  @ save regstatus = r4 >> 24
+  mov r0, r4, lsr #16
+                ldrb r4 , [r10], #1
+  ldrb r1 , [r10], #1
+  @ restore regstatus = r4 >> 24
+  orr r4, r4, r0, lsl #16
+  mov r0 , r7, lsr #24
+                orr r0 , r0, r1, lsl #16
+  s9xgetbytelow
+  mov r1, r0
+  mov r0 , r9, lsr #24
+  orr r0 , r0, r4, lsl #16
+  s9xsetbytelow r1
+  add r7, r7, #0x01000000
+  sub r5, r5, #0x00010000
+  add r9, r9, #0x01000000
+                cmp r5, #0xffff0000
+                subne r10, r10, #3
+                add2cycle2mem
+.endm
+.macro op54x0m1
+  @ save regstatus = r4 >> 24
+  mov r0, r4, lsr #16
+                ldrb r4 , [r10], #1
+  ldrb r1 , [r10], #1
+  @ restore regstatus = r4 >> 24
+  orr r4, r4, r0, lsl #16
+  mov r0 , r7, lsr #16
+                orr r0 , r0, r1, lsl #16
+  s9xgetbytelow
+  mov r1, r0
+  mov r0 , r9, lsr #16
+  orr r0 , r0, r4, lsl #16
+  s9xsetbytelow r1
+  @ load 16bits a
+  ldrb r0,[r14,#13]
+  mov r5,r5,lsr #8
+  orr r5,r5,r0, lsl #24
+  add r7, r7, #0x00010000
+  sub r5, r5, #0x00010000
+  add r9, r9, #0x00010000
+                cmp r5, #0xffff0000
+                subne r10, r10, #3
+                @ update ah
+                mov r0, r5, lsr #24
+                mov r5,r5,lsl #8
+                strb r0,[r14,#13]
+                add2cycle2mem
+.endm
+.macro op54x0m0
+  @ save regstatus = r4 >> 24
+  mov r0, r4, lsr #16
+                ldrb r4 , [r10], #1
+  ldrb r1 , [r10], #1
+  @ restore regstatus = r4 >> 24
+  orr r4, r4, r0, lsl #16
+  mov r0 , r7, lsr #16
+                orr r0 , r0, r1, lsl #16
+  s9xgetbytelow
+  mov r1, r0
+  mov r0 , r9, lsr #16
+  orr r0 , r0, r4, lsl #16
+  s9xsetbytelow r1
+  add r7, r7, #0x00010000
+  sub r5, r5, #0x00010000
+  add r9, r9, #0x00010000
+                cmp r5, #0xffff0000
+                subne r10, r10, #3
+                add2cycle2mem
+.endm
+
+.macro op44x1m1
+  @ save regstatus = r4 >> 24
+  mov r0, r4, lsr #16
+                ldrb r4 , [r10], #1
+  ldrb r1 , [r10], #1
+  @ restore regstatus = r4 >> 24
+  orr r4, r4, r0, lsl #16
+  mov r0 , r7, lsr #24
+                orr r0 , r0, r1, lsl #16
+  s9xgetbytelow
+  mov r1, r0
+  mov r0 , r9, lsr #24
+  orr r0 , r0, r4, lsl #16
+  s9xsetbytelow r1
+  @ load 16bits a
+  ldrb r0,[r14,#13]
+  mov r5,r5,lsr #8
+  orr r5,r5,r0, lsl #24
+  sub r7, r7, #0x01000000
+  sub r5, r5, #0x00010000
+  sub r9, r9, #0x01000000
+                cmp r5, #0xffff0000
+                subne r10, r10, #3
+                @ update ah
+                mov r0, r5, lsr #24
+                mov r5,r5,lsl #8
+                strb r0,[r14,#13]
+                add2cycle2mem
+.endm
+.macro op44x1m0
+  @ save regstatus = r4 >> 24
+  mov r0, r4, lsr #16
+                ldrb r4 , [r10], #1
+  ldrb r1 , [r10], #1
+  @ restore regstatus = r4 >> 24
+  orr r4, r4, r0, lsl #16
+  mov r0 , r7, lsr #24
+                orr r0 , r0, r1, lsl #16
+  s9xgetbytelow
+  mov r1, r0
+  mov r0 , r9, lsr #24
+  orr r0 , r0, r4, lsl #16
+  s9xsetbytelow r1
+  sub r7, r7, #0x01000000
+  sub r5, r5, #0x00010000
+  sub r9, r9, #0x01000000
+                cmp r5, #0xffff0000
+                subne r10, r10, #3
+                add2cycle2mem
+.endm
+.macro op44x0m1
+  @ save regstatus = r4 >> 24
+  mov r0, r4, lsr #16
+                ldrb r4 , [r10], #1
+  ldrb r1 , [r10], #1
+  @ restore regstatus = r4 >> 24
+  orr r4, r4, r0, lsl #16
+  mov r0 , r7, lsr #16
+                orr r0 , r0, r1, lsl #16
+  s9xgetbytelow
+  mov r1, r0
+  mov r0 , r9, lsr #16
+  orr r0 , r0, r4, lsl #16
+  s9xsetbytelow r1
+  @ load 16bits a
+  ldrb r0,[r14,#13]
+  mov r5,r5,lsr #8
+  orr r5,r5,r0, lsl #24
+  sub r7, r7, #0x00010000
+  sub r5, r5, #0x00010000
+  sub r9, r9, #0x00010000
+                cmp r5, #0xffff0000
+                subne r10, r10, #3
+                @ update ah
+                mov r0, r5, lsr #24
+                mov r5,r5,lsl #8
+                strb r0,[r14,#13]
+                add2cycle2mem
+.endm
+.macro op44x0m0
+  @ save regstatus = r4 >> 24
+  mov r0, r4, lsr #16
+                ldrb r4 , [r10], #1
+  ldrb r1 , [r10], #1
+  @ restore regstatus = r4 >> 24
+  orr r4, r4, r0, lsl #16
+  mov r0 , r7, lsr #16
+                orr r0 , r0, r1, lsl #16
+  s9xgetbytelow
+  mov r1, r0
+  mov r0 , r9, lsr #16
+  orr r0 , r0, r4, lsl #16
+  s9xsetbytelow r1
+  sub r7, r7, #0x00010000
+  sub r5, r5, #0x00010000
+  sub r9, r9, #0x00010000
+                cmp r5, #0xffff0000
+                subne r10, r10, #3
+                add2cycle2mem
+.endm
+
+
+
+.macro opc2
+  @ status&=~(*r10++);
+  @ so possible changes are :
+  @ index = 1 -> 0 : x,y 8bits -> 16bits
+  @ mem = 1 -> 0 : a 8bits -> 16bits
+  @ save old status for (16<<(24)) @ 4 @ 1 & (32<<(24)) @ 5 @ 2 comparison
+  mov r2, r4
+  ldrb r0, [r10], #1
+  mvn r0, r0
+  and r4,r4,r0, ror #8 @ 32 - 24
+  tst r4,#(1<<(24 -1))
+  beq 1111f
+  @ emulation mode on : no changes since it was on before opcode
+  @ just be sure to reset mem & index accordingly
+  orr r4,r4,#805306368
+  b 1112f
+1111:
+  @ not in emulation mode, check index & memory bits
+  @ now check index
+  tst r2,#(16<<(24)) @ 4 @ 1
+  beq 1113f
+  @ x & y were 8bit before
+  tst r4,#(16<<(24)) @ 4 @ 1
+  bne 1113f
+  @ x & y are now 16bits
+  mov r7,r7,lsr #8
+  mov r9,r9,lsr #8
+1113: @ x & y still in 16bits
+  @ now check memory
+  tst r2,#(32<<(24)) @ 5 @ 2
+  beq 1112f
+  @ a was 8bit before
+  tst r4,#(32<<(24)) @ 5 @ 2
+  bne 1112f
+  @ a is now 16bits
+  mov r5,r5,lsr #8
+  @ restore ah
+      ldreqb r0,[r14,#13]
+      orreq r5,r5,r0,lsl #24
+1112:
+  s9xfixcycles
+  add1cycle1mem
+.endm
+.macro ope2
+  @ status|=*r10++;
+  @ so possible changes are :
+  @ index = 0 -> 1 : x,y 16bits -> 8bits
+  @ mem = 0 -> 1 : a 16bits -> 8bits
+  @ save old status for (16<<(24)) @ 4 @ 1 & (32<<(24)) @ 5 @ 2 comparison
+  mov r2, r4
+  ldrb r0, [r10], #1
+  orr r4,r4,r0, lsl #24
+  tst r4,#(1<<(24 -1))
+  beq 10111f
+  @ emulation mode on : no changes sinc eit was on before opcode
+  @ just be sure to have mem & index set accordingly
+  orr r4,r4,#805306368
+  b 10112f
+10111:
+  @ not in emulation mode, check index & memory bits
+  @ now check index
+  tst r2,#(16<<(24)) @ 4 @ 1
+  bne 10113f
+  @ x & y were 16bit before
+  tst r4,#(16<<(24)) @ 4 @ 1
+  beq 10113f
+  @ x & y are now 8bits
+  mov r7,r7,lsl #8
+  mov r9,r9,lsl #8
+10113: @ x & y still in 16bits
+  @ now check memory
+  tst r2,#(32<<(24)) @ 5 @ 2
+  bne 10112f
+  @ a was 16bit before
+  tst r4,#(32<<(24)) @ 5 @ 2
+  beq 10112f
+  @ a is now 8bits
+  @ save ah
+  mov r0,r5,lsr #24
+  mov r5,r5,lsl #8
+  strb r0,[r14,#13]
+10112:
+  s9xfixcycles
+  add1cycle1mem
+.endm
+
+
+
+.macro opebm1
+  @ a is 8bits
+  add r0,r14,#13
+  mov r5,r5, lsr #24
+  swpb r5,r5,[r0]
+  movs r5,r5, lsl #24
+  update_zn
+  add2cycle
+.endm
+.macro opebm0
+  @ a is 16bits
+  mov r0, r5, ror #24 @ ll0000hh
+  orr r0, r0, r5, lsr #8@ ll0000hh + 00hhll00 -> llhhllhh
+  mov r5, r0, lsl #16@ llhhllhh -> llhh0000
+  movs r0,r0,lsl #24 @ to set z & n flags with al
+  update_zn
+  add2cycle
+.endm
+
+
+
+
+.macro op40x1m1
+  @ index set, memory set
+  bic r4,r4,#0xff000000
+  pullbr
+  orr r4,r0,r4
+  pullwlow r10
+  tst r4, #(1<<(24 -1))
+  orrne r4, r4, #805306368
+                bne 2401f
+  pullbrlow
+  bic r6,r6,#0xff
+  orr r6,r6,r0
+2401:
+  add r0, r10, r6, lsl #16
+  s9xsetpcbase
+  tst r4, #(16<<(24)) @ 4 @ 1
+  @ index cleared & was set : 8->16
+  moveq r7,r7,lsr #8
+  moveq r9,r9,lsr #8
+  tst r4, #(32<<(24)) @ 5 @ 2
+  @ memory cleared & was set : 8->16
+  ldreqb r0,[r14,#13]
+  moveq r5,r5,lsr #8
+  orreq r5,r5,r0, lsl #24
+  add2cycle
+  s9xfixcycles
+.endm
+.macro op40x0m1
+  @ index cleared, memory set
+  bic r4,r4,#0xff000000
+  pullbr
+  orr r4,r0,r4
+  pullwlow r10
+  tst r4, #(1<<(24 -1))
+  orrne r4, r4, #805306368
+                bne 2401f
+  pullbrlow
+  bic r6,r6,#0xff
+  orr r6,r6,r0
+2401:
+  add r0, r10, r6, lsl #16
+  s9xsetpcbase
+  tst r4, #(16<<(24)) @ 4 @ 1
+  @ index set & was cleared : 16->8
+  movne r7,r7,lsl #8
+  movne r9,r9,lsl #8
+  tst r4, #(32<<(24)) @ 5 @ 2
+  @ memory cleared & was set : 8->16
+  ldreqb r0,[r14,#13]
+  moveq r5,r5,lsr #8
+  orreq r5,r5,r0, lsl #24
+  add2cycle
+  s9xfixcycles
+.endm
+.macro op40x1m0
+  @ index set, memory cleared
+  bic r4,r4,#0xff000000
+  pullbr
+  orr r4,r0,r4
+  pullwlow r10
+  tst r4, #(1<<(24 -1))
+  orrne r4, r4, #805306368
+                bne 2401f
+  pullbrlow
+  bic r6,r6,#0xff
+  orr r6,r6,r0
+2401:
+  add r0, r10, r6, lsl #16
+  s9xsetpcbase
+  tst r4, #(16<<(24)) @ 4 @ 1
+  @ index cleared & was set : 8->16
+  moveq r7,r7,lsr #8
+  moveq r9,r9,lsr #8
+  tst r4, #(32<<(24)) @ 5 @ 2
+  @ memory set & was cleared : 16->8
+  movne r0,r5,lsr #24
+  movne r5,r5,lsl #8
+  strneb r0,[r14,#13]
+  add2cycle
+  s9xfixcycles
+.endm
+.macro op40x0m0
+  @ index cleared, memory cleared
+  bic r4,r4,#0xff000000
+  pullbr
+  orr r4,r0,r4
+  pullwlow r10
+  tst r4, #(1<<(24 -1))
+  orrne r4, r4, #805306368
+                bne 2401f
+  pullbrlow
+  bic r6,r6,#0xff
+  orr r6,r6,r0
+2401:
+  add r0, r10, r6, lsl #16
+  s9xsetpcbase
+  tst r4, #(16<<(24)) @ 4 @ 1
+  @ index set & was cleared : 16->8
+  movne r7,r7,lsl #8
+  movne r9,r9,lsl #8
+  tst r4, #(32<<(24)) @ 5 @ 2
+  @ memory set & was cleared : 16->8
+  @ memory set & was cleared : 16->8
+  movne r0,r5,lsr #24
+  movne r5,r5,lsl #8
+  strneb r0,[r14,#13]
+  add2cycle
+  s9xfixcycles
+.endm
+
+
+
+
+@ wai
+.macro opcb
+ ldrb r0,[r14,#6]
+ movs r0,r0
+ @ (cpu.irqactive)
+ add2cyclene
+ bne 1234f
+
+
+
+ mov r0,#1
+ sub r10,r10,#1
+
+
+
+ strb r0,[r14,#7]
+ ldr r11,[r14,#48]
+# 4224 "os9x_65c816.S"
+ ldrb r0,[r14,#122]
+ movs r0,r0
+ beq 1234f
+ asmapu_execute2
+
+1234:
+.endm
+.macro opdb
+      sub r10,r10,#1
+      @ cpu.flags |= debug_mode_flag;
+.endm
+.macro op42
+.endm
+
+
+
+.macro op29m1
+  ldrb r0 , [r10], #1
+  ands r5 , r5, r0, lsl #24
+  update_zn
+  add1mem
+.endm
+.macro op29m0
+  ldrb r1 , [r10,#1]
+  ldrb r0 , [r10], #2
+  orr r0, r0, r1, lsl #8
+  ands r5 , r5, r0, lsl #16
+  update_zn
+  add2mem
+.endm
+# 4271 "os9x_65c816.S"
+.macro op49m0
+                ldrb r1 , [r10, #1]
+                ldrb r0 , [r10], #2
+  orr r0, r0, r1,lsl #8
+  eors r5, r5, r0,lsl #16
+  update_zn
+  add2mem
+.endm
+
+
+.macro op49m1
+                ldrb r0 , [r10], #1
+  eors r5, r5, r0,lsl #24
+  update_zn
+  add1mem
+.endm
+
+
+
+
+.macro op81m1
+  sta8
+  @ tst r4, #(16<<(24)) @ 4 @ 1
+  @ add1cyclene
+.endm
+.macro op81m0
+  sta16
+  @ tst r4, #(16<<(24)) @ 4 @ 1
+  @ add1cyclene
+.endm
+
+
+
+
+.macro op89m1
+                ldrb r0 , [r10], #1
+  tst r5, r0, lsl #24
+  update_z
+  add1mem
+.endm
+.macro op89m0
+                ldrb r1 , [r10, #1]
+                ldrb r0 , [r10], #2
+  orr r0, r0, r1, lsl #8
+  tst r5, r0, lsl #16
+  update_z
+  add2mem
+.endm
+# 4327 "os9x_65c816.S"
+.macro opa0x1
+                ldrb r0 , [r10], #1
+                movs r9, r0, lsl #24
+  update_zn
+  add1mem
+.endm
+.macro opa0x0
+                ldrb r1 , [r10, #1]
+                ldrb r0 , [r10], #2
+  orr r0, r0, r1, lsl #8
+                movs r9, r0, lsl #16
+  update_zn
+  add2mem
+.endm
+
+
+
+.macro opa2x1
+                ldrb r0 , [r10], #1
+                movs r7, r0, lsl #24
+  update_zn
+  add1mem
+.endm
+.macro opa2x0
+                ldrb r1 , [r10, #1]
+                ldrb r0 , [r10], #2
+  orr r0, r0, r1, lsl #8
+                movs r7, r0, lsl #16
+  update_zn
+  add2mem
+.endm
+
+
+
+.macro opa9m1
+                ldrb r0 , [r10], #1
+                movs r5, r0, lsl #24
+  update_zn
+  add1mem
+.endm
+.macro opa9m0
+                ldrb r1 , [r10, #1]
+                ldrb r0 , [r10], #2
+  orr r0, r0, r1, lsl #8
+                movs r5, r0, lsl #16
+  update_zn
+  add2mem
+.endm
+
+
+
+.macro opc0x1
+  ldrb r0 , [r10], #1
+  subs r1 , r9 , r0, lsl #24
+  biccc r4, r4, #(1<<(24)) @ 0
+  orrcs r4, r4, #(1<<(24)) @ 0
+  update_zn
+  add1mem
+.endm
+.macro opc0x0
+  ldrb r1 , [r10, #1]
+  ldrb r0 , [r10], #2
+  orr r0, r0, r1, lsl #8
+  subs r1 , r9, r0, lsl #16
+  biccc r4, r4, #(1<<(24)) @ 0
+  orrcs r4, r4, #(1<<(24)) @ 0
+  update_zn
+  add2mem
+.endm
+
+
+
+
+
+
+
+.macro opc9m1
+  ldrb r0 , [r10], #1
+  subs r1 , r5 , r0, lsl #24
+  biccc r4, r4, #(1<<(24)) @ 0
+  orrcs r4, r4, #(1<<(24)) @ 0
+  update_zn
+  add1mem
+.endm
+.macro opc9m0
+  ldrb r1 , [r10,#1]
+  ldrb r0 , [r10], #2
+  orr r0, r0, r1, lsl #8
+  subs r1 , r5, r0, lsl #16
+  biccc r4, r4, #(1<<(24)) @ 0
+  orrcs r4, r4, #(1<<(24)) @ 0
+  update_zn
+  add2mem
+.endm
+
+
+
+.macro ope0x1
+  ldrb r0 , [r10], #1
+  subs r1 , r7 , r0, lsl #24
+  biccc r4, r4, #(1<<(24)) @ 0
+  orrcs r4, r4, #(1<<(24)) @ 0
+  update_zn
+  add1mem
+.endm
+.macro ope0x0
+  ldrb r1 , [r10,#1]
+  ldrb r0 , [r10], #2
+  orr r0, r0, r1, lsl #8
+  subs r1 , r7, r0, lsl #16
+  biccc r4, r4, #(1<<(24)) @ 0
+  orrcs r4, r4, #(1<<(24)) @ 0
+  update_zn
+  add2mem
+.endm
+# 4477 "os9x_65c816.S"
+ .globl _test_opcode
+ .globl _asmMainLoop
+
+1:
+  .long jumptable1
+2:
+  .long jumptable2
+3:
+  .long jumptable3
+4:
+  .long jumptable4
+
+@ void asmmainloop(asm_cpu_var_t *asmcpuptr);
+_asmMainLoop:
+ @ save registers
+ stmfd r13!,{r4-r11,lr}
+ @ init pointer to cpuvar structure
+ mov r14,r0
+ ldr r1, 1b
+ str r1, [r14,#136]
+ ldr r1, 2b
+ str r1, [r14,#140]
+ ldr r1, 3b
+ str r1, [r14,#144]
+ ldr r1, 4b
+ str r1, [r14,#148]
+ str r9,[r14,#128]
+ prepare_c_call
+ bl _test_print
+ restore_c_call
+ @ init registers
+ load_regs
+ @ get cpu mode from flag and init jump table
+ s9xfixcycles
+
+mainloop:
+ @ apu execute
+ asmapu_execute
+
+ @ test flags
+ ldr r0,[r14,#0]
+ movs r0,r0
+ bne cpuflags_set @ if flags => check for irq/nmi/scan_keys...
+
+ exec_op @ execute next opcode
+
+cpuflags_set: @ check flags (!=0)
+  tst r0,#(1 << 7) @ check nmi
+  beq cpuflagsnmi_flag_cleared
+  ldr r1,[r14,#76]
+  subs r1,r1,#1
+  str r1,[r14,#76]
+  bne cpuflagsnmi_flag_cleared
+  bic r0,r0,#(1 << 7)
+  str r0,[r14,#0]
+  ldrb r1,[r14,#7]
+  movs r1,r1
+  beq notcpuaitingforinterruptnmi
+  mov r1,#0
+  add r10,r10,#1
+  strb r1,[r14,#7]
+notcpuaitingforinterruptnmi:
+  s9xopcode_nmi
+  ldr r0,[r14,#0]
+cpuflagsnmi_flag_cleared:
+  tst r0,#(1 << 11) @ check (1 << 11)
+  beq cpuflagsirq_pending_flag_cleared
+  ldr r1,[r14,#80]
+  movs r1,r1
+  bne cpuirqcyclecount_notzero
+   ldrb r1,[r14,#7]
+  movs r1,r1
+  beq notcpuaitingforinterruptirq
+         mov r1,#0
+  add r10,r10,#1
+  strb r1,[r14,#7]
+notcpuaitingforinterruptirq:
+  ldrb r1,[r14,#6]
+  movs r1,r1
+  beq cpuirqactive_cleared
+  tst r4,#(4<<(24)) @ 2
+  bne cpuflagsirq_pending_flag_cleared
+  s9xopcode_irq
+  ldr r0,[r14,#0]
+  b cpuflagsirq_pending_flag_cleared
+cpuirqactive_cleared:
+  bic r0,r0,#(1 << 11)
+  str r0,[r14,#0]
+  b cpuflagsirq_pending_flag_cleared
+cpuirqcyclecount_notzero:
+  sub r1,r1,#1
+  str r1,[r14,#80]
+cpuflagsirq_pending_flag_cleared:
+
+  tst r0,#(1 << 4) @ check (1 << 4)
+  bne endmainloop
+
+ exec_op @ execute next opcode
+
+endmainloop:
+# 4589 "os9x_65c816.S"
+ save_regs
+ ldmfd r13!,{r4-r11,lr}
+ mov pc,lr
+@@.pool
+
+@ void test_opcode(struct asm_cpu_var *asm_var);
+_test_opcode:
+ @ save registers
+ stmfd r13!,{r4-r11,lr}
+ @ init pointer to cpuvar structure
+ mov r14,r0
+ @ init registers
+ load_regs
+ @ get cpu mode from flag and init jump table
+ s9xfixcycles
+
+ exec_op
+@@.pool
+
+
+
+
+
+
+jumptable1: .long op00mod1
+   .long op01m1mod1
+   .long op02mod1
+   .long op03m1mod1
+   .long op04m1mod1
+   .long op05m1mod1
+   .long op06m1mod1
+   .long op07m1mod1
+   .long op08mod1
+   .long op09m1mod1
+   .long op0am1mod1
+   .long op0bmod1
+   .long op0cm1mod1
+   .long op0dm1mod1
+   .long op0em1mod1
+   .long op0fm1mod1
+   .long op10mod1
+   .long op11m1mod1
+   .long op12m1mod1
+   .long op13m1mod1
+   .long op14m1mod1
+   .long op15m1mod1
+   .long op16m1mod1
+   .long op17m1mod1
+   .long op18mod1
+   .long op19m1mod1
+   .long op1am1mod1
+   .long op1bmod1
+   .long op1cm1mod1
+   .long op1dm1mod1
+   .long op1em1mod1
+   .long op1fm1mod1
+   .long op20mod1
+   .long op21m1mod1
+   .long op22mod1
+   .long op23m1mod1
+   .long op24m1mod1
+   .long op25m1mod1
+   .long op26m1mod1
+   .long op27m1mod1
+   .long op28mod1
+   .long op29m1mod1
+   .long op2am1mod1
+   .long op2bmod1
+   .long op2cm1mod1
+   .long op2dm1mod1
+   .long op2em1mod1
+   .long op2fm1mod1
+   .long op30mod1
+   .long op31m1mod1
+   .long op32m1mod1
+   .long op33m1mod1
+   .long op34m1mod1
+   .long op35m1mod1
+   .long op36m1mod1
+   .long op37m1mod1
+   .long op38mod1
+   .long op39m1mod1
+   .long op3am1mod1
+   .long op3bmod1
+   .long op3cm1mod1
+   .long op3dm1mod1
+   .long op3em1mod1
+   .long op3fm1mod1
+   .long op40mod1
+   .long op41m1mod1
+   .long op42mod1
+   .long op43m1mod1
+   .long op44x1mod1
+   .long op45m1mod1
+   .long op46m1mod1
+   .long op47m1mod1
+   .long op48m1mod1
+   .long op49m1mod1
+   .long op4am1mod1
+   .long op4bmod1
+   .long op4cmod1
+   .long op4dm1mod1
+   .long op4em1mod1
+   .long op4fm1mod1
+   .long op50mod1
+   .long op51m1mod1
+   .long op52m1mod1
+   .long op53m1mod1
+   .long op54x1mod1
+   .long op55m1mod1
+   .long op56m1mod1
+   .long op57m1mod1
+   .long op58mod1
+   .long op59m1mod1
+   .long op5ax1mod1
+   .long op5bmod1
+   .long op5cmod1
+   .long op5dm1mod1
+   .long op5em1mod1
+   .long op5fm1mod1
+   .long op60mod1
+   .long op61m1mod1
+   .long op62mod1
+   .long op63m1mod1
+   .long op64m1mod1
+   .long op65m1mod1
+   .long op66m1mod1
+   .long op67m1mod1
+   .long op68m1mod1
+   .long op69m1mod1
+   .long op6am1mod1
+   .long op6bmod1
+   .long op6cmod1
+   .long op6dm1mod1
+   .long op6em1mod1
+   .long op6fm1mod1
+   .long op70mod1
+   .long op71m1mod1
+   .long op72m1mod1
+   .long op73m1mod1
+   .long op74m1mod1
+   .long op75m1mod1
+   .long op76m1mod1
+   .long op77m1mod1
+   .long op78mod1
+   .long op79m1mod1
+   .long op7ax1mod1
+   .long op7bmod1
+   .long op7cmod1
+   .long op7dm1mod1
+   .long op7em1mod1
+   .long op7fm1mod1
+   .long op80mod1
+   .long op81m1mod1
+   .long op82mod1
+   .long op83m1mod1
+   .long op84x1mod1
+   .long op85m1mod1
+   .long op86x1mod1
+   .long op87m1mod1
+   .long op88x1mod1
+   .long op89m1mod1
+   .long op8am1mod1
+   .long op8bmod1
+   .long op8cx1mod1
+   .long op8dm1mod1
+   .long op8ex1mod1
+   .long op8fm1mod1
+   .long op90mod1
+   .long op91m1mod1
+   .long op92m1mod1
+   .long op93m1mod1
+   .long op94x1mod1
+   .long op95m1mod1
+   .long op96x1mod1
+   .long op97m1mod1
+   .long op98m1mod1
+   .long op99m1mod1
+   .long op9amod1
+   .long op9bx1mod1
+   .long op9cm1mod1
+   .long op9dm1mod1
+   .long op9em1mod1
+   .long op9fm1mod1
+   .long opa0x1mod1
+   .long opa1m1mod1
+   .long opa2x1mod1
+   .long opa3m1mod1
+   .long opa4x1mod1
+   .long opa5m1mod1
+   .long opa6x1mod1
+   .long opa7m1mod1
+   .long opa8x1mod1
+   .long opa9m1mod1
+   .long opaax1mod1
+   .long opabmod1
+   .long opacx1mod1
+   .long opadm1mod1
+   .long opaex1mod1
+   .long opafm1mod1
+   .long opb0mod1
+   .long opb1m1mod1
+   .long opb2m1mod1
+   .long opb3m1mod1
+   .long opb4x1mod1
+   .long opb5m1mod1
+   .long opb6x1mod1
+   .long opb7m1mod1
+   .long opb8mod1
+   .long opb9m1mod1
+   .long opbax1mod1
+   .long opbbx1mod1
+   .long opbcx1mod1
+   .long opbdm1mod1
+   .long opbex1mod1
+   .long opbfm1mod1
+   .long opc0x1mod1
+   .long opc1m1mod1
+   .long opc2mod1
+   .long opc3m1mod1
+   .long opc4x1mod1
+   .long opc5m1mod1
+   .long opc6m1mod1
+   .long opc7m1mod1
+   .long opc8x1mod1
+   .long opc9m1mod1
+   .long opcax1mod1
+   .long opcbmod1
+   .long opccx1mod1
+   .long opcdm1mod1
+   .long opcem1mod1
+   .long opcfm1mod1
+   .long opd0mod1
+   .long opd1m1mod1
+   .long opd2m1mod1
+   .long opd3m1mod1
+   .long opd4mod1
+   .long opd5m1mod1
+   .long opd6m1mod1
+   .long opd7m1mod1
+   .long opd8mod1
+   .long opd9m1mod1
+   .long opdax1mod1
+   .long opdbmod1
+   .long opdcmod1
+   .long opddm1mod1
+   .long opdem1mod1
+   .long opdfm1mod1
+   .long ope0x1mod1
+   .long ope1m1mod1
+   .long ope2mod1
+   .long ope3m1mod1
+   .long ope4x1mod1
+   .long ope5m1mod1
+   .long ope6m1mod1
+   .long ope7m1mod1
+   .long ope8x1mod1
+   .long ope9m1mod1
+   .long opeamod1
+   .long opebmod1
+   .long opecx1mod1
+   .long opedm1mod1
+   .long opeem1mod1
+   .long opefm1mod1
+   .long opf0mod1
+   .long opf1m1mod1
+   .long opf2m1mod1
+   .long opf3m1mod1
+   .long opf4mod1
+   .long opf5m1mod1
+   .long opf6m1mod1
+   .long opf7m1mod1
+   .long opf8mod1
+   .long opf9m1mod1
+   .long opfax1mod1
+   .long opfbmod1
+   .long opfcmod1
+   .long opfdm1mod1
+   .long opfem1mod1
+   .long opffm1mod1
+
+op00mod1: testmod1 1
+lbl00mod1: testmod1 1
+op00
+   nextopcode
+op01m1mod1: testmod1 1
+lbl01mod1a: directindexedindirect1
+lbl01mod1b: ora8
+   nextopcode
+op02mod1: testmod1 1
+lbl02mod1: testmod1 1
+op02
+   nextopcode
+op03m1mod1: testmod1 1
+lbl03mod1a: stackasmrelative
+lbl03mod1b: ora8
+   nextopcode
+op04m1mod1: testmod1 1
+lbl04mod1a: direct
+lbl04mod1b: tsb8
+   nextopcode
+op05m1mod1: testmod1 1
+lbl05mod1a: direct
+lbl05mod1b: ora8
+   nextopcode
+op06m1mod1: testmod1 1
+lbl06mod1a: direct
+lbl06mod1b: asl8
+   nextopcode
+op07m1mod1: testmod1 1
+lbl07mod1a: directindirectlong
+lbl07mod1b: ora8
+   nextopcode
+op08mod1: testmod1 1
+lbl08mod1: testmod1 1
+  op08
+   nextopcode
+op09m1mod1: testmod1 1
+lbl09mod1: testmod1 1
+  op09m1
+   nextopcode
+op0am1mod1: testmod1 2
+lbl0amod1a: a_asl8
+   nextopcode
+op0bmod1: testmod1 2
+lbl0bmod1: testmod1 2
+op0b
+   nextopcode
+op0cm1mod1: testmod1 2
+lbl0cmod1a: absolute
+lbl0cmod1b: tsb8
+   nextopcode
+op0dm1mod1: testmod1 2
+lbl0dmod1a: absolute
+lbl0dmod1b: ora8
+   nextopcode
+op0em1mod1: testmod1 2
+lbl0emod1a: absolute
+lbl0emod1b: asl8
+   nextopcode
+op0fm1mod1: testmod1 2
+lbl0fmod1a: absolutelong
+lbl0fmod1b: ora8
+   nextopcode
+op10mod1: testmod1 2
+lbl10mod1: testmod1 2
+op10
+   nextopcode
+op11m1mod1: testmod1 2
+lbl11mod1a: directindirectindexed1
+lbl11mod1b: ora8
+   nextopcode
+op12m1mod1: testmod1 2
+lbl12mod1a: directindirect
+lbl12mod1b: ora8
+   nextopcode
+op13m1mod1: testmod1 2
+lbl13mod1a: stackasmrelativeindirectindexed1
+lbl13mod1b: ora8
+   nextopcode
+op14m1mod1: testmod1 2
+lbl14mod1a: direct
+lbl14mod1b: trb8
+   nextopcode
+op15m1mod1: testmod1 2
+lbl15mod1a: directindexedx1
+lbl15mod1b: ora8
+   nextopcode
+op16m1mod1: testmod1 2
+lbl16mod1a: directindexedx1
+lbl16mod1b: asl8
+   nextopcode
+op17m1mod1: testmod1 2
+lbl17mod1a: directindirectindexedlong1
+lbl17mod1b: ora8
+   nextopcode
+op18mod1: testmod1 2
+lbl18mod1: testmod1 2
+op18
+   nextopcode
+op19m1mod1: testmod1 2
+lbl19mod1a: absoluteindexedy1
+lbl19mod1b: ora8
+   nextopcode
+op1am1mod1: testmod1 2
+lbl1amod1a: a_inc8
+   nextopcode
+op1bmod1: testmod1 3
+lbl1bmod1: testmod1 3
+op1bm1
+   nextopcode
+op1cm1mod1: testmod1 3
+lbl1cmod1a: absolute
+lbl1cmod1b: trb8
+   nextopcode
+op1dm1mod1: testmod1 3
+lbl1dmod1a: absoluteindexedx1
+lbl1dmod1b: ora8
+   nextopcode
+op1em1mod1: testmod1 3
+lbl1emod1a: absoluteindexedx1
+lbl1emod1b: asl8
+   nextopcode
+op1fm1mod1: testmod1 3
+lbl1fmod1a: absolutelongindexedx1
+lbl1fmod1b: ora8
+   nextopcode
+op20mod1: testmod1 3
+lbl20mod1: testmod1 3
+op20
+   nextopcode
+op21m1mod1: testmod1 3
+lbl21mod1a: directindexedindirect1
+lbl21mod1b: and8
+   nextopcode
+op22mod1: testmod1 3
+lbl22mod1: testmod1 3
+op22
+   nextopcode
+op23m1mod1: testmod1 3
+lbl23mod1a: stackasmrelative
+lbl23mod1b: and8
+   nextopcode
+op24m1mod1: testmod1 3
+lbl24mod1a: direct
+lbl24mod1b: bit8
+   nextopcode
+op25m1mod1: testmod1 3
+lbl25mod1a: direct
+lbl25mod1b: and8
+   nextopcode
+op26m1mod1: testmod1 3
+lbl26mod1a: direct
+lbl26mod1b: rol8
+   nextopcode
+op27m1mod1: testmod1 3
+lbl27mod1a: directindirectlong
+lbl27mod1b: and8
+   nextopcode
+op28mod1: testmod1 3
+lbl28mod1: testmod1 3
+op28x1m1
+   nextopcode
+@@.pool
+op29m1mod1: testmod1 3
+lbl29mod1: testmod1 3
+op29m1
+   nextopcode
+op2am1mod1: testmod1 3
+lbl2amod1a: a_rol8
+   nextopcode
+op2bmod1: testmod1 3
+lbl2bmod1: testmod1 3
+op2b
+   nextopcode
+op2cm1mod1: testmod1 4
+lbl2cmod1a: absolute
+lbl2cmod1b: bit8
+   nextopcode
+op2dm1mod1: testmod1 4
+lbl2dmod1a: absolute
+lbl2dmod1b: and8
+   nextopcode
+op2em1mod1: testmod1 4
+lbl2emod1a: absolute
+lbl2emod1b: rol8
+   nextopcode
+op2fm1mod1: testmod1 4
+lbl2fmod1a: absolutelong
+lbl2fmod1b: and8
+   nextopcode
+op30mod1: testmod1 4
+lbl30mod1: testmod1 4
+op30
+   nextopcode
+op31m1mod1: testmod1 4
+lbl31mod1a: directindirectindexed1
+lbl31mod1b: and8
+   nextopcode
+op32m1mod1: testmod1 4
+lbl32mod1a: directindirect
+lbl32mod1b: and8
+   nextopcode
+op33m1mod1: testmod1 4
+lbl33mod1a: stackasmrelativeindirectindexed1
+lbl33mod1b: and8
+   nextopcode
+op34m1mod1: testmod1 4
+lbl34mod1a: directindexedx1
+lbl34mod1b: bit8
+   nextopcode
+op35m1mod1: testmod1 4
+lbl35mod1a: directindexedx1
+lbl35mod1b: and8
+   nextopcode
+op36m1mod1: testmod1 4
+lbl36mod1a: directindexedx1
+lbl36mod1b: rol8
+   nextopcode
+op37m1mod1: testmod1 4
+lbl37mod1a: directindirectindexedlong1
+lbl37mod1b: and8
+   nextopcode
+op38mod1: testmod1 4
+lbl38mod1: testmod1 4
+op38
+   nextopcode
+op39m1mod1: testmod1 4
+lbl39mod1a: absoluteindexedy1
+lbl39mod1b: and8
+   nextopcode
+op3am1mod1: testmod1 5
+lbl3amod1a: a_dec8
+   nextopcode
+op3bmod1: testmod1 5
+lbl3bmod1: testmod1 5
+op3bm1
+   nextopcode
+op3cm1mod1: testmod1 5
+lbl3cmod1a: absoluteindexedx1
+lbl3cmod1b: bit8
+   nextopcode
+op3dm1mod1: testmod1 5
+lbl3dmod1a: absoluteindexedx1
+lbl3dmod1b: and8
+   nextopcode
+op3em1mod1: testmod1 5
+lbl3emod1a: absoluteindexedx1
+lbl3emod1b: rol8
+   nextopcode
+op3fm1mod1: testmod1 5
+lbl3fmod1a: absolutelongindexedx1
+lbl3fmod1b: and8
+   nextopcode
+op40mod1: testmod1 5
+lbl40mod1: testmod1 5
+op40x1m1
+   nextopcode
+@@.pool
+op41m1mod1: testmod1 5
+lbl41mod1a: directindexedindirect1
+lbl41mod1b: eor8
+   nextopcode
+op42mod1: testmod1 5
+lbl42mod1: testmod1 5
+op42
+   nextopcode
+op43m1mod1: testmod1 5
+lbl43mod1a: stackasmrelative
+lbl43mod1b: eor8
+   nextopcode
+op44x1mod1: testmod1 5
+lbl44mod1: testmod1 5
+op44x1m1
+   nextopcode
+op45m1mod1: testmod1 5
+lbl45mod1a: direct
+lbl45mod1b: eor8
+   nextopcode
+op46m1mod1: testmod1 5
+lbl46mod1a: direct
+lbl46mod1b: lsr8
+   nextopcode
+op47m1mod1: testmod1 5
+lbl47mod1a: directindirectlong
+lbl47mod1b: eor8
+   nextopcode
+op48m1mod1: testmod1 5
+lbl48mod1: testmod1 5
+op48m1
+   nextopcode
+op49m1mod1: testmod1 5
+lbl49mod1: testmod1 5
+op49m1
+   nextopcode
+op4am1mod1: testmod1 5
+lbl4amod1a: a_lsr8
+   nextopcode
+op4bmod1: testmod1 5
+lbl4bmod1: testmod1 6
+op4b
+   nextopcode
+op4cmod1: testmod1 6
+lbl4cmod1: testmod1 6
+op4c
+   nextopcode
+op4dm1mod1: testmod1 6
+lbl4dmod1a: absolute
+lbl4dmod1b: eor8
+   nextopcode
+op4em1mod1: testmod1 6
+lbl4emod1a: absolute
+lbl4emod1b: lsr8
+   nextopcode
+op4fm1mod1: testmod1 6
+lbl4fmod1a: absolutelong
+lbl4fmod1b: eor8
+   nextopcode
+op50mod1: testmod1 6
+lbl50mod1: testmod1 6
+op50
+   nextopcode
+op51m1mod1: testmod1 6
+lbl51mod1a: directindirectindexed1
+lbl51mod1b: eor8
+   nextopcode
+op52m1mod1: testmod1 6
+lbl52mod1a: directindirect
+lbl52mod1b: eor8
+   nextopcode
+op53m1mod1: testmod1 6
+lbl53mod1a: stackasmrelativeindirectindexed1
+lbl53mod1b: eor8
+   nextopcode
+op54x1mod1: testmod1 6
+lbl54mod1: testmod1 6
+op54x1m1
+   nextopcode
+op55m1mod1: testmod1 6
+lbl55mod1a: directindexedx1
+lbl55mod1b: eor8
+   nextopcode
+op56m1mod1: testmod1 6
+lbl56mod1a: directindexedx1
+lbl56mod1b: lsr8
+   nextopcode
+op57m1mod1: testmod1 6
+lbl57mod1a: directindirectindexedlong1
+lbl57mod1b: eor8
+   nextopcode
+op58mod1: testmod1 6
+lbl58mod1: testmod1 6
+op58
+   nextopcode
+op59m1mod1: testmod1 6
+lbl59mod1a: absoluteindexedy1
+lbl59mod1b: eor8
+   nextopcode
+op5ax1mod1: testmod1 6
+lbl5amod1: testmod1 6
+op5ax1
+   nextopcode
+op5bmod1: testmod1 6
+lbl5bmod1: testmod1 6
+op5bm1
+   nextopcode
+op5cmod1: testmod1 7
+lbl5cmod1: testmod1 7
+op5c
+   nextopcode
+op5dm1mod1: testmod1 7
+lbl5dmod1a: absoluteindexedx1
+lbl5dmod1b: eor8
+   nextopcode
+op5em1mod1: testmod1 7
+lbl5emod1a: absoluteindexedx1
+lbl5emod1b: lsr8
+   nextopcode
+op5fm1mod1: testmod1 7
+lbl5fmod1a: absolutelongindexedx1
+lbl5fmod1b: eor8
+   nextopcode
+op60mod1: testmod1 7
+lbl60mod1: testmod1 7
+op60
+   nextopcode
+op61m1mod1: testmod1 7
+lbl61mod1a: directindexedindirect1
+lbl61mod1b: adc8
+   nextopcode
+op62mod1: testmod1 7
+lbl62mod1: testmod1 7
+op62
+   nextopcode
+op63m1mod1: testmod1 7
+lbl63mod1a: stackasmrelative
+lbl63mod1b: adc8
+   nextopcode
+op64m1mod1: testmod1 7
+lbl64mod1a: direct
+lbl64mod1b: stz8
+   nextopcode
+op65m1mod1: testmod1 7
+lbl65mod1a: direct
+lbl65mod1b: adc8
+   nextopcode
+op66m1mod1: testmod1 7
+lbl66mod1a: direct
+lbl66mod1b: ror8
+   nextopcode
+op67m1mod1: testmod1 7
+lbl67mod1a: directindirectlong
+lbl67mod1b: adc8
+   nextopcode
+op68m1mod1: testmod1 7
+lbl68mod1: testmod1 7
+op68m1
+   nextopcode
+op69m1mod1: testmod1 7
+lbl69mod1a: immediate8
+lbl69mod1b: adc8
+   nextopcode
+op6am1mod1: testmod1 7
+lbl6amod1a: a_ror8
+   nextopcode
+op6bmod1: testmod1 8
+lbl6bmod1: testmod1 8
+op6b
+   nextopcode
+op6cmod1: testmod1 8
+lbl6cmod1: testmod1 8
+op6c
+   nextopcode
+op6dm1mod1: testmod1 8
+lbl6dmod1a: absolute
+lbl6dmod1b: adc8
+   nextopcode
+op6em1mod1: testmod1 8
+lbl6emod1a: absolute
+lbl6emod1b: ror8
+   nextopcode
+op6fm1mod1: testmod1 8
+lbl6fmod1a: absolutelong
+lbl6fmod1b: adc8
+   nextopcode
+op70mod1: testmod1 8
+lbl70mod1: testmod1 8
+op70
+   nextopcode
+op71m1mod1: testmod1 8
+lbl71mod1a: directindirectindexed1
+lbl71mod1b: adc8
+   nextopcode
+op72m1mod1: testmod1 8
+lbl72mod1a: directindirect
+lbl72mod1b: adc8
+   nextopcode
+op73m1mod1: testmod1 8
+lbl73mod1a: stackasmrelativeindirectindexed1
+lbl73mod1b: adc8
+   nextopcode
+
+op74m1mod1: testmod1 8
+lbl74mod1a: directindexedx1
+lbl74mod1b: stz8
+   nextopcode
+op75m1mod1: testmod1 8
+lbl75mod1a: directindexedx1
+lbl75mod1b: adc8
+   nextopcode
+op76m1mod1: testmod1 8
+lbl76mod1a: directindexedx1
+lbl76mod1b: ror8
+   nextopcode
+op77m1mod1: testmod1 8
+lbl77mod1a: directindirectindexedlong1
+lbl77mod1b: adc8
+   nextopcode
+op78mod1: testmod1 8
+lbl78mod1: testmod1 8
+op78
+   nextopcode
+op79m1mod1: testmod1 8
+lbl79mod1a: absoluteindexedy1
+lbl79mod1b: adc8
+   nextopcode
+op7ax1mod1: testmod1 9
+lbl7amod1: testmod1 9
+op7ax1
+   nextopcode
+op7bmod1: testmod1 9
+lbl7bmod1: testmod1 9
+op7bm1
+   nextopcode
+op7cmod1: testmod1 9
+lbl7cmod1: testmod1 9
+  absoluteindexedindirectx1
+  op7c
+   nextopcode
+op7dm1mod1: testmod1 9
+lbl7dmod1a: absoluteindexedx1
+lbl7dmod1b: adc8
+   nextopcode
+op7em1mod1: testmod1 9
+lbl7emod1a: absoluteindexedx1
+lbl7emod1b: ror8
+   nextopcode
+op7fm1mod1: testmod1 9
+lbl7fmod1a: absolutelongindexedx1
+lbl7fmod1b: adc8
+   nextopcode
+
+
+op80mod1: testmod1 9
+lbl80mod1: testmod1 9
+op80
+   nextopcode
+op81m1mod1: testmod1 9
+lbl81mod1a: directindexedindirect1
+lbl81mod1b: op81m1
+   nextopcode
+op82mod1: testmod1 9
+lbl82mod1: testmod1 9
+op82
+   nextopcode
+op83m1mod1: testmod1 9
+lbl83mod1a: stackasmrelative
+lbl83mod1b: sta8
+   nextopcode
+op84x1mod1: testmod1 9
+lbl84mod1a: direct
+lbl84mod1b: sty8
+   nextopcode
+op85m1mod1: testmod1 9
+lbl85mod1a: direct
+lbl85mod1b: sta8
+   nextopcode
+op86x1mod1: testmod1 9
+lbl86mod1a: direct
+lbl86mod1b: stx8
+   nextopcode
+op87m1mod1: testmod1 9
+lbl87mod1a: directindirectlong
+lbl87mod1b: sta8
+   nextopcode
+op88x1mod1: testmod1 9
+lbl88mod1: testmod1 9
+op88x1
+   nextopcode
+op89m1mod1: testmod1 10
+lbl89mod1: testmod1 10
+op89m1
+   nextopcode
+op8am1mod1: testmod1 10
+lbl8amod1: testmod1 10
+op8am1x1
+   nextopcode
+op8bmod1: testmod1 10
+lbl8bmod1: testmod1 10
+op8b
+   nextopcode
+op8cx1mod1: testmod1 10
+lbl8cmod1a: absolute
+lbl8cmod1b: sty8
+   nextopcode
+op8dm1mod1: testmod1 10
+lbl8dmod1a: absolute
+lbl8dmod1b: sta8
+   nextopcode
+op8ex1mod1: testmod1 10
+lbl8emod1a: absolute
+lbl8emod1b: stx8
+   nextopcode
+op8fm1mod1: testmod1 10
+lbl8fmod1a: absolutelong
+lbl8fmod1b: sta8
+   nextopcode
+op90mod1: testmod1 10
+lbl90mod1: testmod1 10
+op90
+   nextopcode
+op91m1mod1: testmod1 10
+lbl91mod1a: directindirectindexed1
+lbl91mod1b: sta8
+   nextopcode
+op92m1mod1: testmod1 10
+lbl92mod1a: directindirect
+lbl92mod1b: sta8
+   nextopcode
+op93m1mod1: testmod1 10
+lbl93mod1a: stackasmrelativeindirectindexed1
+lbl93mod1b: sta8
+   nextopcode
+op94x1mod1: testmod1 10
+lbl94mod1a: directindexedx1
+lbl94mod1b: sty8
+   nextopcode
+op95m1mod1: testmod1 10
+lbl95mod1a: directindexedx1
+lbl95mod1b: sta8
+   nextopcode
+op96x1mod1: testmod1 10
+lbl96mod1a: directindexedy1
+lbl96mod1b: stx8
+   nextopcode
+op97m1mod1: testmod1 10
+lbl97mod1a: directindirectindexedlong1
+lbl97mod1b: sta8
+   nextopcode
+op98m1mod1: testmod1 10
+lbl98mod1: testmod1 10
+op98m1x1
+   nextopcode
+op99m1mod1: testmod1 11
+lbl99mod1a: absoluteindexedy1
+lbl99mod1b: sta8
+   nextopcode
+op9amod1: testmod1 11
+lbl9amod1: testmod1 11
+op9ax1
+   nextopcode
+op9bx1mod1: testmod1 11
+lbl9bmod1: testmod1 11
+op9bx1
+   nextopcode
+op9cm1mod1: testmod1 11
+lbl9cmod1a: absolute
+lbl9cmod1b: stz8
+   nextopcode
+op9dm1mod1: testmod1 11
+lbl9dmod1a: absoluteindexedx1
+lbl9dmod1b: sta8
+   nextopcode
+op9em1mod1: testmod1 11
+lbl9emod1: testmod1 11
+absoluteindexedx1
+  stz8
+   nextopcode
+op9fm1mod1: testmod1 11
+lbl9fmod1a: absolutelongindexedx1
+lbl9fmod1b: sta8
+   nextopcode
+opa0x1mod1: testmod1 11
+lbla0mod1: testmod1 11
+opa0x1
+   nextopcode
+opa1m1mod1: testmod1 11
+lbla1mod1a: directindexedindirect1
+lbla1mod1b: lda8
+   nextopcode
+opa2x1mod1: testmod1 11
+lbla2mod1: testmod1 11
+opa2x1
+   nextopcode
+opa3m1mod1: testmod1 11
+lbla3mod1a: stackasmrelative
+lbla3mod1b: lda8
+   nextopcode
+opa4x1mod1: testmod1 11
+lbla4mod1a: direct
+lbla4mod1b: ldy8
+   nextopcode
+opa5m1mod1: testmod1 11
+lbla5mod1a: direct
+lbla5mod1b: lda8
+   nextopcode
+opa6x1mod1: testmod1 11
+lbla6mod1a: direct
+lbla6mod1b: ldx8
+   nextopcode
+opa7m1mod1: testmod1 11
+lbla7mod1a: directindirectlong
+lbla7mod1b: lda8
+   nextopcode
+opa8x1mod1: testmod1 11
+lbla8mod1: testmod1 11
+opa8x1m1
+   nextopcode
+opa9m1mod1: testmod1 11
+lbla9mod1: testmod1 11
+opa9m1
+   nextopcode
+opaax1mod1: testmod1 11
+lblaamod1: testmod1 11
+opaax1m1
+   nextopcode
+opabmod1: testmod1 12
+lblabmod1: testmod1 12
+opab
+   nextopcode
+opacx1mod1: testmod1 12
+lblacmod1a: absolute
+lblacmod1b: ldy8
+   nextopcode
+opadm1mod1: testmod1 12
+lbladmod1a: absolute
+lbladmod1b: lda8
+   nextopcode
+opaex1mod1: testmod1 12
+lblaemod1a: absolute
+lblaemod1b: ldx8
+   nextopcode
+opafm1mod1: testmod1 12
+lblafmod1a: absolutelong
+lblafmod1b: lda8
+   nextopcode
+opb0mod1: testmod1 12
+lblb0mod1: testmod1 12
+opb0
+   nextopcode
+opb1m1mod1: testmod1 12
+lblb1mod1a: directindirectindexed1
+lblb1mod1b: lda8
+   nextopcode
+opb2m1mod1: testmod1 12
+lblb2mod1a: directindirect
+lblb2mod1b: lda8
+   nextopcode
+opb3m1mod1: testmod1 12
+lblb3mod1a: stackasmrelativeindirectindexed1
+lblb3mod1b: lda8
+   nextopcode
+opb4x1mod1: testmod1 12
+lblb4mod1a: directindexedx1
+lblb4mod1b: ldy8
+   nextopcode
+opb5m1mod1: testmod1 12
+lblb5mod1a: directindexedx1
+lblb5mod1b: lda8
+   nextopcode
+opb6x1mod1: testmod1 12
+lblb6mod1a: directindexedy1
+lblb6mod1b: ldx8
+   nextopcode
+opb7m1mod1: testmod1 12
+lblb7mod1a: directindirectindexedlong1
+lblb7mod1b: lda8
+   nextopcode
+opb8mod1: testmod1 12
+lblb8mod1: testmod1 12
+opb8
+   nextopcode
+opb9m1mod1: testmod1 12
+lblb9mod1a: absoluteindexedy1
+lblb9mod1b: lda8
+   nextopcode
+opbax1mod1: testmod1 12
+lblbamod1: testmod1 12
+opbax1
+   nextopcode
+opbbx1mod1: testmod1 12
+lblbbmod1: testmod1 12
+opbbx1
+   nextopcode
+opbcx1mod1: testmod1 12
+lblbcmod1a: absoluteindexedx1
+lblbcmod1b: ldy8
+   nextopcode
+opbdm1mod1: testmod1 12
+lblbdmod1a: absoluteindexedx1
+lblbdmod1b: lda8
+   nextopcode
+opbex1mod1: testmod1 12
+lblbemod1a: absoluteindexedy1
+lblbemod1b: ldx8
+   nextopcode
+opbfm1mod1: testmod1 12
+lblbfmod1a: absolutelongindexedx1
+lblbfmod1b: lda8
+   nextopcode
+opc0x1mod1: testmod1 12
+lblc0mod1: testmod1 12
+opc0x1
+   nextopcode
+opc1m1mod1: testmod1 12
+lblc1mod1a: directindexedindirect1
+lblc1mod1b: cmp8
+   nextopcode
+opc2mod1: testmod1 12
+lblc2mod1: testmod1 12
+opc2
+   nextopcode
+@@.pool
+opc3m1mod1: testmod1 13
+lblc3mod1a: stackasmrelative
+lblc3mod1b: cmp8
+   nextopcode
+opc4x1mod1: testmod1 13
+lblc4mod1a: direct
+lblc4mod1b: cmy8
+   nextopcode
+opc5m1mod1: testmod1 13
+lblc5mod1a: direct
+lblc5mod1b: cmp8
+   nextopcode
+opc6m1mod1: testmod1 13
+lblc6mod1a: direct
+lblc6mod1b: dec8
+   nextopcode
+opc7m1mod1: testmod1 13
+lblc7mod1a: directindirectlong
+lblc7mod1b: cmp8
+   nextopcode
+opc8x1mod1: testmod1 13
+lblc8mod1: testmod1 13
+opc8x1
+   nextopcode
+opc9m1mod1: testmod1 13
+lblc9mod1: testmod1 13
+opc9m1
+   nextopcode
+opcax1mod1: testmod1 13
+lblcamod1: testmod1 13
+opcax1
+   nextopcode
+opcbmod1: testmod1 13
+lblcbmod1: testmod1 13
+opcb
+   nextopcode
+opccx1mod1: testmod1 13
+lblccmod1a: absolute
+lblccmod1b: cmy8
+   nextopcode
+opcdm1mod1: testmod1 13
+lblcdmod1a: absolute
+lblcdmod1b: cmp8
+   nextopcode
+opcem1mod1: testmod1 13
+lblcemod1a: absolute
+lblcemod1b: dec8
+   nextopcode
+opcfm1mod1: testmod1 13
+lblcfmod1a: absolutelong
+lblcfmod1b: cmp8
+   nextopcode
+opd0mod1: testmod1 13
+lbld0mod1: testmod1 13
+opd0
+   nextopcode
+opd1m1mod1: testmod1 13
+lbld1mod1a: directindirectindexed1
+lbld1mod1b: cmp8
+   nextopcode
+opd2m1mod1: testmod1 13
+lbld2mod1a: directindirect
+lbld2mod1b: cmp8
+   nextopcode
+opd3m1mod1: testmod1 13
+lbld3mod1a: stackasmrelativeindirectindexed1
+lbld3mod1b: cmp8
+   nextopcode
+opd4mod1: testmod1 14
+lbld4mod1: testmod1 14
+opd4
+   nextopcode
+opd5m1mod1: testmod1 14
+lbld5mod1a: directindexedx1
+lbld5mod1b: cmp8
+   nextopcode
+opd6m1mod1: testmod1 14
+lbld6mod1a: directindexedx1
+lbld6mod1b: dec8
+   nextopcode
+opd7m1mod1: testmod1 14
+lbld7mod1a: directindirectindexedlong1
+lbld7mod1b: cmp8
+   nextopcode
+opd8mod1: testmod1 14
+lbld8mod1: testmod1 14
+opd8
+   nextopcode
+opd9m1mod1: testmod1 14
+lbld9mod1a: absoluteindexedy1
+lbld9mod1b: cmp8
+   nextopcode
+opdax1mod1: testmod1 14
+lbldamod1: testmod1 14
+opdax1
+   nextopcode
+opdbmod1: testmod1 14
+lbldbmod1: testmod1 14
+opdb
+   nextopcode
+opdcmod1: testmod1 14
+lbldcmod1: testmod1 14
+opdc
+   nextopcode
+opddm1mod1: testmod1 14
+lblddmod1a: absoluteindexedx1
+lblddmod1b: cmp8
+   nextopcode
+opdem1mod1: testmod1 14
+lbldemod1a: absoluteindexedx1
+lbldemod1b: dec8
+   nextopcode
+opdfm1mod1: testmod1 14
+lbldfmod1a: absolutelongindexedx1
+lbldfmod1b: cmp8
+   nextopcode
+ope0x1mod1: testmod1 14
+lble0mod1: testmod1 14
+ope0x1
+   nextopcode
+ope1m1mod1: testmod1 14
+lble1mod1a: directindexedindirect1
+lble1mod1b: sbc8
+   nextopcode
+ope2mod1: testmod1 14
+lble2mod1: testmod1 14
+ope2
+   nextopcode
+@@.pool
+ope3m1mod1: testmod1 14
+lble3mod1a: stackasmrelative
+lble3mod1b: sbc8
+   nextopcode
+ope4x1mod1: testmod1 14
+lble4mod1a: direct
+lble4mod1b: cmx8
+   nextopcode
+ope5m1mod1: testmod1 15
+lble5mod1a: direct
+lble5mod1b: sbc8
+   nextopcode
+ope6m1mod1: testmod1 15
+lble6mod1a: direct
+lble6mod1b: inc8
+   nextopcode
+ope7m1mod1: testmod1 15
+lble7mod1a: directindirectlong
+lble7mod1b: sbc8
+   nextopcode
+ope8x1mod1: testmod1 15
+lble8mod1: testmod1 15
+ope8x1
+   nextopcode
+ope9m1mod1: testmod1 15
+lble9mod1a: immediate8
+lble9mod1b: sbc8
+   nextopcode
+opeamod1: testmod1 15
+lbleamod1: testmod1 15
+opea
+   nextopcode
+opebmod1: testmod1 15
+lblebmod1: testmod1 15
+opebm1
+   nextopcode
+opecx1mod1: testmod1 15
+lblecmod1a: absolute
+lblecmod1b: cmx8
+   nextopcode
+opedm1mod1: testmod1 15
+lbledmod1a: absolute
+lbledmod1b: sbc8
+   nextopcode
+opeem1mod1: testmod1 15
+lbleemod1a: absolute
+lbleemod1b: inc8
+   nextopcode
+opefm1mod1: testmod1 15
+lblefmod1a: absolutelong
+lblefmod1b: sbc8
+   nextopcode
+opf0mod1: testmod1 15
+lblf0mod1: testmod1 15
+opf0
+   nextopcode
+opf1m1mod1: testmod1 15
+lblf1mod1a: directindirectindexed1
+lblf1mod1b: sbc8
+   nextopcode
+opf2m1mod1: testmod1 15
+lblf2mod1a: directindirect
+lblf2mod1b: sbc8
+   nextopcode
+opf3m1mod1: testmod1 15
+lblf3mod1a: stackasmrelativeindirectindexed1
+lblf3mod1b: sbc8
+   nextopcode
+opf4mod1: testmod1 15
+lblf4mod1: testmod1 15
+opf4
+   nextopcode
+opf5m1mod1: testmod1 15
+lblf5mod1a: directindexedx1
+lblf5mod1b: sbc8
+   nextopcode
+opf6m1mod1: testmod1 15
+lblf6mod1a: directindexedx1
+lblf6mod1b: inc8
+   nextopcode
+opf7m1mod1: testmod1 15
+lblf7mod1a: directindirectindexedlong1
+lblf7mod1b: sbc8
+   nextopcode
+opf8mod1: testmod1 15
+lblf8mod1: testmod1 15
+opf8
+   nextopcode
+opf9m1mod1: testmod1 15
+lblf9mod1a: absoluteindexedy1
+lblf9mod1b: sbc8
+   nextopcode
+opfax1mod1: testmod1 15
+lblfamod1: testmod1 15
+opfax1
+   nextopcode
+opfbmod1: testmod1 15
+lblfbmod1: testmod1 15
+opfb
+   nextopcode
+opfcmod1: testmod1 15
+lblfcmod1: testmod1 15
+opfcx1
+   nextopcode
+opfdm1mod1: testmod1 15
+lblfdmod1a: absoluteindexedx1
+lblfdmod1b: sbc8
+   nextopcode
+opfem1mod1: testmod1 15
+lblfemod1a: absoluteindexedx1
+lblfemod1b: inc8
+   nextopcode
+opffm1mod1: testmod1 15
+lblffmod1a: absolutelongindexedx1
+lblffmod1b: sbc8
+   nextopcode
+@@.pool
+
+
+jumptable2: .long op00mod2
+   .long op01m1mod2
+   .long op02mod2
+   .long op03m1mod2
+   .long op04m1mod2
+   .long op05m1mod2
+   .long op06m1mod2
+   .long op07m1mod2
+   .long op08mod2
+   .long op09m1mod2
+   .long op0am1mod2
+   .long op0bmod2
+   .long op0cm1mod2
+   .long op0dm1mod2
+   .long op0em1mod2
+   .long op0fm1mod2
+   .long op10mod2
+   .long op11m1mod2
+   .long op12m1mod2
+   .long op13m1mod2
+   .long op14m1mod2
+   .long op15m1mod2
+   .long op16m1mod2
+   .long op17m1mod2
+   .long op18mod2
+   .long op19m1mod2
+   .long op1am1mod2
+   .long op1bmod2
+   .long op1cm1mod2
+   .long op1dm1mod2
+   .long op1em1mod2
+   .long op1fm1mod2
+   .long op20mod2
+   .long op21m1mod2
+   .long op22mod2
+   .long op23m1mod2
+   .long op24m1mod2
+   .long op25m1mod2
+   .long op26m1mod2
+   .long op27m1mod2
+   .long op28mod2
+   .long op29m1mod2
+   .long op2am1mod2
+   .long op2bmod2
+   .long op2cm1mod2
+   .long op2dm1mod2
+   .long op2em1mod2
+   .long op2fm1mod2
+   .long op30mod2
+   .long op31m1mod2
+   .long op32m1mod2
+   .long op33m1mod2
+   .long op34m1mod2
+   .long op35m1mod2
+   .long op36m1mod2
+   .long op37m1mod2
+   .long op38mod2
+   .long op39m1mod2
+   .long op3am1mod2
+   .long op3bmod2
+   .long op3cm1mod2
+   .long op3dm1mod2
+   .long op3em1mod2
+   .long op3fm1mod2
+   .long op40mod2
+   .long op41m1mod2
+   .long op42mod2
+   .long op43m1mod2
+   .long op44x0mod2
+   .long op45m1mod2
+   .long op46m1mod2
+   .long op47m1mod2
+   .long op48m1mod2
+   .long op49m1mod2
+   .long op4am1mod2
+   .long op4bmod2
+   .long op4cmod2
+   .long op4dm1mod2
+   .long op4em1mod2
+   .long op4fm1mod2
+   .long op50mod2
+   .long op51m1mod2
+   .long op52m1mod2
+   .long op53m1mod2
+   .long op54x0mod2
+   .long op55m1mod2
+   .long op56m1mod2
+   .long op57m1mod2
+   .long op58mod2
+   .long op59m1mod2
+   .long op5ax0mod2
+   .long op5bmod2
+   .long op5cmod2
+   .long op5dm1mod2
+   .long op5em1mod2
+   .long op5fm1mod2
+   .long op60mod2
+   .long op61m1mod2
+   .long op62mod2
+   .long op63m1mod2
+   .long op64m1mod2
+   .long op65m1mod2
+   .long op66m1mod2
+   .long op67m1mod2
+   .long op68m1mod2
+   .long op69m1mod2
+   .long op6am1mod2
+   .long op6bmod2
+   .long op6cmod2
+   .long op6dm1mod2
+   .long op6em1mod2
+   .long op6fm1mod2
+   .long op70mod2
+   .long op71m1mod2
+   .long op72m1mod2
+   .long op73m1mod2
+   .long op74m1mod2
+   .long op75m1mod2
+   .long op76m1mod2
+   .long op77m1mod2
+   .long op78mod2
+   .long op79m1mod2
+   .long op7ax0mod2
+   .long op7bmod2
+   .long op7cmod2
+   .long op7dm1mod2
+   .long op7em1mod2
+   .long op7fm1mod2
+   .long op80mod2
+   .long op81m1mod2
+   .long op82mod2
+   .long op83m1mod2
+   .long op84x0mod2
+   .long op85m1mod2
+   .long op86x0mod2
+   .long op87m1mod2
+   .long op88x0mod2
+   .long op89m1mod2
+   .long op8am1mod2
+   .long op8bmod2
+   .long op8cx0mod2
+   .long op8dm1mod2
+   .long op8ex0mod2
+   .long op8fm1mod2
+   .long op90mod2
+   .long op91m1mod2
+   .long op92m1mod2
+   .long op93m1mod2
+   .long op94x0mod2
+   .long op95m1mod2
+   .long op96x0mod2
+   .long op97m1mod2
+   .long op98m1mod2
+   .long op99m1mod2
+   .long op9amod2
+   .long op9bx0mod2
+   .long op9cm1mod2
+   .long op9dm1mod2
+   .long op9em1mod2
+   .long op9fm1mod2
+   .long opa0x0mod2
+   .long opa1m1mod2
+   .long opa2x0mod2
+   .long opa3m1mod2
+   .long opa4x0mod2
+   .long opa5m1mod2
+   .long opa6x0mod2
+   .long opa7m1mod2
+   .long opa8x0mod2
+   .long opa9m1mod2
+   .long opaax0mod2
+   .long opabmod2
+   .long opacx0mod2
+   .long opadm1mod2
+   .long opaex0mod2
+   .long opafm1mod2
+   .long opb0mod2
+   .long opb1m1mod2
+   .long opb2m1mod2
+   .long opb3m1mod2
+   .long opb4x0mod2
+   .long opb5m1mod2
+   .long opb6x0mod2
+   .long opb7m1mod2
+   .long opb8mod2
+   .long opb9m1mod2
+   .long opbax0mod2
+   .long opbbx0mod2
+   .long opbcx0mod2
+   .long opbdm1mod2
+   .long opbex0mod2
+   .long opbfm1mod2
+   .long opc0x0mod2
+   .long opc1m1mod2
+   .long opc2mod2
+   .long opc3m1mod2
+   .long opc4x0mod2
+   .long opc5m1mod2
+   .long opc6m1mod2
+   .long opc7m1mod2
+   .long opc8x0mod2
+   .long opc9m1mod2
+   .long opcax0mod2
+   .long opcbmod2
+   .long opccx0mod2
+   .long opcdm1mod2
+   .long opcem1mod2
+   .long opcfm1mod2
+   .long opd0mod2
+   .long opd1m1mod2
+   .long opd2m1mod2
+   .long opd3m1mod2
+   .long opd4mod2
+   .long opd5m1mod2
+   .long opd6m1mod2
+   .long opd7m1mod2
+   .long opd8mod2
+   .long opd9m1mod2
+   .long opdax0mod2
+   .long opdbmod2
+   .long opdcmod2
+   .long opddm1mod2
+   .long opdem1mod2
+   .long opdfm1mod2
+   .long ope0x0mod2
+   .long ope1m1mod2
+   .long ope2mod2
+   .long ope3m1mod2
+   .long ope4x0mod2
+   .long ope5m1mod2
+   .long ope6m1mod2
+   .long ope7m1mod2
+   .long ope8x0mod2
+   .long ope9m1mod2
+   .long opeamod2
+   .long opebmod2
+   .long opecx0mod2
+   .long opedm1mod2
+   .long opeem1mod2
+   .long opefm1mod2
+   .long opf0mod2
+   .long opf1m1mod2
+   .long opf2m1mod2
+   .long opf3m1mod2
+   .long opf4mod2
+   .long opf5m1mod2
+   .long opf6m1mod2
+   .long opf7m1mod2
+   .long opf8mod2
+   .long opf9m1mod2
+   .long opfax0mod2
+   .long opfbmod2
+   .long opfcmod2
+   .long opfdm1mod2
+   .long opfem1mod2
+   .long opffm1mod2
+op00mod2: testmod1 20
+
+lbl00mod2: testmod1 20
+ op00
+   nextopcode
+op01m1mod2: testmod1 20
+
+lbl01mod2a: directindexedindirect0
+lbl01mod2b: ora8
+   nextopcode
+op02mod2: testmod1 20
+
+lbl02mod2: testmod1 20
+ op02
+   nextopcode
+op03m1mod2: testmod1 20
+
+lbl03mod2a: stackasmrelative
+lbl03mod2b: ora8
+   nextopcode
+op04m1mod2: testmod1 20
+
+lbl04mod2a: direct
+lbl04mod2b: tsb8
+   nextopcode
+op05m1mod2: testmod1 20
+
+lbl05mod2a: direct
+lbl05mod2b: ora8
+   nextopcode
+op06m1mod2: testmod1 20
+
+lbl06mod2a: direct
+lbl06mod2b: asl8
+   nextopcode
+op07m1mod2: testmod1 20
+
+lbl07mod2a: directindirectlong
+lbl07mod2b: ora8
+   nextopcode
+op08mod2: testmod1 20
+
+lbl08mod2: testmod1 20
+ op08
+   nextopcode
+op09m1mod2: testmod1 20
+
+lbl09mod2: testmod1 20
+ op09m1
+   nextopcode
+op0am1mod2: testmod1 20
+
+lbl0amod2a: a_asl8
+   nextopcode
+op0bmod2: testmod1 20
+
+lbl0bmod2: testmod1 20
+ op0b
+   nextopcode
+op0cm1mod2: testmod1 20
+
+lbl0cmod2a: absolute
+lbl0cmod2b: tsb8
+   nextopcode
+op0dm1mod2: testmod1 20
+
+lbl0dmod2a: absolute
+lbl0dmod2b: ora8
+   nextopcode
+op0em1mod2: testmod1 20
+
+lbl0emod2a: absolute
+lbl0emod2b: asl8
+   nextopcode
+op0fm1mod2: testmod1 20
+
+lbl0fmod2a: absolutelong
+lbl0fmod2b: ora8
+   nextopcode
+op10mod2: testmod1 20
+
+lbl10mod2: testmod1 20
+ op10
+   nextopcode
+op11m1mod2: testmod1 20
+
+lbl11mod2a: directindirectindexed0
+lbl11mod2b: ora8
+   nextopcode
+op12m1mod2: testmod1 20
+
+lbl12mod2a: directindirect
+lbl12mod2b: ora8
+   nextopcode
+op13m1mod2: testmod1 20
+
+lbl13mod2a: stackasmrelativeindirectindexed0
+lbl13mod2b: ora8
+   nextopcode
+op14m1mod2: testmod1 20
+
+lbl14mod2a: direct
+lbl14mod2b: trb8
+   nextopcode
+op15m1mod2: testmod1 20
+
+lbl15mod2a: directindexedx0
+lbl15mod2b: ora8
+   nextopcode
+op16m1mod2: testmod1 20
+
+lbl16mod2a: directindexedx0
+lbl16mod2b: asl8
+   nextopcode
+op17m1mod2: testmod1 20
+
+lbl17mod2a: directindirectindexedlong0
+lbl17mod2b: ora8
+   nextopcode
+op18mod2: testmod1 20
+
+lbl18mod2: testmod1 20
+ op18
+   nextopcode
+op19m1mod2: testmod1 20
+
+lbl19mod2a: absoluteindexedy0
+lbl19mod2b: ora8
+   nextopcode
+op1am1mod2: testmod1 20
+
+lbl1amod2a: a_inc8
+   nextopcode
+op1bmod2: testmod1 20
+
+lbl1bmod2: testmod1 20
+ op1bm1
+   nextopcode
+op1cm1mod2: testmod1 20
+
+lbl1cmod2a: absolute
+lbl1cmod2b: trb8
+   nextopcode
+op1dm1mod2: testmod1 20
+
+lbl1dmod2a: absoluteindexedx0
+lbl1dmod2b: ora8
+   nextopcode
+op1em1mod2: testmod1 20
+
+lbl1emod2a: absoluteindexedx0
+lbl1emod2b: asl8
+   nextopcode
+op1fm1mod2: testmod1 20
+
+lbl1fmod2a: absolutelongindexedx0
+lbl1fmod2b: ora8
+   nextopcode
+op20mod2: testmod1 20
+
+lbl20mod2: testmod1 20
+ op20
+   nextopcode
+op21m1mod2: testmod1 20
+
+lbl21mod2a: directindexedindirect0
+lbl21mod2b: and8
+   nextopcode
+op22mod2: testmod1 20
+
+lbl22mod2: testmod1 20
+ op22
+   nextopcode
+op23m1mod2: testmod1 20
+
+lbl23mod2a: stackasmrelative
+lbl23mod2b: and8
+   nextopcode
+op24m1mod2: testmod1 20
+
+lbl24mod2a: direct
+lbl24mod2b: bit8
+   nextopcode
+op25m1mod2: testmod1 20
+
+lbl25mod2a: direct
+lbl25mod2b: and8
+   nextopcode
+op26m1mod2: testmod1 20
+
+lbl26mod2a: direct
+lbl26mod2b: rol8
+   nextopcode
+op27m1mod2: testmod1 20
+
+lbl27mod2a: directindirectlong
+lbl27mod2b: and8
+   nextopcode
+op28mod2: testmod1 20
+
+lbl28mod2: testmod1 20
+ op28x0m1
+   nextopcode
+@@.pool
+op29m1mod2: testmod1 20
+
+lbl29mod2: testmod1 20
+ op29m1
+   nextopcode
+op2am1mod2: testmod1 20
+
+lbl2amod2a: a_rol8
+   nextopcode
+op2bmod2: testmod1 20
+
+lbl2bmod2: testmod1 20
+ op2b
+   nextopcode
+op2cm1mod2: testmod1 20
+
+lbl2cmod2a: absolute
+lbl2cmod2b: bit8
+   nextopcode
+op2dm1mod2: testmod1 20
+
+lbl2dmod2a: absolute
+lbl2dmod2b: and8
+   nextopcode
+op2em1mod2: testmod1 20
+
+lbl2emod2a: absolute
+lbl2emod2b: rol8
+   nextopcode
+op2fm1mod2: testmod1 20
+
+lbl2fmod2a: absolutelong
+lbl2fmod2b: and8
+   nextopcode
+op30mod2: testmod1 20
+
+lbl30mod2: testmod1 20
+ op30
+   nextopcode
+op31m1mod2: testmod1 20
+
+lbl31mod2a: directindirectindexed0
+lbl31mod2b: and8
+   nextopcode
+op32m1mod2: testmod1 20
+
+lbl32mod2a: directindirect
+lbl32mod2b: and8
+   nextopcode
+op33m1mod2: testmod1 20
+
+lbl33mod2a: stackasmrelativeindirectindexed0
+lbl33mod2b: and8
+   nextopcode
+op34m1mod2: testmod1 20
+
+lbl34mod2a: directindexedx0
+lbl34mod2b: bit8
+   nextopcode
+op35m1mod2: testmod1 20
+
+lbl35mod2a: directindexedx0
+lbl35mod2b: and8
+   nextopcode
+op36m1mod2: testmod1 20
+
+lbl36mod2a: directindexedx0
+lbl36mod2b: rol8
+   nextopcode
+op37m1mod2: testmod1 20
+
+lbl37mod2a: directindirectindexedlong0
+lbl37mod2b: and8
+   nextopcode
+op38mod2: testmod1 20
+
+lbl38mod2: testmod1 20
+ op38
+   nextopcode
+op39m1mod2: testmod1 20
+
+lbl39mod2a: absoluteindexedy0
+lbl39mod2b: and8
+   nextopcode
+op3am1mod2: testmod1 20
+
+lbl3amod2a: a_dec8
+   nextopcode
+op3bmod2: testmod1 20
+
+lbl3bmod2: testmod1 20
+ op3bm1
+   nextopcode
+op3cm1mod2: testmod1 20
+
+lbl3cmod2a: absoluteindexedx0
+lbl3cmod2b: bit8
+   nextopcode
+op3dm1mod2: testmod1 20
+
+lbl3dmod2a: absoluteindexedx0
+lbl3dmod2b: and8
+   nextopcode
+op3em1mod2: testmod1 20
+
+lbl3emod2a: absoluteindexedx0
+lbl3emod2b: rol8
+   nextopcode
+op3fm1mod2: testmod1 20
+
+lbl3fmod2a: absolutelongindexedx0
+lbl3fmod2b: and8
+   nextopcode
+op40mod2: testmod1 20
+
+lbl40mod2: testmod1 20
+ op40x0m1
+   nextopcode
+@@.pool
+op41m1mod2: testmod1 20
+
+lbl41mod2a: directindexedindirect0
+lbl41mod2b: eor8
+   nextopcode
+op42mod2: testmod1 20
+
+lbl42mod2: testmod1 20
+ op42
+   nextopcode
+op43m1mod2: testmod1 20
+
+lbl43mod2a: stackasmrelative
+lbl43mod2b: eor8
+   nextopcode
+op44x0mod2: testmod1 20
+
+lbl44mod2: testmod1 20
+ op44x0m1
+   nextopcode
+op45m1mod2: testmod1 20
+
+lbl45mod2a: direct
+lbl45mod2b: eor8
+   nextopcode
+op46m1mod2: testmod1 20
+
+lbl46mod2a: direct
+lbl46mod2b: lsr8
+   nextopcode
+op47m1mod2: testmod1 20
+
+lbl47mod2a: directindirectlong
+lbl47mod2b: eor8
+   nextopcode
+op48m1mod2: testmod1 20
+
+lbl48mod2: testmod1 20
+ op48m1
+   nextopcode
+op49m1mod2: testmod1 20
+
+lbl49mod2: testmod1 20
+ op49m1
+   nextopcode
+op4am1mod2: testmod1 20
+
+lbl4amod2a: a_lsr8
+   nextopcode
+op4bmod2: testmod1 20
+
+lbl4bmod2: testmod1 20
+ op4b
+   nextopcode
+op4cmod2: testmod1 20
+
+lbl4cmod2: testmod1 20
+ op4c
+   nextopcode
+op4dm1mod2: testmod1 20
+
+lbl4dmod2a: absolute
+lbl4dmod2b: eor8
+   nextopcode
+op4em1mod2: testmod1 20
+
+lbl4emod2a: absolute
+lbl4emod2b: lsr8
+   nextopcode
+op4fm1mod2: testmod1 20
+
+lbl4fmod2a: absolutelong
+lbl4fmod2b: eor8
+   nextopcode
+op50mod2: testmod1 20
+
+lbl50mod2: testmod1 20
+ op50
+   nextopcode
+op51m1mod2: testmod1 20
+
+lbl51mod2a: directindirectindexed0
+lbl51mod2b: eor8
+   nextopcode
+op52m1mod2: testmod1 20
+
+lbl52mod2a: directindirect
+lbl52mod2b: eor8
+   nextopcode
+op53m1mod2: testmod1 20
+
+lbl53mod2a: stackasmrelativeindirectindexed0
+lbl53mod2b: eor8
+   nextopcode
+op54x0mod2: testmod1 20
+
+lbl54mod2: testmod1 20
+ op54x0m1
+   nextopcode
+op55m1mod2: testmod1 20
+
+lbl55mod2a: directindexedx0
+lbl55mod2b: eor8
+   nextopcode
+op56m1mod2: testmod1 20
+
+lbl56mod2a: directindexedx0
+lbl56mod2b: lsr8
+   nextopcode
+op57m1mod2: testmod1 20
+
+lbl57mod2a: directindirectindexedlong0
+lbl57mod2b: eor8
+   nextopcode
+op58mod2: testmod1 20
+
+lbl58mod2: testmod1 20
+ op58
+   nextopcode
+op59m1mod2: testmod1 20
+
+lbl59mod2a: absoluteindexedy0
+lbl59mod2b: eor8
+   nextopcode
+op5ax0mod2: testmod1 20
+
+lbl5amod2: testmod1 20
+ op5ax0
+   nextopcode
+op5bmod2: testmod1 20
+
+lbl5bmod2: testmod1 20
+ op5bm1
+   nextopcode
+op5cmod2: testmod1 20
+
+lbl5cmod2: testmod1 20
+ op5c
+   nextopcode
+op5dm1mod2: testmod1 20
+
+lbl5dmod2a: absoluteindexedx0
+lbl5dmod2b: eor8
+   nextopcode
+op5em1mod2: testmod1 20
+
+lbl5emod2a: absoluteindexedx0
+lbl5emod2b: lsr8
+   nextopcode
+op5fm1mod2: testmod1 20
+
+lbl5fmod2a: absolutelongindexedx0
+lbl5fmod2b: eor8
+   nextopcode
+op60mod2: testmod1 20
+
+lbl60mod2: testmod1 20
+ op60
+   nextopcode
+op61m1mod2: testmod1 20
+
+lbl61mod2a: directindexedindirect0
+lbl61mod2b: adc8
+   nextopcode
+op62mod2: testmod1 20
+
+lbl62mod2: testmod1 20
+ op62
+   nextopcode
+op63m1mod2: testmod1 20
+
+lbl63mod2a: stackasmrelative
+lbl63mod2b: adc8
+   nextopcode
+op64m1mod2: testmod1 20
+
+lbl64mod2a: direct
+lbl64mod2b: stz8
+   nextopcode
+op65m1mod2: testmod1 20
+
+lbl65mod2a: direct
+lbl65mod2b: adc8
+   nextopcode
+op66m1mod2: testmod1 20
+
+lbl66mod2a: direct
+lbl66mod2b: ror8
+   nextopcode
+op67m1mod2: testmod1 20
+
+lbl67mod2a: directindirectlong
+lbl67mod2b: adc8
+   nextopcode
+op68m1mod2: testmod1 20
+
+lbl68mod2: testmod1 20
+ op68m1
+   nextopcode
+op69m1mod2: testmod1 20
+
+lbl69mod2a: immediate8
+lbl69mod2b: adc8
+   nextopcode
+op6am1mod2: testmod1 20
+
+lbl6amod2a: a_ror8
+   nextopcode
+op6bmod2: testmod1 20
+
+lbl6bmod2: testmod1 20
+ op6b
+   nextopcode
+op6cmod2: testmod1 20
+
+lbl6cmod2: testmod1 20
+ op6c
+   nextopcode
+op6dm1mod2: testmod1 20
+
+lbl6dmod2a: absolute
+lbl6dmod2b: adc8
+   nextopcode
+op6em1mod2: testmod1 20
+
+lbl6emod2a: absolute
+lbl6emod2b: ror8
+   nextopcode
+op6fm1mod2: testmod1 20
+
+lbl6fmod2a: absolutelong
+lbl6fmod2b: adc8
+   nextopcode
+op70mod2: testmod1 20
+
+lbl70mod2: testmod1 20
+ op70
+   nextopcode
+op71m1mod2: testmod1 20
+
+lbl71mod2a: directindirectindexed0
+lbl71mod2b: adc8
+   nextopcode
+op72m1mod2: testmod1 20
+
+lbl72mod2a: directindirect
+lbl72mod2b: adc8
+   nextopcode
+op73m1mod2: testmod1 20
+
+lbl73mod2a: stackasmrelativeindirectindexed0
+lbl73mod2b: adc8
+   nextopcode
+op74m1mod2: testmod1 20
+
+lbl74mod2a: directindexedx0
+lbl74mod2b: stz8
+   nextopcode
+op75m1mod2: testmod1 20
+
+lbl75mod2a: directindexedx0
+lbl75mod2b: adc8
+   nextopcode
+op76m1mod2: testmod1 20
+
+lbl76mod2a: directindexedx0
+lbl76mod2b: ror8
+   nextopcode
+op77m1mod2: testmod1 20
+
+lbl77mod2a: directindirectindexedlong0
+lbl77mod2b: adc8
+   nextopcode
+op78mod2: testmod1 20
+
+lbl78mod2: testmod1 20
+ op78
+   nextopcode
+op79m1mod2: testmod1 20
+
+lbl79mod2a: absoluteindexedy0
+lbl79mod2b: adc8
+   nextopcode
+op7ax0mod2: testmod1 20
+
+lbl7amod2: testmod1 20
+ op7ax0
+   nextopcode
+op7bmod2: testmod1 20
+
+lbl7bmod2: testmod1 20
+ op7bm1
+   nextopcode
+op7cmod2: testmod1 20
+
+lbl7cmod2: testmod1 20
+ absoluteindexedindirectx0
+  op7c
+   nextopcode
+op7dm1mod2: testmod1 20
+
+lbl7dmod2a: absoluteindexedx0
+lbl7dmod2b: adc8
+   nextopcode
+op7em1mod2: testmod1 20
+
+lbl7emod2a: absoluteindexedx0
+lbl7emod2b: ror8
+   nextopcode
+op7fm1mod2: testmod1 20
+
+lbl7fmod2a: absolutelongindexedx0
+lbl7fmod2b: adc8
+   nextopcode
+
+
+op80mod2: testmod1 20
+
+lbl80mod2: testmod1 20
+ op80
+   nextopcode
+op81m1mod2: testmod1 20
+
+lbl81mod2a: directindexedindirect0
+lbl81mod2b: op81m1
+   nextopcode
+op82mod2: testmod1 20
+
+lbl82mod2: testmod1 20
+ op82
+   nextopcode
+op83m1mod2: testmod1 20
+
+lbl83mod2a: stackasmrelative
+lbl83mod2b: sta8
+   nextopcode
+op84x0mod2: testmod1 20
+
+lbl84mod2a: direct
+lbl84mod2b: sty16
+   nextopcode
+op85m1mod2: testmod1 20
+
+lbl85mod2a: direct
+lbl85mod2b: sta8
+   nextopcode
+op86x0mod2: testmod1 20
+
+lbl86mod2a: direct
+lbl86mod2b: stx16
+   nextopcode
+op87m1mod2: testmod1 20
+
+lbl87mod2a: directindirectlong
+lbl87mod2b: sta8
+   nextopcode
+op88x0mod2: testmod1 20
+
+lbl88mod2: testmod1 20
+ op88x0
+   nextopcode
+op89m1mod2: testmod1 20
+
+lbl89mod2: testmod1 20
+ op89m1
+   nextopcode
+op8am1mod2: testmod1 20
+
+lbl8amod2: testmod1 20
+ op8am1x0
+   nextopcode
+op8bmod2: testmod1 20
+
+lbl8bmod2: testmod1 20
+ op8b
+   nextopcode
+op8cx0mod2: testmod1 20
+
+lbl8cmod2a: absolute
+lbl8cmod2b: sty16
+   nextopcode
+op8dm1mod2: testmod1 20
+
+lbl8dmod2a: absolute
+lbl8dmod2b: sta8
+   nextopcode
+op8ex0mod2: testmod1 20
+
+lbl8emod2a: absolute
+lbl8emod2b: stx16
+   nextopcode
+op8fm1mod2: testmod1 20
+
+lbl8fmod2a: absolutelong
+lbl8fmod2b: sta8
+   nextopcode
+op90mod2: testmod1 20
+
+lbl90mod2: testmod1 20
+ op90
+   nextopcode
+op91m1mod2: testmod1 20
+
+lbl91mod2a: directindirectindexed0
+lbl91mod2b: sta8
+   nextopcode
+op92m1mod2: testmod1 20
+
+lbl92mod2a: directindirect
+lbl92mod2b: sta8
+   nextopcode
+op93m1mod2: testmod1 20
+
+lbl93mod2a: stackasmrelativeindirectindexed0
+lbl93mod2b: sta8
+   nextopcode
+op94x0mod2: testmod1 20
+
+lbl94mod2a: directindexedx0
+lbl94mod2b: sty16
+   nextopcode
+op95m1mod2: testmod1 20
+
+lbl95mod2a: directindexedx0
+lbl95mod2b: sta8
+   nextopcode
+op96x0mod2: testmod1 20
+
+lbl96mod2a: directindexedy0
+lbl96mod2b: stx16
+   nextopcode
+op97m1mod2: testmod1 20
+
+lbl97mod2a: directindirectindexedlong0
+lbl97mod2b: sta8
+   nextopcode
+op98m1mod2: testmod1 20
+
+lbl98mod2: testmod1 20
+ op98m1x0
+   nextopcode
+op99m1mod2: testmod1 20
+
+lbl99mod2a: absoluteindexedy0
+lbl99mod2b: sta8
+   nextopcode
+op9amod2: testmod1 20
+
+lbl9amod2: testmod1 20
+ op9ax0
+   nextopcode
+op9bx0mod2: testmod1 20
+
+lbl9bmod2: testmod1 20
+ op9bx0
+   nextopcode
+op9cm1mod2: testmod1 20
+
+lbl9cmod2a: absolute
+lbl9cmod2b: stz8
+   nextopcode
+op9dm1mod2: testmod1 20
+
+lbl9dmod2a: absoluteindexedx0
+lbl9dmod2b: sta8
+   nextopcode
+op9em1mod2: testmod1 20
+
+lbl9emod2: testmod1 20
+ absoluteindexedx0
+  stz8
+   nextopcode
+op9fm1mod2: testmod1 20
+
+lbl9fmod2a: absolutelongindexedx0
+lbl9fmod2b: sta8
+   nextopcode
+opa0x0mod2: testmod1 20
+
+lbla0mod2: testmod1 20
+ opa0x0
+   nextopcode
+opa1m1mod2: testmod1 20
+
+lbla1mod2a: directindexedindirect0
+lbla1mod2b: lda8
+   nextopcode
+opa2x0mod2: testmod1 20
+
+lbla2mod2: testmod1 20
+ opa2x0
+   nextopcode
+opa3m1mod2: testmod1 20
+
+lbla3mod2a: stackasmrelative
+lbla3mod2b: lda8
+   nextopcode
+opa4x0mod2: testmod1 20
+
+lbla4mod2a: direct
+lbla4mod2b: ldy16
+   nextopcode
+opa5m1mod2: testmod1 20
+
+lbla5mod2a: direct
+lbla5mod2b: lda8
+   nextopcode
+opa6x0mod2: testmod1 20
+
+lbla6mod2a: direct
+lbla6mod2b: ldx16
+   nextopcode
+opa7m1mod2: testmod1 20
+
+lbla7mod2a: directindirectlong
+lbla7mod2b: lda8
+   nextopcode
+opa8x0mod2: testmod1 20
+
+lbla8mod2: testmod1 20
+ opa8x0m1
+   nextopcode
+opa9m1mod2: testmod1 20
+
+lbla9mod2: testmod1 20
+ opa9m1
+   nextopcode
+opaax0mod2: testmod1 20
+
+lblaamod2: testmod1 20
+ opaax0m1
+   nextopcode
+opabmod2: testmod1 20
+
+lblabmod2: testmod1 20
+ opab
+   nextopcode
+opacx0mod2: testmod1 20
+
+lblacmod2a: absolute
+lblacmod2b: ldy16
+   nextopcode
+opadm1mod2: testmod1 20
+
+lbladmod2a: absolute
+lbladmod2b: lda8
+   nextopcode
+opaex0mod2: testmod1 20
+
+lblaemod2a: absolute
+lblaemod2b: ldx16
+   nextopcode
+opafm1mod2: testmod1 20
+
+lblafmod2a: absolutelong
+lblafmod2b: lda8
+   nextopcode
+opb0mod2: testmod1 20
+
+lblb0mod2: testmod1 20
+ opb0
+   nextopcode
+opb1m1mod2: testmod1 20
+
+lblb1mod2a: directindirectindexed0
+lblb1mod2b: lda8
+   nextopcode
+opb2m1mod2: testmod1 20
+
+lblb2mod2a: directindirect
+lblb2mod2b: lda8
+   nextopcode
+opb3m1mod2: testmod1 20
+
+lblb3mod2a: stackasmrelativeindirectindexed0
+lblb3mod2b: lda8
+   nextopcode
+opb4x0mod2: testmod1 20
+
+lblb4mod2a: directindexedx0
+lblb4mod2b: ldy16
+   nextopcode
+opb5m1mod2: testmod1 20
+
+lblb5mod2a: directindexedx0
+lblb5mod2b: lda8
+   nextopcode
+opb6x0mod2: testmod1 20
+
+lblb6mod2a: directindexedy0
+lblb6mod2b: ldx16
+   nextopcode
+opb7m1mod2: testmod1 20
+
+lblb7mod2a: directindirectindexedlong0
+lblb7mod2b: lda8
+   nextopcode
+opb8mod2: testmod1 20
+
+lblb8mod2: testmod1 20
+ opb8
+   nextopcode
+opb9m1mod2: testmod1 20
+
+lblb9mod2a: absoluteindexedy0
+lblb9mod2b: lda8
+   nextopcode
+opbax0mod2: testmod1 20
+
+lblbamod2: testmod1 20
+ opbax0
+   nextopcode
+opbbx0mod2: testmod1 20
+
+lblbbmod2: testmod1 20
+ opbbx0
+   nextopcode
+opbcx0mod2: testmod1 20
+
+lblbcmod2a: absoluteindexedx0
+lblbcmod2b: ldy16
+   nextopcode
+opbdm1mod2: testmod1 20
+
+lblbdmod2a: absoluteindexedx0
+lblbdmod2b: lda8
+   nextopcode
+opbex0mod2: testmod1 20
+
+lblbemod2a: absoluteindexedy0
+lblbemod2b: ldx16
+   nextopcode
+opbfm1mod2: testmod1 20
+
+lblbfmod2a: absolutelongindexedx0
+lblbfmod2b: lda8
+   nextopcode
+opc0x0mod2: testmod1 20
+
+lblc0mod2: testmod1 20
+ opc0x0
+   nextopcode
+opc1m1mod2: testmod1 20
+
+lblc1mod2a: directindexedindirect0
+lblc1mod2b: cmp8
+   nextopcode
+opc2mod2: testmod1 20
+
+lblc2mod2: testmod1 20
+ opc2
+   nextopcode
+@@.pool
+opc3m1mod2: testmod1 20
+
+lblc3mod2a: stackasmrelative
+lblc3mod2b: cmp8
+   nextopcode
+opc4x0mod2: testmod1 20
+
+lblc4mod2a: direct
+lblc4mod2b: cmy16
+   nextopcode
+opc5m1mod2: testmod1 20
+
+lblc5mod2a: direct
+lblc5mod2b: cmp8
+   nextopcode
+opc6m1mod2: testmod1 20
+
+lblc6mod2a: direct
+lblc6mod2b: dec8
+   nextopcode
+opc7m1mod2: testmod1 20
+
+lblc7mod2a: directindirectlong
+lblc7mod2b: cmp8
+   nextopcode
+opc8x0mod2: testmod1 20
+
+lblc8mod2: testmod1 20
+ opc8x0
+   nextopcode
+opc9m1mod2: testmod1 20
+
+lblc9mod2: testmod1 20
+ opc9m1
+   nextopcode
+opcax0mod2: testmod1 20
+
+lblcamod2: testmod1 20
+ opcax0
+   nextopcode
+opcbmod2: testmod1 20
+
+lblcbmod2: testmod1 20
+ opcb
+   nextopcode
+opccx0mod2: testmod1 20
+
+lblccmod2a: absolute
+lblccmod2b: cmy16
+   nextopcode
+opcdm1mod2: testmod1 20
+
+lblcdmod2a: absolute
+lblcdmod2b: cmp8
+   nextopcode
+opcem1mod2: testmod1 20
+
+lblcemod2a: absolute
+lblcemod2b: dec8
+   nextopcode
+opcfm1mod2: testmod1 20
+
+lblcfmod2a: absolutelong
+lblcfmod2b: cmp8
+   nextopcode
+opd0mod2: testmod1 20
+
+lbld0mod2: testmod1 20
+ opd0
+   nextopcode
+opd1m1mod2: testmod1 20
+
+lbld1mod2a: directindirectindexed0
+lbld1mod2b: cmp8
+   nextopcode
+opd2m1mod2: testmod1 20
+
+lbld2mod2a: directindirect
+lbld2mod2b: cmp8
+   nextopcode
+opd3m1mod2: testmod1 20
+
+lbld3mod2a: stackasmrelativeindirectindexed0
+lbld3mod2b: cmp8
+   nextopcode
+opd4mod2: testmod1 20
+
+lbld4mod2: testmod1 20
+ opd4
+   nextopcode
+opd5m1mod2: testmod1 20
+
+lbld5mod2a: directindexedx0
+lbld5mod2b: cmp8
+   nextopcode
+opd6m1mod2: testmod1 20
+
+lbld6mod2a: directindexedx0
+lbld6mod2b: dec8
+   nextopcode
+opd7m1mod2: testmod1 20
+
+lbld7mod2a: directindirectindexedlong0
+lbld7mod2b: cmp8
+   nextopcode
+opd8mod2: testmod1 20
+
+lbld8mod2: testmod1 20
+ opd8
+   nextopcode
+opd9m1mod2: testmod1 20
+
+lbld9mod2a: absoluteindexedy0
+lbld9mod2b: cmp8
+   nextopcode
+opdax0mod2: testmod1 20
+
+lbldamod2: testmod1 20
+ opdax0
+   nextopcode
+opdbmod2: testmod1 20
+
+lbldbmod2: testmod1 20
+ opdb
+   nextopcode
+opdcmod2: testmod1 20
+
+lbldcmod2: testmod1 20
+ opdc
+   nextopcode
+opddm1mod2: testmod1 20
+
+lblddmod2a: absoluteindexedx0
+lblddmod2b: cmp8
+   nextopcode
+opdem1mod2: testmod1 20
+
+lbldemod2a: absoluteindexedx0
+lbldemod2b: dec8
+   nextopcode
+opdfm1mod2: testmod1 20
+
+lbldfmod2a: absolutelongindexedx0
+lbldfmod2b: cmp8
+   nextopcode
+ope0x0mod2: testmod1 20
+
+lble0mod2: testmod1 20
+ ope0x0
+   nextopcode
+ope1m1mod2: testmod1 20
+
+lble1mod2a: directindexedindirect0
+lble1mod2b: sbc8
+   nextopcode
+ope2mod2: testmod1 20
+
+lble2mod2: testmod1 20
+ ope2
+   nextopcode
+@@.pool
+ope3m1mod2: testmod1 20
+
+lble3mod2a: stackasmrelative
+lble3mod2b: sbc8
+   nextopcode
+ope4x0mod2: testmod1 20
+
+lble4mod2a: direct
+lble4mod2b: cmx16
+   nextopcode
+ope5m1mod2: testmod1 20
+
+lble5mod2a: direct
+lble5mod2b: sbc8
+   nextopcode
+ope6m1mod2: testmod1 20
+
+lble6mod2a: direct
+lble6mod2b: inc8
+   nextopcode
+ope7m1mod2: testmod1 20
+
+lble7mod2a: directindirectlong
+lble7mod2b: sbc8
+   nextopcode
+ope8x0mod2: testmod1 20
+
+lble8mod2: testmod1 20
+ ope8x0
+   nextopcode
+ope9m1mod2: testmod1 20
+
+lble9mod2a: immediate8
+lble9mod2b: sbc8
+   nextopcode
+opeamod2: testmod1 20
+
+lbleamod2: testmod1 20
+ opea
+   nextopcode
+opebmod2: testmod1 20
+
+lblebmod2: testmod1 20
+ opebm1
+   nextopcode
+opecx0mod2: testmod1 20
+
+lblecmod2a: absolute
+lblecmod2b: cmx16
+   nextopcode
+opedm1mod2: testmod1 20
+
+lbledmod2a: absolute
+lbledmod2b: sbc8
+   nextopcode
+opeem1mod2: testmod1 20
+
+lbleemod2a: absolute
+lbleemod2b: inc8
+   nextopcode
+opefm1mod2: testmod1 20
+
+lblefmod2a: absolutelong
+lblefmod2b: sbc8
+   nextopcode
+opf0mod2: testmod1 20
+
+lblf0mod2: testmod1 20
+ opf0
+   nextopcode
+opf1m1mod2: testmod1 20
+
+lblf1mod2a: directindirectindexed0
+lblf1mod2b: sbc8
+   nextopcode
+opf2m1mod2: testmod1 20
+
+lblf2mod2a: directindirect
+lblf2mod2b: sbc8
+   nextopcode
+opf3m1mod2: testmod1 20
+
+lblf3mod2a: stackasmrelativeindirectindexed0
+lblf3mod2b: sbc8
+   nextopcode
+opf4mod2: testmod1 20
+
+lblf4mod2: testmod1 20
+ opf4
+   nextopcode
+opf5m1mod2: testmod1 20
+
+lblf5mod2a: directindexedx0
+lblf5mod2b: sbc8
+   nextopcode
+opf6m1mod2: testmod1 20
+
+lblf6mod2a: directindexedx0
+lblf6mod2b: inc8
+   nextopcode
+opf7m1mod2: testmod1 20
+
+lblf7mod2a: directindirectindexedlong0
+lblf7mod2b: sbc8
+   nextopcode
+opf8mod2: testmod1 20
+
+lblf8mod2: testmod1 20
+ opf8
+   nextopcode
+opf9m1mod2: testmod1 20
+
+lblf9mod2a: absoluteindexedy0
+lblf9mod2b: sbc8
+   nextopcode
+opfax0mod2: testmod1 20
+
+lblfamod2: testmod1 20
+ opfax0
+   nextopcode
+opfbmod2: testmod1 20
+
+lblfbmod2: testmod1 20
+ opfb
+   nextopcode
+opfcmod2: testmod1 20
+
+lblfcmod2: testmod1 20
+ opfcx0
+   nextopcode
+opfdm1mod2: testmod1 20
+
+lblfdmod2a: absoluteindexedx0
+lblfdmod2b: sbc8
+   nextopcode
+opfem1mod2: testmod1 20
+
+lblfemod2a: absoluteindexedx0
+lblfemod2b: inc8
+   nextopcode
+opffm1mod2: testmod1 20
+
+lblffmod2a: absolutelongindexedx0
+lblffmod2b: sbc8
+   nextopcode
+
+@@.pool
+
+
+jumptable3: .long op00mod3
+   .long op01m0mod3
+   .long op02mod3
+   .long op03m0mod3
+   .long op04m0mod3
+   .long op05m0mod3
+   .long op06m0mod3
+   .long op07m0mod3
+   .long op08mod3
+   .long op09m0mod3
+   .long op0am0mod3
+   .long op0bmod3
+   .long op0cm0mod3
+   .long op0dm0mod3
+   .long op0em0mod3
+   .long op0fm0mod3
+   .long op10mod3
+   .long op11m0mod3
+   .long op12m0mod3
+   .long op13m0mod3
+   .long op14m0mod3
+   .long op15m0mod3
+   .long op16m0mod3
+   .long op17m0mod3
+   .long op18mod3
+   .long op19m0mod3
+   .long op1am0mod3
+   .long op1bmod3
+   .long op1cm0mod3
+   .long op1dm0mod3
+   .long op1em0mod3
+   .long op1fm0mod3
+   .long op20mod3
+   .long op21m0mod3
+   .long op22mod3
+   .long op23m0mod3
+   .long op24m0mod3
+   .long op25m0mod3
+   .long op26m0mod3
+   .long op27m0mod3
+   .long op28mod3
+   .long op29m0mod3
+   .long op2am0mod3
+   .long op2bmod3
+   .long op2cm0mod3
+   .long op2dm0mod3
+   .long op2em0mod3
+   .long op2fm0mod3
+   .long op30mod3
+   .long op31m0mod3
+   .long op32m0mod3
+   .long op33m0mod3
+   .long op34m0mod3
+   .long op35m0mod3
+   .long op36m0mod3
+   .long op37m0mod3
+   .long op38mod3
+   .long op39m0mod3
+   .long op3am0mod3
+   .long op3bmod3
+   .long op3cm0mod3
+   .long op3dm0mod3
+   .long op3em0mod3
+   .long op3fm0mod3
+   .long op40mod3
+   .long op41m0mod3
+   .long op42mod3
+   .long op43m0mod3
+   .long op44x0mod3
+   .long op45m0mod3
+   .long op46m0mod3
+   .long op47m0mod3
+   .long op48m0mod3
+   .long op49m0mod3
+   .long op4am0mod3
+   .long op4bmod3
+   .long op4cmod3
+   .long op4dm0mod3
+   .long op4em0mod3
+   .long op4fm0mod3
+   .long op50mod3
+   .long op51m0mod3
+   .long op52m0mod3
+   .long op53m0mod3
+   .long op54x0mod3
+   .long op55m0mod3
+   .long op56m0mod3
+   .long op57m0mod3
+   .long op58mod3
+   .long op59m0mod3
+   .long op5ax0mod3
+   .long op5bmod3
+   .long op5cmod3
+   .long op5dm0mod3
+   .long op5em0mod3
+   .long op5fm0mod3
+   .long op60mod3
+   .long op61m0mod3
+   .long op62mod3
+   .long op63m0mod3
+   .long op64m0mod3
+   .long op65m0mod3
+   .long op66m0mod3
+   .long op67m0mod3
+   .long op68m0mod3
+   .long op69m0mod3
+   .long op6am0mod3
+   .long op6bmod3
+   .long op6cmod3
+   .long op6dm0mod3
+   .long op6em0mod3
+   .long op6fm0mod3
+   .long op70mod3
+   .long op71m0mod3
+   .long op72m0mod3
+   .long op73m0mod3
+   .long op74m0mod3
+   .long op75m0mod3
+   .long op76m0mod3
+   .long op77m0mod3
+   .long op78mod3
+   .long op79m0mod3
+   .long op7ax0mod3
+   .long op7bmod3
+   .long op7cmod3
+   .long op7dm0mod3
+   .long op7em0mod3
+   .long op7fm0mod3
+   .long op80mod3
+   .long op81m0mod3
+   .long op82mod3
+   .long op83m0mod3
+   .long op84x0mod3
+   .long op85m0mod3
+   .long op86x0mod3
+   .long op87m0mod3
+   .long op88x0mod3
+   .long op89m0mod3
+   .long op8am0mod3
+   .long op8bmod3
+   .long op8cx0mod3
+   .long op8dm0mod3
+   .long op8ex0mod3
+   .long op8fm0mod3
+   .long op90mod3
+   .long op91m0mod3
+   .long op92m0mod3
+   .long op93m0mod3
+   .long op94x0mod3
+   .long op95m0mod3
+   .long op96x0mod3
+   .long op97m0mod3
+   .long op98m0mod3
+   .long op99m0mod3
+   .long op9amod3
+   .long op9bx0mod3
+   .long op9cm0mod3
+   .long op9dm0mod3
+   .long op9em0mod3
+   .long op9fm0mod3
+   .long opa0x0mod3
+   .long opa1m0mod3
+   .long opa2x0mod3
+   .long opa3m0mod3
+   .long opa4x0mod3
+   .long opa5m0mod3
+   .long opa6x0mod3
+   .long opa7m0mod3
+   .long opa8x0mod3
+   .long opa9m0mod3
+   .long opaax0mod3
+   .long opabmod3
+   .long opacx0mod3
+   .long opadm0mod3
+   .long opaex0mod3
+   .long opafm0mod3
+   .long opb0mod3
+   .long opb1m0mod3
+   .long opb2m0mod3
+   .long opb3m0mod3
+   .long opb4x0mod3
+   .long opb5m0mod3
+   .long opb6x0mod3
+   .long opb7m0mod3
+   .long opb8mod3
+   .long opb9m0mod3
+   .long opbax0mod3
+   .long opbbx0mod3
+   .long opbcx0mod3
+   .long opbdm0mod3
+   .long opbex0mod3
+   .long opbfm0mod3
+   .long opc0x0mod3
+   .long opc1m0mod3
+   .long opc2mod3
+   .long opc3m0mod3
+   .long opc4x0mod3
+   .long opc5m0mod3
+   .long opc6m0mod3
+   .long opc7m0mod3
+   .long opc8x0mod3
+   .long opc9m0mod3
+   .long opcax0mod3
+   .long opcbmod3
+   .long opccx0mod3
+   .long opcdm0mod3
+   .long opcem0mod3
+   .long opcfm0mod3
+   .long opd0mod3
+   .long opd1m0mod3
+   .long opd2m0mod3
+   .long opd3m0mod3
+   .long opd4mod3
+   .long opd5m0mod3
+   .long opd6m0mod3
+   .long opd7m0mod3
+   .long opd8mod3
+   .long opd9m0mod3
+   .long opdax0mod3
+   .long opdbmod3
+   .long opdcmod3
+   .long opddm0mod3
+   .long opdem0mod3
+   .long opdfm0mod3
+   .long ope0x0mod3
+   .long ope1m0mod3
+   .long ope2mod3
+   .long ope3m0mod3
+   .long ope4x0mod3
+   .long ope5m0mod3
+   .long ope6m0mod3
+   .long ope7m0mod3
+   .long ope8x0mod3
+   .long ope9m0mod3
+   .long opeamod3
+   .long opebmod3
+   .long opecx0mod3
+   .long opedm0mod3
+   .long opeem0mod3
+   .long opefm0mod3
+   .long opf0mod3
+   .long opf1m0mod3
+   .long opf2m0mod3
+   .long opf3m0mod3
+   .long opf4mod3
+   .long opf5m0mod3
+   .long opf6m0mod3
+   .long opf7m0mod3
+   .long opf8mod3
+   .long opf9m0mod3
+   .long opfax0mod3
+   .long opfbmod3
+   .long opfcmod3
+   .long opfdm0mod3
+   .long opfem0mod3
+   .long opffm0mod3
+op00mod3: testmod1 300
+
+lbl00mod3: testmod1 300
+ op00
+   nextopcode
+op01m0mod3: testmod1 300
+
+lbl01mod3a: directindexedindirect0
+lbl01mod3b: ora16
+   nextopcode
+op02mod3: testmod1 300
+
+lbl02mod3: testmod1 300
+ op02
+   nextopcode
+op03m0mod3: testmod1 300
+
+lbl03mod3a: stackasmrelative
+lbl03mod3b: ora16
+   nextopcode
+op04m0mod3: testmod1 300
+
+lbl04mod3a: direct
+lbl04mod3b: tsb16
+   nextopcode
+op05m0mod3: testmod1 300
+
+lbl05mod3a: direct
+lbl05mod3b: ora16
+   nextopcode
+op06m0mod3: testmod1 300
+
+lbl06mod3a: direct
+lbl06mod3b: asl16
+   nextopcode
+op07m0mod3: testmod1 300
+
+lbl07mod3a: directindirectlong
+lbl07mod3b: ora16
+   nextopcode
+op08mod3: testmod1 300
+
+lbl08mod3: testmod1 300
+ op08
+   nextopcode
+op09m0mod3: testmod1 300
+
+lbl09mod3: testmod1 300
+ op09m0
+   nextopcode
+op0am0mod3: testmod1 300
+
+lbl0amod3a: a_asl16
+   nextopcode
+op0bmod3: testmod1 300
+
+lbl0bmod3: testmod1 300
+ op0b
+   nextopcode
+op0cm0mod3: testmod1 300
+
+lbl0cmod3a: absolute
+lbl0cmod3b: tsb16
+   nextopcode
+op0dm0mod3: testmod1 300
+
+lbl0dmod3a: absolute
+lbl0dmod3b: ora16
+   nextopcode
+op0em0mod3: testmod1 300
+
+lbl0emod3a: absolute
+lbl0emod3b: asl16
+   nextopcode
+op0fm0mod3: testmod1 300
+
+lbl0fmod3a: absolutelong
+lbl0fmod3b: ora16
+   nextopcode
+op10mod3: testmod1 300
+
+lbl10mod3: testmod1 300
+ op10
+   nextopcode
+op11m0mod3: testmod1 300
+
+lbl11mod3a: directindirectindexed0
+lbl11mod3b: ora16
+   nextopcode
+op12m0mod3: testmod1 300
+
+lbl12mod3a: directindirect
+lbl12mod3b: ora16
+   nextopcode
+op13m0mod3: testmod1 300
+
+lbl13mod3a: stackasmrelativeindirectindexed0
+lbl13mod3b: ora16
+   nextopcode
+op14m0mod3: testmod1 300
+
+lbl14mod3a: direct
+lbl14mod3b: trb16
+   nextopcode
+op15m0mod3: testmod1 300
+
+lbl15mod3a: directindexedx0
+lbl15mod3b: ora16
+   nextopcode
+op16m0mod3: testmod1 300
+
+lbl16mod3a: directindexedx0
+lbl16mod3b: asl16
+   nextopcode
+op17m0mod3: testmod1 300
+
+lbl17mod3a: directindirectindexedlong0
+lbl17mod3b: ora16
+   nextopcode
+op18mod3: testmod1 300
+
+lbl18mod3: testmod1 300
+ op18
+   nextopcode
+op19m0mod3: testmod1 300
+
+lbl19mod3a: absoluteindexedy0
+lbl19mod3b: ora16
+   nextopcode
+op1am0mod3: testmod1 300
+
+lbl1amod3a: a_inc16
+   nextopcode
+op1bmod3: testmod1 300
+
+lbl1bmod3: testmod1 300
+ op1bm0
+   nextopcode
+op1cm0mod3: testmod1 300
+
+lbl1cmod3a: absolute
+lbl1cmod3b: trb16
+   nextopcode
+op1dm0mod3: testmod1 300
+
+lbl1dmod3a: absoluteindexedx0
+lbl1dmod3b: ora16
+   nextopcode
+op1em0mod3: testmod1 300
+
+lbl1emod3a: absoluteindexedx0
+lbl1emod3b: asl16
+   nextopcode
+op1fm0mod3: testmod1 300
+
+lbl1fmod3a: absolutelongindexedx0
+lbl1fmod3b: ora16
+   nextopcode
+op20mod3: testmod1 300
+
+lbl20mod3: testmod1 300
+ op20
+   nextopcode
+op21m0mod3: testmod1 300
+
+lbl21mod3a: directindexedindirect0
+lbl21mod3b: and16
+   nextopcode
+op22mod3: testmod1 300
+
+lbl22mod3: testmod1 300
+ op22
+   nextopcode
+op23m0mod3: testmod1 300
+
+lbl23mod3a: stackasmrelative
+lbl23mod3b: and16
+   nextopcode
+op24m0mod3: testmod1 300
+
+lbl24mod3a: direct
+lbl24mod3b: bit16
+   nextopcode
+op25m0mod3: testmod1 300
+
+lbl25mod3a: direct
+lbl25mod3b: and16
+   nextopcode
+op26m0mod3: testmod1 300
+
+lbl26mod3a: direct
+lbl26mod3b: rol16
+   nextopcode
+op27m0mod3: testmod1 300
+
+lbl27mod3a: directindirectlong
+lbl27mod3b: and16
+   nextopcode
+op28mod3: testmod1 300
+
+lbl28mod3: testmod1 300
+ op28x0m0
+   nextopcode
+@@.pool
+op29m0mod3: testmod1 300
+
+lbl29mod3: testmod1 300
+ op29m0
+   nextopcode
+op2am0mod3: testmod1 300
+
+lbl2amod3a: a_rol16
+   nextopcode
+op2bmod3: testmod1 300
+
+lbl2bmod3: testmod1 300
+ op2b
+   nextopcode
+op2cm0mod3: testmod1 300
+
+lbl2cmod3a: absolute
+lbl2cmod3b: bit16
+   nextopcode
+op2dm0mod3: testmod1 300
+
+lbl2dmod3a: absolute
+lbl2dmod3b: and16
+   nextopcode
+op2em0mod3: testmod1 300
+
+lbl2emod3a: absolute
+lbl2emod3b: rol16
+   nextopcode
+op2fm0mod3: testmod1 300
+
+lbl2fmod3a: absolutelong
+lbl2fmod3b: and16
+   nextopcode
+op30mod3: testmod1 300
+
+lbl30mod3: testmod1 300
+ op30
+   nextopcode
+op31m0mod3: testmod1 300
+
+lbl31mod3a: directindirectindexed0
+lbl31mod3b: and16
+   nextopcode
+op32m0mod3: testmod1 300
+
+lbl32mod3a: directindirect
+lbl32mod3b: and16
+   nextopcode
+op33m0mod3: testmod1 300
+
+lbl33mod3a: stackasmrelativeindirectindexed0
+lbl33mod3b: and16
+   nextopcode
+op34m0mod3: testmod1 300
+
+lbl34mod3a: directindexedx0
+lbl34mod3b: bit16
+   nextopcode
+op35m0mod3: testmod1 300
+
+lbl35mod3a: directindexedx0
+lbl35mod3b: and16
+   nextopcode
+op36m0mod3: testmod1 300
+
+lbl36mod3a: directindexedx0
+lbl36mod3b: rol16
+   nextopcode
+op37m0mod3: testmod1 300
+
+lbl37mod3a: directindirectindexedlong0
+lbl37mod3b: and16
+   nextopcode
+op38mod3: testmod1 300
+
+lbl38mod3: testmod1 300
+ op38
+   nextopcode
+op39m0mod3: testmod1 300
+
+lbl39mod3a: absoluteindexedy0
+lbl39mod3b: and16
+   nextopcode
+op3am0mod3: testmod1 300
+
+lbl3amod3a: a_dec16
+   nextopcode
+op3bmod3: testmod1 300
+
+lbl3bmod3: testmod1 300
+ op3bm0
+   nextopcode
+op3cm0mod3: testmod1 300
+
+lbl3cmod3a: absoluteindexedx0
+lbl3cmod3b: bit16
+   nextopcode
+op3dm0mod3: testmod1 300
+
+lbl3dmod3a: absoluteindexedx0
+lbl3dmod3b: and16
+   nextopcode
+op3em0mod3: testmod1 300
+
+lbl3emod3a: absoluteindexedx0
+lbl3emod3b: rol16
+   nextopcode
+op3fm0mod3: testmod1 300
+
+lbl3fmod3a: absolutelongindexedx0
+lbl3fmod3b: and16
+   nextopcode
+op40mod3: testmod1 300
+
+lbl40mod3: testmod1 300
+ op40x0m0
+   nextopcode
+@@.pool
+op41m0mod3: testmod1 300
+
+lbl41mod3a: directindexedindirect0
+lbl41mod3b: eor16
+   nextopcode
+op42mod3: testmod1 300
+
+lbl42mod3: testmod1 300
+ op42
+   nextopcode
+op43m0mod3: testmod1 300
+
+lbl43mod3a: stackasmrelative
+lbl43mod3b: eor16
+   nextopcode
+op44x0mod3: testmod1 300
+
+lbl44mod3: testmod1 300
+ op44x0m0
+   nextopcode
+op45m0mod3: testmod1 300
+
+lbl45mod3a: direct
+lbl45mod3b: eor16
+   nextopcode
+op46m0mod3: testmod1 300
+
+lbl46mod3a: direct
+lbl46mod3b: lsr16
+   nextopcode
+op47m0mod3: testmod1 300
+
+lbl47mod3a: directindirectlong
+lbl47mod3b: eor16
+   nextopcode
+op48m0mod3: testmod1 300
+
+lbl48mod3: testmod1 300
+ op48m0
+   nextopcode
+op49m0mod3: testmod1 300
+
+lbl49mod3: testmod1 300
+ op49m0
+   nextopcode
+op4am0mod3: testmod1 300
+
+lbl4amod3a: a_lsr16
+   nextopcode
+op4bmod3: testmod1 300
+
+lbl4bmod3: testmod1 300
+ op4b
+   nextopcode
+op4cmod3: testmod1 300
+
+lbl4cmod3: testmod1 300
+ op4c
+   nextopcode
+op4dm0mod3: testmod1 300
+
+lbl4dmod3a: absolute
+lbl4dmod3b: eor16
+   nextopcode
+op4em0mod3: testmod1 300
+
+lbl4emod3a: absolute
+lbl4emod3b: lsr16
+   nextopcode
+op4fm0mod3: testmod1 300
+
+lbl4fmod3a: absolutelong
+lbl4fmod3b: eor16
+   nextopcode
+op50mod3: testmod1 300
+
+lbl50mod3: testmod1 300
+ op50
+   nextopcode
+op51m0mod3: testmod1 300
+
+lbl51mod3a: directindirectindexed0
+lbl51mod3b: eor16
+   nextopcode
+op52m0mod3: testmod1 300
+
+lbl52mod3a: directindirect
+lbl52mod3b: eor16
+   nextopcode
+op53m0mod3: testmod1 300
+
+lbl53mod3a: stackasmrelativeindirectindexed0
+lbl53mod3b: eor16
+   nextopcode
+op54x0mod3: testmod1 300
+
+lbl54mod3: testmod1 300
+ op54x0m0
+   nextopcode
+op55m0mod3: testmod1 300
+
+lbl55mod3a: directindexedx0
+lbl55mod3b: eor16
+   nextopcode
+op56m0mod3: testmod1 300
+
+lbl56mod3a: directindexedx0
+lbl56mod3b: lsr16
+   nextopcode
+op57m0mod3: testmod1 300
+
+lbl57mod3a: directindirectindexedlong0
+lbl57mod3b: eor16
+   nextopcode
+op58mod3: testmod1 300
+
+lbl58mod3: testmod1 300
+ op58
+   nextopcode
+op59m0mod3: testmod1 300
+
+lbl59mod3a: absoluteindexedy0
+lbl59mod3b: eor16
+   nextopcode
+op5ax0mod3: testmod1 300
+
+lbl5amod3: testmod1 300
+ op5ax0
+   nextopcode
+op5bmod3: testmod1 300
+
+lbl5bmod3: testmod1 300
+ op5bm0
+   nextopcode
+op5cmod3: testmod1 300
+
+lbl5cmod3: testmod1 300
+ op5c
+   nextopcode
+op5dm0mod3: testmod1 300
+
+lbl5dmod3a: absoluteindexedx0
+lbl5dmod3b: eor16
+   nextopcode
+op5em0mod3: testmod1 300
+
+lbl5emod3a: absoluteindexedx0
+lbl5emod3b: lsr16
+   nextopcode
+op5fm0mod3: testmod1 300
+
+lbl5fmod3a: absolutelongindexedx0
+lbl5fmod3b: eor16
+   nextopcode
+op60mod3: testmod1 300
+
+lbl60mod3: testmod1 300
+ op60
+   nextopcode
+op61m0mod3: testmod1 300
+
+lbl61mod3a: directindexedindirect0
+lbl61mod3b: adc16
+   nextopcode
+op62mod3: testmod1 300
+
+lbl62mod3: testmod1 300
+ op62
+   nextopcode
+op63m0mod3: testmod1 300
+
+lbl63mod3a: stackasmrelative
+lbl63mod3b: adc16
+   nextopcode
+@@.pool
+op64m0mod3: testmod1 300
+
+lbl64mod3a: direct
+lbl64mod3b: stz16
+   nextopcode
+op65m0mod3: testmod1 300
+
+lbl65mod3a: direct
+lbl65mod3b: adc16
+   nextopcode
+@@.pool
+op66m0mod3: testmod1 300
+
+lbl66mod3a: direct
+lbl66mod3b: ror16
+   nextopcode
+op67m0mod3: testmod1 300
+
+lbl67mod3a: directindirectlong
+lbl67mod3b: adc16
+   nextopcode
+@@.pool
+op68m0mod3: testmod1 300
+
+lbl68mod3: testmod1 300
+ op68m0
+   nextopcode
+op69m0mod3: testmod1 300
+
+lbl69mod3a: immediate16
+lbl69mod3b: adc16
+   nextopcode
+@.pool
+op6am0mod3: testmod1 300
+
+lbl6amod3a: a_ror16
+   nextopcode
+op6bmod3: testmod1 300
+
+lbl6bmod3: testmod1 300
+ op6b
+   nextopcode
+op6cmod3: testmod1 300
+
+lbl6cmod3: testmod1 300
+ op6c
+   nextopcode
+op6dm0mod3: testmod1 300
+
+lbl6dmod3a: absolute
+lbl6dmod3b: adc16
+   nextopcode
+op6em0mod3: testmod1 300
+
+lbl6emod3a: absolute
+lbl6emod3b: ror16
+   nextopcode
+op6fm0mod3: testmod1 300
+
+lbl6fmod3a: absolutelong
+lbl6fmod3b: adc16
+   nextopcode
+op70mod3: testmod1 300
+
+lbl70mod3: testmod1 300
+ op70
+   nextopcode
+op71m0mod3: testmod1 300
+
+lbl71mod3a: directindirectindexed0
+lbl71mod3b: adc16
+   nextopcode
+op72m0mod3: testmod1 300
+
+lbl72mod3a: directindirect
+lbl72mod3b: adc16
+   nextopcode
+op73m0mod3: testmod1 300
+
+lbl73mod3a: stackasmrelativeindirectindexed0
+lbl73mod3b: adc16
+   nextopcode
+@.pool
+op74m0mod3: testmod1 300
+
+lbl74mod3a: directindexedx0
+lbl74mod3b: stz16
+   nextopcode
+op75m0mod3: testmod1 300
+
+lbl75mod3a: directindexedx0
+lbl75mod3b: adc16
+   nextopcode
+@.pool
+op76m0mod3: testmod1 300
+
+lbl76mod3a: directindexedx0
+lbl76mod3b: ror16
+   nextopcode
+op77m0mod3: testmod1 300
+
+lbl77mod3a: directindirectindexedlong0
+lbl77mod3b: adc16
+   nextopcode
+op78mod3: testmod1 300
+
+lbl78mod3: testmod1 300
+ op78
+   nextopcode
+op79m0mod3: testmod1 300
+
+lbl79mod3a: absoluteindexedy0
+lbl79mod3b: adc16
+   nextopcode
+op7ax0mod3: testmod1 300
+
+lbl7amod3: testmod1 300
+ op7ax0
+   nextopcode
+op7bmod3: testmod1 300
+
+lbl7bmod3: testmod1 300
+ op7bm0
+   nextopcode
+op7cmod3: testmod1 300
+
+lbl7cmod3: testmod1 300
+ absoluteindexedindirectx0
+  op7c
+   nextopcode
+op7dm0mod3: testmod1 300
+
+lbl7dmod3a: absoluteindexedx0
+lbl7dmod3b: adc16
+   nextopcode
+op7em0mod3: testmod1 300
+
+lbl7emod3a: absoluteindexedx0
+lbl7emod3b: ror16
+   nextopcode
+op7fm0mod3: testmod1 300
+
+lbl7fmod3a: absolutelongindexedx0
+lbl7fmod3b: adc16
+   nextopcode
+@.pool
+op80mod3: testmod1 300
+
+lbl80mod3: testmod1 300
+ op80
+   nextopcode
+op81m0mod3: testmod1 300
+
+lbl81mod3a: directindexedindirect0
+lbl81mod3b: op81m0
+   nextopcode
+op82mod3: testmod1 300
+
+lbl82mod3: testmod1 300
+ op82
+   nextopcode
+op83m0mod3: testmod1 300
+
+lbl83mod3a: stackasmrelative
+lbl83mod3b: sta16
+   nextopcode
+op84x0mod3: testmod1 300
+
+lbl84mod3a: direct
+lbl84mod3b: sty16
+   nextopcode
+op85m0mod3: testmod1 300
+
+lbl85mod3a: direct
+lbl85mod3b: sta16
+   nextopcode
+op86x0mod3: testmod1 300
+
+lbl86mod3a: direct
+lbl86mod3b: stx16
+   nextopcode
+op87m0mod3: testmod1 300
+
+lbl87mod3a: directindirectlong
+lbl87mod3b: sta16
+   nextopcode
+op88x0mod3: testmod1 300
+
+lbl88mod3: testmod1 300
+ op88x0
+   nextopcode
+op89m0mod3: testmod1 300
+
+lbl89mod3: testmod1 300
+ op89m0
+   nextopcode
+op8am0mod3: testmod1 300
+
+lbl8amod3: testmod1 300
+ op8am0x0
+   nextopcode
+op8bmod3: testmod1 300
+
+lbl8bmod3: testmod1 300
+ op8b
+   nextopcode
+op8cx0mod3: testmod1 300
+
+lbl8cmod3a: absolute
+lbl8cmod3b: sty16
+   nextopcode
+op8dm0mod3: testmod1 300
+
+lbl8dmod3a: absolute
+lbl8dmod3b: sta16
+   nextopcode
+op8ex0mod3: testmod1 300
+
+lbl8emod3a: absolute
+lbl8emod3b: stx16
+   nextopcode
+op8fm0mod3: testmod1 300
+
+lbl8fmod3a: absolutelong
+lbl8fmod3b: sta16
+   nextopcode
+op90mod3: testmod1 300
+
+lbl90mod3: testmod1 300
+ op90
+   nextopcode
+op91m0mod3: testmod1 300
+
+lbl91mod3a: directindirectindexed0
+lbl91mod3b: sta16
+   nextopcode
+op92m0mod3: testmod1 300
+
+lbl92mod3a: directindirect
+lbl92mod3b: sta16
+   nextopcode
+op93m0mod3: testmod1 300
+
+lbl93mod3a: stackasmrelativeindirectindexed0
+lbl93mod3b: sta16
+   nextopcode
+op94x0mod3: testmod1 300
+
+lbl94mod3a: directindexedx0
+lbl94mod3b: sty16
+   nextopcode
+op95m0mod3: testmod1 300
+
+lbl95mod3a: directindexedx0
+lbl95mod3b: sta16
+   nextopcode
+op96x0mod3: testmod1 300
+
+lbl96mod3a: directindexedy0
+lbl96mod3b: stx16
+   nextopcode
+op97m0mod3: testmod1 300
+
+lbl97mod3a: directindirectindexedlong0
+lbl97mod3b: sta16
+   nextopcode
+op98m0mod3: testmod1 300
+
+lbl98mod3: testmod1 300
+ op98m0x0
+   nextopcode
+op99m0mod3: testmod1 300
+
+lbl99mod3a: absoluteindexedy0
+lbl99mod3b: sta16
+   nextopcode
+op9amod3: testmod1 300
+
+lbl9amod3: testmod1 300
+ op9ax0
+   nextopcode
+op9bx0mod3: testmod1 300
+
+lbl9bmod3: testmod1 300
+ op9bx0
+   nextopcode
+op9cm0mod3: testmod1 300
+
+lbl9cmod3a: absolute
+lbl9cmod3b: stz16
+   nextopcode
+op9dm0mod3: testmod1 300
+
+lbl9dmod3a: absoluteindexedx0
+lbl9dmod3b: sta16
+   nextopcode
+op9em0mod3: testmod1 300
+
+lbl9emod3: testmod1 300
+ absoluteindexedx0
+  stz16
+   nextopcode
+op9fm0mod3: testmod1 300
+
+lbl9fmod3a: absolutelongindexedx0
+lbl9fmod3b: sta16
+   nextopcode
+opa0x0mod3: testmod1 300
+
+lbla0mod3: testmod1 300
+ opa0x0
+   nextopcode
+opa1m0mod3: testmod1 300
+
+lbla1mod3a: directindexedindirect0
+lbla1mod3b: lda16
+   nextopcode
+opa2x0mod3: testmod1 300
+
+lbla2mod3: testmod1 300
+ opa2x0
+   nextopcode
+opa3m0mod3: testmod1 300
+
+lbla3mod3a: stackasmrelative
+lbla3mod3b: lda16
+   nextopcode
+opa4x0mod3: testmod1 300
+
+lbla4mod3a: direct
+lbla4mod3b: ldy16
+   nextopcode
+opa5m0mod3: testmod1 300
+
+lbla5mod3a: direct
+lbla5mod3b: lda16
+   nextopcode
+opa6x0mod3: testmod1 300
+
+lbla6mod3a: direct
+lbla6mod3b: ldx16
+   nextopcode
+opa7m0mod3: testmod1 300
+
+lbla7mod3a: directindirectlong
+lbla7mod3b: lda16
+   nextopcode
+opa8x0mod3: testmod1 300
+
+lbla8mod3: testmod1 300
+ opa8x0m0
+   nextopcode
+opa9m0mod3: testmod1 300
+
+lbla9mod3: testmod1 300
+ opa9m0
+   nextopcode
+opaax0mod3: testmod1 300
+
+lblaamod3: testmod1 300
+ opaax0m0
+   nextopcode
+opabmod3: testmod1 300
+
+lblabmod3: testmod1 300
+ opab
+   nextopcode
+opacx0mod3: testmod1 300
+
+lblacmod3a: absolute
+lblacmod3b: ldy16
+   nextopcode
+opadm0mod3: testmod1 300
+
+lbladmod3a: absolute
+lbladmod3b: lda16
+   nextopcode
+opaex0mod3: testmod1 300
+
+lblaemod3a: absolute
+lblaemod3b: ldx16
+   nextopcode
+opafm0mod3: testmod1 300
+
+lblafmod3a: absolutelong
+lblafmod3b: lda16
+   nextopcode
+opb0mod3: testmod1 300
+
+lblb0mod3: testmod1 300
+ opb0
+   nextopcode
+opb1m0mod3: testmod1 300
+
+lblb1mod3a: directindirectindexed0
+lblb1mod3b: lda16
+   nextopcode
+opb2m0mod3: testmod1 300
+
+lblb2mod3a: directindirect
+lblb2mod3b: lda16
+   nextopcode
+opb3m0mod3: testmod1 300
+
+lblb3mod3a: stackasmrelativeindirectindexed0
+lblb3mod3b: lda16
+   nextopcode
+opb4x0mod3: testmod1 300
+
+lblb4mod3a: directindexedx0
+lblb4mod3b: ldy16
+   nextopcode
+opb5m0mod3: testmod1 300
+
+lblb5mod3a: directindexedx0
+lblb5mod3b: lda16
+   nextopcode
+opb6x0mod3: testmod1 300
+
+lblb6mod3a: directindexedy0
+lblb6mod3b: ldx16
+   nextopcode
+opb7m0mod3: testmod1 300
+
+lblb7mod3a: directindirectindexedlong0
+lblb7mod3b: lda16
+   nextopcode
+opb8mod3: testmod1 300
+
+lblb8mod3: testmod1 300
+ opb8
+   nextopcode
+opb9m0mod3: testmod1 300
+
+lblb9mod3a: absoluteindexedy0
+lblb9mod3b: lda16
+   nextopcode
+opbax0mod3: testmod1 300
+
+lblbamod3: testmod1 300
+ opbax0
+   nextopcode
+opbbx0mod3: testmod1 300
+
+lblbbmod3: testmod1 300
+ opbbx0
+   nextopcode
+opbcx0mod3: testmod1 300
+
+lblbcmod3a: absoluteindexedx0
+lblbcmod3b: ldy16
+   nextopcode
+opbdm0mod3: testmod1 300
+
+lblbdmod3a: absoluteindexedx0
+lblbdmod3b: lda16
+   nextopcode
+opbex0mod3: testmod1 300
+
+lblbemod3a: absoluteindexedy0
+lblbemod3b: ldx16
+   nextopcode
+opbfm0mod3: testmod1 300
+
+lblbfmod3a: absolutelongindexedx0
+lblbfmod3b: lda16
+   nextopcode
+opc0x0mod3: testmod1 300
+
+lblc0mod3: testmod1 300
+ opc0x0
+   nextopcode
+opc1m0mod3: testmod1 300
+
+lblc1mod3a: directindexedindirect0
+lblc1mod3b: cmp16
+   nextopcode
+opc2mod3: testmod1 300
+
+lblc2mod3: testmod1 300
+ opc2
+   nextopcode
+@.pool
+opc3m0mod3: testmod1 300
+
+lblc3mod3a: stackasmrelative
+lblc3mod3b: cmp16
+   nextopcode
+opc4x0mod3: testmod1 300
+
+lblc4mod3a: direct
+lblc4mod3b: cmy16
+   nextopcode
+opc5m0mod3: testmod1 300
+
+lblc5mod3a: direct
+lblc5mod3b: cmp16
+   nextopcode
+opc6m0mod3: testmod1 300
+
+lblc6mod3a: direct
+lblc6mod3b: dec16
+   nextopcode
+opc7m0mod3: testmod1 300
+
+lblc7mod3a: directindirectlong
+lblc7mod3b: cmp16
+   nextopcode
+opc8x0mod3: testmod1 300
+
+lblc8mod3: testmod1 300
+ opc8x0
+   nextopcode
+opc9m0mod3: testmod1 300
+
+lblc9mod3: testmod1 300
+ opc9m0
+   nextopcode
+opcax0mod3: testmod1 300
+
+lblcamod3: testmod1 300
+ opcax0
+   nextopcode
+opcbmod3: testmod1 300
+
+lblcbmod3: testmod1 300
+ opcb
+   nextopcode
+opccx0mod3: testmod1 300
+
+lblccmod3a: absolute
+lblccmod3b: cmy16
+   nextopcode
+opcdm0mod3: testmod1 300
+
+lblcdmod3a: absolute
+lblcdmod3b: cmp16
+   nextopcode
+opcem0mod3: testmod1 300
+
+lblcemod3a: absolute
+lblcemod3b: dec16
+   nextopcode
+opcfm0mod3: testmod1 300
+
+lblcfmod3a: absolutelong
+lblcfmod3b: cmp16
+   nextopcode
+opd0mod3: testmod1 300
+
+lbld0mod3: testmod1 300
+ opd0
+   nextopcode
+opd1m0mod3: testmod1 300
+
+lbld1mod3a: directindirectindexed0
+lbld1mod3b: cmp16
+   nextopcode
+opd2m0mod3: testmod1 300
+
+lbld2mod3a: directindirect
+lbld2mod3b: cmp16
+   nextopcode
+opd3m0mod3: testmod1 300
+
+lbld3mod3a: stackasmrelativeindirectindexed0
+lbld3mod3b: cmp16
+   nextopcode
+opd4mod3: testmod1 300
+
+lbld4mod3: testmod1 300
+ opd4
+   nextopcode
+opd5m0mod3: testmod1 300
+
+lbld5mod3a: directindexedx0
+lbld5mod3b: cmp16
+   nextopcode
+opd6m0mod3: testmod1 300
+
+lbld6mod3a: directindexedx0
+lbld6mod3b: dec16
+   nextopcode
+opd7m0mod3: testmod1 300
+
+lbld7mod3a: directindirectindexedlong0
+lbld7mod3b: cmp16
+   nextopcode
+opd8mod3: testmod1 300
+
+lbld8mod3: testmod1 300
+ opd8
+   nextopcode
+opd9m0mod3: testmod1 300
+
+lbld9mod3a: absoluteindexedy0
+lbld9mod3b: cmp16
+   nextopcode
+opdax0mod3: testmod1 300
+
+lbldamod3: testmod1 300
+ opdax0
+   nextopcode
+opdbmod3: testmod1 300
+
+lbldbmod3: testmod1 300
+ opdb
+   nextopcode
+opdcmod3: testmod1 300
+
+lbldcmod3: testmod1 300
+ opdc
+   nextopcode
+opddm0mod3: testmod1 300
+
+lblddmod3a: absoluteindexedx0
+lblddmod3b: cmp16
+   nextopcode
+opdem0mod3: testmod1 300
+
+lbldemod3a: absoluteindexedx0
+lbldemod3b: dec16
+   nextopcode
+opdfm0mod3: testmod1 300
+
+lbldfmod3a: absolutelongindexedx0
+lbldfmod3b: cmp16
+   nextopcode
+ope0x0mod3: testmod1 300
+
+lble0mod3: testmod1 300
+ ope0x0
+   nextopcode
+ope1m0mod3: testmod1 300
+
+lble1mod3a: directindexedindirect0
+lble1mod3b: sbc16
+   nextopcode
+ope2mod3: testmod1 300
+
+lble2mod3: testmod1 300
+ ope2
+   nextopcode
+@.pool
+ope3m0mod3: testmod1 300
+
+lble3mod3a: stackasmrelative
+lble3mod3b: sbc16
+   nextopcode
+ope4x0mod3: testmod1 300
+
+lble4mod3a: direct
+lble4mod3b: cmx16
+   nextopcode
+ope5m0mod3: testmod1 300
+
+lble5mod3a: direct
+lble5mod3b: sbc16
+   nextopcode
+ope6m0mod3: testmod1 300
+
+lble6mod3a: direct
+lble6mod3b: inc16
+   nextopcode
+ope7m0mod3: testmod1 300
+
+lble7mod3a: directindirectlong
+lble7mod3b: sbc16
+   nextopcode
+ope8x0mod3: testmod1 300
+
+lble8mod3: testmod1 300
+ ope8x0
+   nextopcode
+ope9m0mod3: testmod1 300
+
+lble9mod3a: immediate16
+lble9mod3b: sbc16
+   nextopcode
+opeamod3: testmod1 300
+
+lbleamod3: testmod1 300
+ opea
+   nextopcode
+opebmod3: testmod1 300
+
+lblebmod3: testmod1 300
+ opebm0
+   nextopcode
+opecx0mod3: testmod1 300
+
+lblecmod3a: absolute
+lblecmod3b: cmx16
+   nextopcode
+opedm0mod3: testmod1 300
+
+lbledmod3a: absolute
+lbledmod3b: sbc16
+   nextopcode
+opeem0mod3: testmod1 300
+
+lbleemod3a: absolute
+lbleemod3b: inc16
+   nextopcode
+opefm0mod3: testmod1 300
+
+lblefmod3a: absolutelong
+lblefmod3b: sbc16
+   nextopcode
+opf0mod3: testmod1 300
+
+lblf0mod3: testmod1 300
+ opf0
+   nextopcode
+opf1m0mod3: testmod1 300
+
+lblf1mod3a: directindirectindexed0
+lblf1mod3b: sbc16
+   nextopcode
+opf2m0mod3: testmod1 300
+
+lblf2mod3a: directindirect
+lblf2mod3b: sbc16
+   nextopcode
+opf3m0mod3: testmod1 300
+
+lblf3mod3a: stackasmrelativeindirectindexed0
+lblf3mod3b: sbc16
+   nextopcode
+opf4mod3: testmod1 300
+
+lblf4mod3: testmod1 300
+ opf4
+   nextopcode
+opf5m0mod3: testmod1 300
+
+lblf5mod3a: directindexedx0
+lblf5mod3b: sbc16
+   nextopcode
+opf6m0mod3: testmod1 300
+
+lblf6mod3a: directindexedx0
+lblf6mod3b: inc16
+   nextopcode
+opf7m0mod3: testmod1 300
+
+lblf7mod3a: directindirectindexedlong0
+lblf7mod3b: sbc16
+   nextopcode
+opf8mod3: testmod1 300
+
+lblf8mod3: testmod1 300
+ opf8
+   nextopcode
+opf9m0mod3: testmod1 300
+
+lblf9mod3a: absoluteindexedy0
+lblf9mod3b: sbc16
+   nextopcode
+opfax0mod3: testmod1 300
+
+lblfamod3: testmod1 300
+ opfax0
+   nextopcode
+opfbmod3: testmod1 300
+
+lblfbmod3: testmod1 300
+ opfb
+   nextopcode
+opfcmod3: testmod1 300
+
+lblfcmod3: testmod1 300
+ opfcx0
+   nextopcode
+opfdm0mod3: testmod1 300
+
+lblfdmod3a: absoluteindexedx0
+lblfdmod3b: sbc16
+   nextopcode
+opfem0mod3: testmod1 300
+
+lblfemod3a: absoluteindexedx0
+lblfemod3b: inc16
+   nextopcode
+opffm0mod3: testmod1 300
+
+lblffmod3a: absolutelongindexedx0
+lblffmod3b: sbc16
+   nextopcode
+@.pool
+
+jumptable4: .long op00mod4
+   .long op01m0mod4
+   .long op02mod4
+   .long op03m0mod4
+   .long op04m0mod4
+   .long op05m0mod4
+   .long op06m0mod4
+   .long op07m0mod4
+   .long op08mod4
+   .long op09m0mod4
+   .long op0am0mod4
+   .long op0bmod4
+   .long op0cm0mod4
+   .long op0dm0mod4
+   .long op0em0mod4
+   .long op0fm0mod4
+   .long op10mod4
+   .long op11m0mod4
+   .long op12m0mod4
+   .long op13m0mod4
+   .long op14m0mod4
+   .long op15m0mod4
+   .long op16m0mod4
+   .long op17m0mod4
+   .long op18mod4
+   .long op19m0mod4
+   .long op1am0mod4
+   .long op1bmod4
+   .long op1cm0mod4
+   .long op1dm0mod4
+   .long op1em0mod4
+   .long op1fm0mod4
+   .long op20mod4
+   .long op21m0mod4
+   .long op22mod4
+   .long op23m0mod4
+   .long op24m0mod4
+   .long op25m0mod4
+   .long op26m0mod4
+   .long op27m0mod4
+   .long op28mod4
+   .long op29m0mod4
+   .long op2am0mod4
+   .long op2bmod4
+   .long op2cm0mod4
+   .long op2dm0mod4
+   .long op2em0mod4
+   .long op2fm0mod4
+   .long op30mod4
+   .long op31m0mod4
+   .long op32m0mod4
+   .long op33m0mod4
+   .long op34m0mod4
+   .long op35m0mod4
+   .long op36m0mod4
+   .long op37m0mod4
+   .long op38mod4
+   .long op39m0mod4
+   .long op3am0mod4
+   .long op3bmod4
+   .long op3cm0mod4
+   .long op3dm0mod4
+   .long op3em0mod4
+   .long op3fm0mod4
+   .long op40mod4
+   .long op41m0mod4
+   .long op42mod4
+   .long op43m0mod4
+   .long op44x1mod4
+   .long op45m0mod4
+   .long op46m0mod4
+   .long op47m0mod4
+   .long op48m0mod4
+   .long op49m0mod4
+   .long op4am0mod4
+   .long op4bmod4
+   .long op4cmod4
+   .long op4dm0mod4
+   .long op4em0mod4
+   .long op4fm0mod4
+   .long op50mod4
+   .long op51m0mod4
+   .long op52m0mod4
+   .long op53m0mod4
+   .long op54x1mod4
+   .long op55m0mod4
+   .long op56m0mod4
+   .long op57m0mod4
+   .long op58mod4
+   .long op59m0mod4
+   .long op5ax1mod4
+   .long op5bmod4
+   .long op5cmod4
+   .long op5dm0mod4
+   .long op5em0mod4
+   .long op5fm0mod4
+   .long op60mod4
+   .long op61m0mod4
+   .long op62mod4
+   .long op63m0mod4
+   .long op64m0mod4
+   .long op65m0mod4
+   .long op66m0mod4
+   .long op67m0mod4
+   .long op68m0mod4
+   .long op69m0mod4
+   .long op6am0mod4
+   .long op6bmod4
+   .long op6cmod4
+   .long op6dm0mod4
+   .long op6em0mod4
+   .long op6fm0mod4
+   .long op70mod4
+   .long op71m0mod4
+   .long op72m0mod4
+   .long op73m0mod4
+   .long op74m0mod4
+   .long op75m0mod4
+   .long op76m0mod4
+   .long op77m0mod4
+   .long op78mod4
+   .long op79m0mod4
+   .long op7ax1mod4
+   .long op7bmod4
+   .long op7cmod4
+   .long op7dm0mod4
+   .long op7em0mod4
+   .long op7fm0mod4
+   .long op80mod4
+   .long op81m0mod4
+   .long op82mod4
+   .long op83m0mod4
+   .long op84x1mod4
+   .long op85m0mod4
+   .long op86x1mod4
+   .long op87m0mod4
+   .long op88x1mod4
+   .long op89m0mod4
+   .long op8am0mod4
+   .long op8bmod4
+   .long op8cx1mod4
+   .long op8dm0mod4
+   .long op8ex1mod4
+   .long op8fm0mod4
+   .long op90mod4
+   .long op91m0mod4
+   .long op92m0mod4
+   .long op93m0mod4
+   .long op94x1mod4
+   .long op95m0mod4
+   .long op96x1mod4
+   .long op97m0mod4
+   .long op98m0mod4
+   .long op99m0mod4
+   .long op9amod4
+   .long op9bx1mod4
+   .long op9cm0mod4
+   .long op9dm0mod4
+   .long op9em0mod4
+   .long op9fm0mod4
+   .long opa0x1mod4
+   .long opa1m0mod4
+   .long opa2x1mod4
+   .long opa3m0mod4
+   .long opa4x1mod4
+   .long opa5m0mod4
+   .long opa6x1mod4
+   .long opa7m0mod4
+   .long opa8x1mod4
+   .long opa9m0mod4
+   .long opaax1mod4
+   .long opabmod4
+   .long opacx1mod4
+   .long opadm0mod4
+   .long opaex1mod4
+   .long opafm0mod4
+   .long opb0mod4
+   .long opb1m0mod4
+   .long opb2m0mod4
+   .long opb3m0mod4
+   .long opb4x1mod4
+   .long opb5m0mod4
+   .long opb6x1mod4
+   .long opb7m0mod4
+   .long opb8mod4
+   .long opb9m0mod4
+   .long opbax1mod4
+   .long opbbx1mod4
+   .long opbcx1mod4
+   .long opbdm0mod4
+   .long opbex1mod4
+   .long opbfm0mod4
+   .long opc0x1mod4
+   .long opc1m0mod4
+   .long opc2mod4
+   .long opc3m0mod4
+   .long opc4x1mod4
+   .long opc5m0mod4
+   .long opc6m0mod4
+   .long opc7m0mod4
+   .long opc8x1mod4
+   .long opc9m0mod4
+   .long opcax1mod4
+   .long opcbmod4
+   .long opccx1mod4
+   .long opcdm0mod4
+   .long opcem0mod4
+   .long opcfm0mod4
+   .long opd0mod4
+   .long opd1m0mod4
+   .long opd2m0mod4
+   .long opd3m0mod4
+   .long opd4mod4
+   .long opd5m0mod4
+   .long opd6m0mod4
+   .long opd7m0mod4
+   .long opd8mod4
+   .long opd9m0mod4
+   .long opdax1mod4
+   .long opdbmod4
+   .long opdcmod4
+   .long opddm0mod4
+   .long opdem0mod4
+   .long opdfm0mod4
+   .long ope0x1mod4
+   .long ope1m0mod4
+   .long ope2mod4
+   .long ope3m0mod4
+   .long ope4x1mod4
+   .long ope5m0mod4
+   .long ope6m0mod4
+   .long ope7m0mod4
+   .long ope8x1mod4
+   .long ope9m0mod4
+   .long opeamod4
+   .long opebmod4
+   .long opecx1mod4
+   .long opedm0mod4
+   .long opeem0mod4
+   .long opefm0mod4
+   .long opf0mod4
+   .long opf1m0mod4
+   .long opf2m0mod4
+   .long opf3m0mod4
+   .long opf4mod4
+   .long opf5m0mod4
+   .long opf6m0mod4
+   .long opf7m0mod4
+   .long opf8mod4
+   .long opf9m0mod4
+   .long opfax1mod4
+   .long opfbmod4
+   .long opfcmod4
+   .long opfdm0mod4
+   .long opfem0mod4
+   .long opffm0mod4
+op00mod4: testmod1 1
+
+lbl00mod4: testmod1 2
+ op00
+   nextopcode
+op01m0mod4: testmod1 3
+
+lbl01mod4a: directindexedindirect1
+lbl01mod4b: ora16
+   nextopcode
+op02mod4: testmod1 4
+
+lbl02mod4: testmod1 5
+ op02
+   nextopcode
+op03m0mod4: testmod1 6
+
+lbl03mod4a: stackasmrelative
+lbl03mod4b: ora16
+   nextopcode
+op04m0mod4: testmod1 7
+
+lbl04mod4a: direct
+lbl04mod4b: tsb16
+   nextopcode
+op05m0mod4: testmod1 8
+
+lbl05mod4a: direct
+lbl05mod4b: ora16
+   nextopcode
+op06m0mod4: testmod1 9
+
+lbl06mod4a: direct
+lbl06mod4b: asl16
+   nextopcode
+op07m0mod4: testmod1 10
+
+lbl07mod4a: directindirectlong
+lbl07mod4b: ora16
+   nextopcode
+op08mod4: testmod1 11
+
+lbl08mod4: testmod1 12
+ op08
+   nextopcode
+op09m0mod4: testmod1 13
+
+lbl09mod4: testmod1 14
+ op09m0
+   nextopcode
+op0am0mod4: testmod1 15
+
+lbl0amod4a: a_asl16
+   nextopcode
+op0bmod4: testmod1 16
+
+lbl0bmod4: testmod1 17
+ op0b
+   nextopcode
+op0cm0mod4: testmod1 18
+
+lbl0cmod4a: absolute
+lbl0cmod4b: tsb16
+   nextopcode
+op0dm0mod4: testmod1 19
+
+lbl0dmod4a: absolute
+lbl0dmod4b: ora16
+   nextopcode
+op0em0mod4: testmod1 20
+
+lbl0emod4a: absolute
+lbl0emod4b: asl16
+   nextopcode
+op0fm0mod4: testmod1 21
+
+lbl0fmod4a: absolutelong
+lbl0fmod4b: ora16
+   nextopcode
+op10mod4: testmod1 22
+
+lbl10mod4: testmod1 23
+ op10
+   nextopcode
+op11m0mod4: testmod1 24
+
+lbl11mod4a: directindirectindexed1
+lbl11mod4b: ora16
+   nextopcode
+op12m0mod4: testmod1 25
+
+lbl12mod4a: directindirect
+lbl12mod4b: ora16
+   nextopcode
+op13m0mod4: testmod1 26
+
+lbl13mod4a: stackasmrelativeindirectindexed1
+lbl13mod4b: ora16
+   nextopcode
+op14m0mod4: testmod1 27
+
+lbl14mod4a: direct
+lbl14mod4b: trb16
+   nextopcode
+op15m0mod4: testmod1 28
+
+lbl15mod4a: directindexedx1
+lbl15mod4b: ora16
+   nextopcode
+op16m0mod4: testmod1 29
+
+lbl16mod4a: directindexedx1
+lbl16mod4b: asl16
+   nextopcode
+op17m0mod4: testmod1 30
+
+lbl17mod4a: directindirectindexedlong1
+lbl17mod4b: ora16
+   nextopcode
+op18mod4: testmod1 31
+
+lbl18mod4: testmod1 32
+ op18
+   nextopcode
+op19m0mod4: testmod1 33
+
+lbl19mod4a: absoluteindexedy1
+lbl19mod4b: ora16
+   nextopcode
+op1am0mod4: testmod1 34
+
+lbl1amod4a: a_inc16
+   nextopcode
+op1bmod4: testmod1 35
+
+lbl1bmod4: testmod1 36
+ op1bm0
+   nextopcode
+op1cm0mod4: testmod1 37
+
+lbl1cmod4a: absolute
+lbl1cmod4b: trb16
+   nextopcode
+op1dm0mod4: testmod1 38
+
+lbl1dmod4a: absoluteindexedx1
+lbl1dmod4b: ora16
+   nextopcode
+op1em0mod4: testmod1 39
+
+lbl1emod4a: absoluteindexedx1
+lbl1emod4b: asl16
+   nextopcode
+op1fm0mod4: testmod1 440
+
+lbl1fmod4a: absolutelongindexedx1
+lbl1fmod4b: ora16
+   nextopcode
+op20mod4: testmod1 440
+
+lbl20mod4: testmod1 440
+ op20
+   nextopcode
+op21m0mod4: testmod1 440
+
+lbl21mod4a: directindexedindirect1
+lbl21mod4b: and16
+   nextopcode
+op22mod4: testmod1 440
+
+lbl22mod4: testmod1 440
+ op22
+   nextopcode
+op23m0mod4: testmod1 440
+
+lbl23mod4a: stackasmrelative
+lbl23mod4b: and16
+   nextopcode
+op24m0mod4: testmod1 440
+
+lbl24mod4a: direct
+lbl24mod4b: bit16
+   nextopcode
+op25m0mod4: testmod1 440
+
+lbl25mod4a: direct
+lbl25mod4b: and16
+   nextopcode
+op26m0mod4: testmod1 440
+
+lbl26mod4a: direct
+lbl26mod4b: rol16
+   nextopcode
+op27m0mod4: testmod1 440
+
+lbl27mod4a: directindirectlong
+lbl27mod4b: and16
+   nextopcode
+op28mod4: testmod1 440
+
+lbl28mod4: testmod1 440
+ op28x1m0
+   nextopcode
+@.pool
+op29m0mod4: testmod1 440
+
+lbl29mod4: testmod1 440
+ op29m0
+   nextopcode
+op2am0mod4: testmod1 440
+
+lbl2amod4a: a_rol16
+   nextopcode
+op2bmod4: testmod1 440
+
+lbl2bmod4: testmod1 460
+ op2b
+   nextopcode
+op2cm0mod4: testmod1 460
+
+lbl2cmod4a: absolute
+lbl2cmod4b: bit16
+   nextopcode
+op2dm0mod4: testmod1 460
+
+lbl2dmod4a: absolute
+lbl2dmod4b: and16
+   nextopcode
+op2em0mod4: testmod1 460
+
+lbl2emod4a: absolute
+lbl2emod4b: rol16
+   nextopcode
+op2fm0mod4: testmod1 460
+
+lbl2fmod4a: absolutelong
+lbl2fmod4b: and16
+   nextopcode
+op30mod4: testmod1 460
+
+lbl30mod4: testmod1 460
+ op30
+   nextopcode
+op31m0mod4: testmod1 460
+
+lbl31mod4a: directindirectindexed1
+lbl31mod4b: and16
+   nextopcode
+op32m0mod4: testmod1 460
+
+lbl32mod4a: directindirect
+lbl32mod4b: and16
+   nextopcode
+op33m0mod4: testmod1 460
+
+lbl33mod4a: stackasmrelativeindirectindexed1
+lbl33mod4b: and16
+   nextopcode
+op34m0mod4: testmod1 460
+
+lbl34mod4a: directindexedx1
+lbl34mod4b: bit16
+   nextopcode
+op35m0mod4: testmod1 460
+
+lbl35mod4a: directindexedx1
+lbl35mod4b: and16
+   nextopcode
+op36m0mod4: testmod1 460
+
+lbl36mod4a: directindexedx1
+lbl36mod4b: rol16
+   nextopcode
+op37m0mod4: testmod1 460
+
+lbl37mod4a: directindirectindexedlong1
+lbl37mod4b: and16
+   nextopcode
+op38mod4: testmod1 460
+
+lbl38mod4: testmod1 460
+ op38
+   nextopcode
+op39m0mod4: testmod1 460
+
+lbl39mod4a: absoluteindexedy1
+lbl39mod4b: and16
+   nextopcode
+op3am0mod4: testmod1 460
+
+lbl3amod4a: a_dec16
+   nextopcode
+op3bmod4: testmod1 460
+
+lbl3bmod4: testmod1 480
+ op3bm0
+   nextopcode
+op3cm0mod4: testmod1 480
+
+lbl3cmod4a: absoluteindexedx1
+lbl3cmod4b: bit16
+   nextopcode
+op3dm0mod4: testmod1 480
+
+lbl3dmod4a: absoluteindexedx1
+lbl3dmod4b: and16
+   nextopcode
+op3em0mod4: testmod1 480
+
+lbl3emod4a: absoluteindexedx1
+lbl3emod4b: rol16
+   nextopcode
+op3fm0mod4: testmod1 480
+
+lbl3fmod4a: absolutelongindexedx1
+lbl3fmod4b: and16
+   nextopcode
+op40mod4: testmod1 480
+
+lbl40mod4: testmod1 480
+ op40x1m0
+   nextopcode
+@.pool
+op41m0mod4: testmod1 480
+
+lbl41mod4a: directindexedindirect1
+lbl41mod4b: eor16
+   nextopcode
+op42mod4: testmod1 480
+
+lbl42mod4: testmod1 480
+ op42
+   nextopcode
+op43m0mod4: testmod1 480
+
+lbl43mod4a: stackasmrelative
+lbl43mod4b: eor16
+   nextopcode
+op44x1mod4: testmod1 480
+
+lbl44mod4: testmod1 480
+ op44x1m0
+   nextopcode
+op45m0mod4: testmod1 480
+
+lbl45mod4a: direct
+lbl45mod4b: eor16
+   nextopcode
+op46m0mod4: testmod1 480
+
+lbl46mod4a: direct
+lbl46mod4b: lsr16
+   nextopcode
+op47m0mod4: testmod1 480
+
+lbl47mod4a: directindirectlong
+lbl47mod4b: eor16
+   nextopcode
+op48m0mod4: testmod1 480
+
+lbl48mod4: testmod1 480
+ op48m0
+   nextopcode
+op49m0mod4: testmod1 480
+
+lbl49mod4: testmod1 480
+ op49m0
+   nextopcode
+op4am0mod4: testmod1 480
+
+lbl4amod4a: a_lsr16
+   nextopcode
+op4bmod4: testmod1 480
+
+lbl4bmod4: testmod1 480
+ op4b
+   nextopcode
+op4cmod4: testmod1 500
+
+lbl4cmod4: testmod1 500
+ op4c
+   nextopcode
+op4dm0mod4: testmod1 500
+
+lbl4dmod4a: absolute
+lbl4dmod4b: eor16
+   nextopcode
+op4em0mod4: testmod1 500
+
+lbl4emod4a: absolute
+lbl4emod4b: lsr16
+   nextopcode
+op4fm0mod4: testmod1 500
+
+lbl4fmod4a: absolutelong
+lbl4fmod4b: eor16
+   nextopcode
+op50mod4: testmod1 500
+
+lbl50mod4: testmod1 500
+ op50
+   nextopcode
+op51m0mod4: testmod1 500
+
+lbl51mod4a: directindirectindexed1
+lbl51mod4b: eor16
+   nextopcode
+op52m0mod4: testmod1 500
+
+lbl52mod4a: directindirect
+lbl52mod4b: eor16
+   nextopcode
+op53m0mod4: testmod1 500
+
+lbl53mod4a: stackasmrelativeindirectindexed1
+lbl53mod4b: eor16
+   nextopcode
+op54x1mod4: testmod1 500
+
+lbl54mod4: testmod1 500
+ op54x1m0
+   nextopcode
+op55m0mod4: testmod1 500
+
+lbl55mod4a: directindexedx1
+lbl55mod4b: eor16
+   nextopcode
+op56m0mod4: testmod1 500
+
+lbl56mod4a: directindexedx1
+lbl56mod4b: lsr16
+   nextopcode
+op57m0mod4: testmod1 500
+
+lbl57mod4a: directindirectindexedlong1
+lbl57mod4b: eor16
+   nextopcode
+op58mod4: testmod1 500
+
+lbl58mod4: testmod1 500
+ op58
+   nextopcode
+op59m0mod4: testmod1 500
+
+lbl59mod4a: absoluteindexedy1
+lbl59mod4b: eor16
+   nextopcode
+op5ax1mod4: testmod1 500
+
+lbl5amod4: testmod1 500
+ op5ax1
+   nextopcode
+op5bmod4: testmod1 500
+
+lbl5bmod4: testmod1 500
+ op5bm0
+   nextopcode
+op5cmod4: testmod1 520
+
+lbl5cmod4: testmod1 520
+ op5c
+   nextopcode
+op5dm0mod4: testmod1 520
+
+lbl5dmod4a: absoluteindexedx1
+lbl5dmod4b: eor16
+   nextopcode
+op5em0mod4: testmod1 520
+
+lbl5emod4a: absoluteindexedx1
+lbl5emod4b: lsr16
+   nextopcode
+op5fm0mod4: testmod1 520
+
+lbl5fmod4a: absolutelongindexedx1
+lbl5fmod4b: eor16
+   nextopcode
+op60mod4: testmod1 520
+
+lbl60mod4: testmod1 520
+ op60
+   nextopcode
+op61m0mod4: testmod1 520
+
+lbl61mod4a: directindexedindirect1
+lbl61mod4b: adc16
+   nextopcode
+op62mod4: testmod1 520
+
+lbl62mod4: testmod1 520
+ op62
+   nextopcode
+op63m0mod4: testmod1 520
+
+lbl63mod4a: stackasmrelative
+lbl63mod4b: adc16
+   nextopcode
+@.pool
+op64m0mod4: testmod1 520
+
+lbl64mod4a: direct
+lbl64mod4b: stz16
+   nextopcode
+op65m0mod4: testmod1 520
+
+lbl65mod4a: direct
+lbl65mod4b: adc16
+   nextopcode
+@.pool
+op66m0mod4: testmod1 540
+
+lbl66mod4a: direct
+lbl66mod4b: ror16
+   nextopcode
+op67m0mod4: testmod1 540
+
+lbl67mod4a: directindirectlong
+lbl67mod4b: adc16
+   nextopcode
+@.pool
+op68m0mod4: testmod1 540
+
+lbl68mod4: testmod1 540
+ op68m0
+   nextopcode
+op69m0mod4: testmod1 540
+
+lbl69mod4a: immediate16
+lbl69mod4b: adc16
+   nextopcode
+@.pool
+op6am0mod4: testmod1 540
+
+lbl6amod4a: a_ror16
+   nextopcode
+op6bmod4: testmod1 540
+
+lbl6bmod4: testmod1 540
+ op6b
+   nextopcode
+op6cmod4: testmod1 540
+
+lbl6cmod4: testmod1 540
+ op6c
+   nextopcode
+op6dm0mod4: testmod1 540
+
+lbl6dmod4a: absolute
+lbl6dmod4b: adc16
+   nextopcode
+op6em0mod4: testmod1 540
+
+lbl6emod4a: absolute
+lbl6emod4b: ror16
+   nextopcode
+op6fm0mod4: testmod1 540
+
+lbl6fmod4a: absolutelong
+lbl6fmod4b: adc16
+   nextopcode
+op70mod4: testmod1 540
+
+lbl70mod4: testmod1 540
+ op70
+   nextopcode
+op71m0mod4: testmod1 540
+
+lbl71mod4a: directindirectindexed1
+lbl71mod4b: adc16
+   nextopcode
+op72m0mod4: testmod1 540
+
+lbl72mod4a: directindirect
+lbl72mod4b: adc16
+   nextopcode
+op73m0mod4: testmod1 540
+
+lbl73mod4a: stackasmrelativeindirectindexed1
+lbl73mod4b: adc16
+   nextopcode
+@.pool
+op74m0mod4: testmod1 540
+
+lbl74mod4a: directindexedx1
+lbl74mod4b: stz16
+   nextopcode
+op75m0mod4: testmod1 540
+
+lbl75mod4a: directindexedx1
+lbl75mod4b: adc16
+   nextopcode
+@.pool
+op76m0mod4: testmod1 540
+
+lbl76mod4a: directindexedx1
+lbl76mod4b: ror16
+   nextopcode
+op77m0mod4: testmod1 540
+
+lbl77mod4a: directindirectindexedlong1
+lbl77mod4b: adc16
+   nextopcode
+op78mod4: testmod1 540
+
+lbl78mod4: testmod1 540
+ op78
+   nextopcode
+op79m0mod4: testmod1 560
+
+lbl79mod4a: absoluteindexedy1
+lbl79mod4b: adc16
+   nextopcode
+op7ax1mod4: testmod1 560
+
+lbl7amod4: testmod1 560
+ op7ax1
+   nextopcode
+op7bmod4: testmod1 560
+
+lbl7bmod4: testmod1 560
+ op7bm0
+   nextopcode
+op7cmod4: testmod1 560
+
+lbl7cmod4: testmod1 560
+ absoluteindexedindirectx1
+  op7c
+   nextopcode
+op7dm0mod4: testmod1 560
+
+lbl7dmod4a: absoluteindexedx1
+lbl7dmod4b: adc16
+   nextopcode
+op7em0mod4: testmod1 560
+
+lbl7emod4a: absoluteindexedx1
+lbl7emod4b: ror16
+   nextopcode
+op7fm0mod4: testmod1 560
+
+lbl7fmod4a: absolutelongindexedx1
+lbl7fmod4b: adc16
+   nextopcode
+@.pool
+op80mod4: testmod1 560
+
+lbl80mod4: testmod1 560
+ op80
+   nextopcode
+op81m0mod4: testmod1 560
+
+lbl81mod4a: directindexedindirect1
+lbl81mod4b: op81m0
+   nextopcode
+op82mod4: testmod1 560
+
+lbl82mod4: testmod1 560
+ op82
+   nextopcode
+op83m0mod4: testmod1 560
+
+lbl83mod4a: stackasmrelative
+lbl83mod4b: sta16
+   nextopcode
+op84x1mod4: testmod1 560
+
+lbl84mod4a: direct
+lbl84mod4b: sty8
+   nextopcode
+op85m0mod4: testmod1 560
+
+lbl85mod4a: direct
+lbl85mod4b: sta16
+   nextopcode
+op86x1mod4: testmod1 560
+
+lbl86mod4a: direct
+lbl86mod4b: stx8
+   nextopcode
+op87m0mod4: testmod1 560
+
+lbl87mod4a: directindirectlong
+lbl87mod4b: sta16
+   nextopcode
+op88x1mod4: testmod1 560
+
+lbl88mod4: testmod1 560
+ op88x1
+   nextopcode
+op89m0mod4: testmod1 560
+
+lbl89mod4: testmod1 560
+ op89m0
+   nextopcode
+op8am0mod4: testmod1 560
+
+lbl8amod4: testmod1 560
+ op8am0x1
+   nextopcode
+op8bmod4: testmod1 580
+
+lbl8bmod4: testmod1 580
+ op8b
+   nextopcode
+op8cx1mod4: testmod1 580
+
+lbl8cmod4a: absolute
+lbl8cmod4b: sty8
+   nextopcode
+op8dm0mod4: testmod1 580
+
+lbl8dmod4a: absolute
+lbl8dmod4b: sta16
+   nextopcode
+op8ex1mod4: testmod1 580
+
+lbl8emod4a: absolute
+lbl8emod4b: stx8
+   nextopcode
+op8fm0mod4: testmod1 580
+
+lbl8fmod4a: absolutelong
+lbl8fmod4b: sta16
+   nextopcode
+op90mod4: testmod1 580
+
+lbl90mod4: testmod1 580
+ op90
+   nextopcode
+op91m0mod4: testmod1 580
+
+lbl91mod4a: directindirectindexed1
+lbl91mod4b: sta16
+   nextopcode
+op92m0mod4: testmod1 580
+
+lbl92mod4a: directindirect
+lbl92mod4b: sta16
+   nextopcode
+op93m0mod4: testmod1 580
+
+lbl93mod4a: stackasmrelativeindirectindexed1
+lbl93mod4b: sta16
+   nextopcode
+op94x1mod4: testmod1 580
+
+lbl94mod4a: directindexedx1
+lbl94mod4b: sty8
+   nextopcode
+op95m0mod4: testmod1 580
+
+lbl95mod4a: directindexedx1
+lbl95mod4b: sta16
+   nextopcode
+op96x1mod4: testmod1 580
+
+lbl96mod4a: directindexedy1
+lbl96mod4b: stx8
+   nextopcode
+op97m0mod4: testmod1 580
+
+lbl97mod4a: directindirectindexedlong1
+lbl97mod4b: sta16
+   nextopcode
+op98m0mod4: testmod1 580
+
+lbl98mod4: testmod1 580
+ op98m0x1
+   nextopcode
+op99m0mod4: testmod1 580
+
+lbl99mod4a: absoluteindexedy1
+lbl99mod4b: sta16
+   nextopcode
+op9amod4: testmod1 580
+
+lbl9amod4: testmod1 580
+ op9ax1
+   nextopcode
+op9bx1mod4: testmod1 580
+
+lbl9bmod4: testmod1 580
+ op9bx1
+   nextopcode
+op9cm0mod4: testmod1 580
+
+lbl9cmod4a: absolute
+lbl9cmod4b: stz16
+   nextopcode
+op9dm0mod4: testmod1 580
+
+lbl9dmod4a: absoluteindexedx1
+lbl9dmod4b: sta16
+   nextopcode
+op9em0mod4: testmod1 580
+
+lbl9emod4: testmod1 580
+ absoluteindexedx1
+  stz16
+   nextopcode
+op9fm0mod4: testmod1 580
+
+lbl9fmod4a: absolutelongindexedx1
+lbl9fmod4b: sta16
+   nextopcode
+opa0x1mod4: testmod1 580
+
+lbla0mod4: testmod1 580
+ opa0x1
+   nextopcode
+opa1m0mod4: testmod1 600
+
+lbla1mod4a: directindexedindirect1
+lbla1mod4b: lda16
+   nextopcode
+opa2x1mod4: testmod1 600
+
+lbla2mod4: testmod1 600
+ opa2x1
+   nextopcode
+opa3m0mod4: testmod1 600
+
+lbla3mod4a: stackasmrelative
+lbla3mod4b: lda16
+   nextopcode
+opa4x1mod4: testmod1 600
+
+lbla4mod4a: direct
+lbla4mod4b: ldy8
+   nextopcode
+opa5m0mod4: testmod1 600
+
+lbla5mod4a: direct
+lbla5mod4b: lda16
+   nextopcode
+opa6x1mod4: testmod1 600
+
+lbla6mod4a: direct
+lbla6mod4b: ldx8
+   nextopcode
+opa7m0mod4: testmod1 600
+
+lbla7mod4a: directindirectlong
+lbla7mod4b: lda16
+   nextopcode
+opa8x1mod4: testmod1 600
+
+lbla8mod4: testmod1 600
+ opa8x1m0
+   nextopcode
+opa9m0mod4: testmod1 600
+
+lbla9mod4: testmod1 600
+ opa9m0
+   nextopcode
+opaax1mod4: testmod1 600
+
+lblaamod4: testmod1 600
+ opaax1m0
+   nextopcode
+opabmod4: testmod1 600
+
+lblabmod4: testmod1 600
+ opab
+   nextopcode
+opacx1mod4: testmod1 600
+
+lblacmod4a: absolute
+lblacmod4b: ldy8
+   nextopcode
+opadm0mod4: testmod1 600
+
+lbladmod4a: absolute
+lbladmod4b: lda16
+   nextopcode
+opaex1mod4: testmod1 600
+
+lblaemod4a: absolute
+lblaemod4b: ldx8
+   nextopcode
+opafm0mod4: testmod1 600
+
+lblafmod4a: absolutelong
+lblafmod4b: lda16
+   nextopcode
+opb0mod4: testmod1 600
+
+lblb0mod4: testmod1 600
+ opb0
+   nextopcode
+opb1m0mod4: testmod1 600
+
+lblb1mod4a: directindirectindexed1
+lblb1mod4b: lda16
+   nextopcode
+opb2m0mod4: testmod1 620
+
+lblb2mod4a: directindirect
+lblb2mod4b: lda16
+   nextopcode
+opb3m0mod4: testmod1 620
+
+lblb3mod4a: stackasmrelativeindirectindexed1
+lblb3mod4b: lda16
+   nextopcode
+opb4x1mod4: testmod1 620
+
+lblb4mod4a: directindexedx1
+lblb4mod4b: ldy8
+   nextopcode
+opb5m0mod4: testmod1 620
+
+lblb5mod4a: directindexedx1
+lblb5mod4b: lda16
+   nextopcode
+opb6x1mod4: testmod1 620
+
+lblb6mod4a: directindexedy1
+lblb6mod4b: ldx8
+   nextopcode
+opb7m0mod4: testmod1 620
+
+lblb7mod4a: directindirectindexedlong1
+lblb7mod4b: lda16
+   nextopcode
+opb8mod4: testmod1 620
+
+lblb8mod4: testmod1 620
+ opb8
+   nextopcode
+opb9m0mod4: testmod1 620
+
+lblb9mod4a: absoluteindexedy1
+lblb9mod4b: lda16
+   nextopcode
+opbax1mod4: testmod1 620
+
+lblbamod4: testmod1 620
+ opbax1
+   nextopcode
+opbbx1mod4: testmod1 620
+
+lblbbmod4: testmod1 620
+ opbbx1
+   nextopcode
+opbcx1mod4: testmod1 620
+
+lblbcmod4a: absoluteindexedx1
+lblbcmod4b: ldy8
+   nextopcode
+opbdm0mod4: testmod1 620
+
+lblbdmod4a: absoluteindexedx1
+lblbdmod4b: lda16
+   nextopcode
+opbex1mod4: testmod1 620
+
+lblbemod4a: absoluteindexedy1
+lblbemod4b: ldx8
+   nextopcode
+opbfm0mod4: testmod1 620
+
+lblbfmod4a: absolutelongindexedx1
+lblbfmod4b: lda16
+   nextopcode
+opc0x1mod4: testmod1 620
+
+lblc0mod4: testmod1 620
+ opc0x1
+   nextopcode
+opc1m0mod4: testmod1 620
+
+lblc1mod4a: directindexedindirect1
+lblc1mod4b: cmp16
+   nextopcode
+opc2mod4: testmod1 640
+
+lblc2mod4: testmod1 640
+ opc2
+   nextopcode
+@.pool
+opc3m0mod4: testmod1 640
+
+lblc3mod4a: stackasmrelative
+lblc3mod4b: cmp16
+   nextopcode
+opc4x1mod4: testmod1 640
+
+lblc4mod4a: direct
+lblc4mod4b: cmy8
+   nextopcode
+opc5m0mod4: testmod1 640
+
+lblc5mod4a: direct
+lblc5mod4b: cmp16
+   nextopcode
+opc6m0mod4: testmod1 640
+
+lblc6mod4a: direct
+lblc6mod4b: dec16
+   nextopcode
+opc7m0mod4: testmod1 640
+
+lblc7mod4a: directindirectlong
+lblc7mod4b: cmp16
+   nextopcode
+opc8x1mod4: testmod1 640
+
+lblc8mod4: testmod1 640
+ opc8x1
+   nextopcode
+opc9m0mod4: testmod1 640
+
+lblc9mod4: testmod1 640
+ opc9m0
+   nextopcode
+opcax1mod4: testmod1 640
+
+lblcamod4: testmod1 640
+ opcax1
+   nextopcode
+opcbmod4: testmod1 640
+
+lblcbmod4: testmod1 640
+ opcb
+   nextopcode
+opccx1mod4: testmod1 640
+
+lblccmod4a: absolute
+lblccmod4b: cmy8
+   nextopcode
+opcdm0mod4: testmod1 640
+
+lblcdmod4a: absolute
+lblcdmod4b: cmp16
+   nextopcode
+opcem0mod4: testmod1 640
+
+lblcemod4a: absolute
+lblcemod4b: dec16
+   nextopcode
+opcfm0mod4: testmod1 640
+
+lblcfmod4a: absolutelong
+lblcfmod4b: cmp16
+   nextopcode
+opd0mod4: testmod1 660
+
+lbld0mod4: testmod1 660
+ opd0
+   nextopcode
+opd1m0mod4: testmod1 660
+
+lbld1mod4a: directindirectindexed1
+lbld1mod4b: cmp16
+   nextopcode
+opd2m0mod4: testmod1 660
+
+lbld2mod4a: directindirect
+lbld2mod4b: cmp16
+   nextopcode
+opd3m0mod4: testmod1 660
+
+lbld3mod4a: stackasmrelativeindirectindexed1
+lbld3mod4b: cmp16
+   nextopcode
+opd4mod4: testmod1 660
+
+lbld4mod4: testmod1 660
+ opd4
+   nextopcode
+opd5m0mod4: testmod1 660
+
+lbld5mod4a: directindexedx1
+lbld5mod4b: cmp16
+   nextopcode
+opd6m0mod4: testmod1 660
+
+lbld6mod4a: directindexedx1
+lbld6mod4b: dec16
+   nextopcode
+opd7m0mod4: testmod1 660
+
+lbld7mod4a: directindirectindexedlong1
+lbld7mod4b: cmp16
+   nextopcode
+opd8mod4: testmod1 660
+
+lbld8mod4: testmod1 660
+ opd8
+   nextopcode
+opd9m0mod4: testmod1 660
+
+lbld9mod4a: absoluteindexedy1
+lbld9mod4b: cmp16
+   nextopcode
+opdax1mod4: testmod1 660
+
+lbldamod4: testmod1 660
+ opdax1
+   nextopcode
+opdbmod4: testmod1 660
+
+lbldbmod4: testmod1 660
+ opdb
+   nextopcode
+opdcmod4: testmod1 660
+
+lbldcmod4: testmod1 660
+ opdc
+   nextopcode
+opddm0mod4: testmod1 660
+
+lblddmod4a: absoluteindexedx1
+lblddmod4b: cmp16
+   nextopcode
+opdem0mod4: testmod1 660
+
+lbldemod4a: absoluteindexedx1
+lbldemod4b: dec16
+   nextopcode
+opdfm0mod4: testmod1 660
+
+lbldfmod4a: absolutelongindexedx1
+lbldfmod4b: cmp16
+   nextopcode
+ope0x1mod4: testmod1 660
+
+lble0mod4: testmod1 660
+ ope0x1
+   nextopcode
+ope1m0mod4: testmod1 660
+
+lble1mod4a: directindexedindirect1
+lble1mod4b: sbc16
+   nextopcode
+ope2mod4: testmod1 660
+
+lble2mod4: testmod1 660
+ ope2
+   nextopcode
+@.pool
+ope3m0mod4: testmod1 680
+
+lble3mod4a: stackasmrelative
+lble3mod4b: sbc16
+   nextopcode
+ope4x1mod4: testmod1 680
+
+lble4mod4a: direct
+lble4mod4b: cmx8
+   nextopcode
+ope5m0mod4: testmod1 680
+
+lble5mod4a: direct
+lble5mod4b: sbc16
+   nextopcode
+ope6m0mod4: testmod1 680
+
+lble6mod4a: direct
+lble6mod4b: inc16
+   nextopcode
+ope7m0mod4: testmod1 680
+
+lble7mod4a: directindirectlong
+lble7mod4b: sbc16
+   nextopcode
+ope8x1mod4: testmod1 680
+
+lble8mod4: testmod1 680
+ ope8x1
+   nextopcode
+ope9m0mod4: testmod1 680
+
+lble9mod4a: immediate16
+lble9mod4b: sbc16
+   nextopcode
+opeamod4: testmod1 680
+
+lbleamod4: testmod1 680
+ opea
+   nextopcode
+opebmod4: testmod1 680
+
+lblebmod4: testmod1 680
+ opebm0
+   nextopcode
+opecx1mod4: testmod1 680
+
+lblecmod4a: absolute
+lblecmod4b: cmx8
+   nextopcode
+opedm0mod4: testmod1 680
+
+lbledmod4a: absolute
+lbledmod4b: sbc16
+   nextopcode
+opeem0mod4: testmod1 680
+
+lbleemod4a: absolute
+lbleemod4b: inc16
+   nextopcode
+opefm0mod4: testmod1 680
+
+lblefmod4a: absolutelong
+lblefmod4b: sbc16
+   nextopcode
+opf0mod4: testmod1 680
+
+lblf0mod4: testmod1 680
+ opf0
+   nextopcode
+opf1m0mod4: testmod1 680
+
+lblf1mod4a: directindirectindexed1
+lblf1mod4b: sbc16
+   nextopcode
+opf2m0mod4: testmod1 700
+
+lblf2mod4a: directindirect
+lblf2mod4b: sbc16
+   nextopcode
+opf3m0mod4: testmod1 700
+
+lblf3mod4a: stackasmrelativeindirectindexed1
+lblf3mod4b: sbc16
+   nextopcode
+opf4mod4: testmod1 700
+
+lblf4mod4: testmod1 700
+ opf4
+   nextopcode
+opf5m0mod4: testmod1 700
+
+lblf5mod4a: directindexedx1
+lblf5mod4b: sbc16
+   nextopcode
+opf6m0mod4: testmod1 700
+
+lblf6mod4a: directindexedx1
+lblf6mod4b: inc16
+   nextopcode
+opf7m0mod4: testmod1 700
+
+lblf7mod4a: directindirectindexedlong1
+lblf7mod4b: sbc16
+   nextopcode
+opf8mod4: testmod1 700
+
+lblf8mod4: testmod1 700
+ opf8
+   nextopcode
+opf9m0mod4: testmod1 700
+
+lblf9mod4a: absoluteindexedy1
+lblf9mod4b: sbc16
+   nextopcode
+opfax1mod4: testmod1 700
+
+lblfamod4: testmod1 700
+ opfax1
+   nextopcode
+opfbmod4: testmod1 700
+
+lblfbmod4: testmod1 700
+ opfb
+   nextopcode
+opfcmod4: testmod1 700
+
+lblfcmod4: testmod1 700
+ opfcx1
+   nextopcode
+opfdm0mod4: testmod1 700
+
+lblfdmod4a: absoluteindexedx1
+lblfdmod4b: sbc16
+   nextopcode
+opfem0mod4: testmod1 700
+
+lblfemod4a: absoluteindexedx1
+lblfemod4b: inc16
+   nextopcode
+opffm0mod4: testmod1 700
+
+lblffmod4a: absolutelongindexedx1
+lblffmod4b: sbc16
+   nextopcode
+
+
+   @.pool
