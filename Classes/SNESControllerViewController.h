@@ -54,6 +54,7 @@
 - (void) updateConnectionStatus;
 - (void) showDisconnectionAlert;
 - (void) changeBackgroundImage:(NSString *)newImageName;
+- (IBAction)dismissController:(id)sender;
 
 
 @end

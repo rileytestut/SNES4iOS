@@ -31,6 +31,10 @@
 		BF7B7A3114A64DFE00014E61 /* grayButton.png in Resources */ = {isa = PBXBuildFile; fileRef = BF7B7A2E14A64DFE00014E61 /* grayButton.png */; };
 		BF7B7A3214A64DFE00014E61 /* NotConnectedIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = BF7B7A2F14A64DFE00014E61 /* NotConnectedIcon.png */; };
 		BF7B7A3414A64F8B00014E61 /* SessionController.xib in Resources */ = {isa = PBXBuildFile; fileRef = BF7B7A3314A64F8B00014E61 /* SessionController.xib */; };
+		BFA4E4A414A6B482000AA7DA /* 31-circle-x.png in Resources */ = {isa = PBXBuildFile; fileRef = BFA4E4A214A6B482000AA7DA /* 31-circle-x.png */; };
+		BFA4E4A514A6B482000AA7DA /* 31-circle-x@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BFA4E4A314A6B482000AA7DA /* 31-circle-x@2x.png */; };
+		BFA4E4A914A6BA18000AA7DA /* Controller.png in Resources */ = {isa = PBXBuildFile; fileRef = BFA4E4A714A6BA18000AA7DA /* Controller.png */; };
+		BFA4E4AA14A6BA18000AA7DA /* Controller@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BFA4E4A814A6BA18000AA7DA /* Controller@2x.png */; };
 		BFD71BA014A5A2B100850EEE /* RomSelectionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = BFD71B9F14A5A2B100850EEE /* RomSelectionViewController.xib */; };
 		BFD71BAB14A5AC2F00850EEE /* landscape_controller.png in Resources */ = {isa = PBXBuildFile; fileRef = BFD71BA914A5AC2E00850EEE /* landscape_controller.png */; };
 		BFD71BAC14A5AC2F00850EEE /* portrait_controller.png in Resources */ = {isa = PBXBuildFile; fileRef = BFD71BAA14A5AC2F00850EEE /* portrait_controller.png */; };
@@ -133,6 +137,11 @@
 		BF7B7A2E14A64DFE00014E61 /* grayButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = grayButton.png; sourceTree = "<group>"; };
 		BF7B7A2F14A64DFE00014E61 /* NotConnectedIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = NotConnectedIcon.png; sourceTree = "<group>"; };
 		BF7B7A3314A64F8B00014E61 /* SessionController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SessionController.xib; sourceTree = "<group>"; };
+		BFA4E4A214A6B482000AA7DA /* 31-circle-x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "31-circle-x.png"; sourceTree = "<group>"; };
+		BFA4E4A314A6B482000AA7DA /* 31-circle-x@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "31-circle-x@2x.png"; sourceTree = "<group>"; };
+		BFA4E4A714A6BA18000AA7DA /* Controller.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Controller.png; sourceTree = "<group>"; };
+		BFA4E4A814A6BA18000AA7DA /* Controller@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Controller@2x.png"; sourceTree = "<group>"; };
+		BFA4E4CA14A6EB31000AA7DA /* SNES4iOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SNES4iOS.entitlements; sourceTree = "<group>"; };
 		BFD71B9F14A5A2B100850EEE /* RomSelectionViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RomSelectionViewController.xib; sourceTree = "<group>"; };
 		BFD71BA914A5AC2E00850EEE /* landscape_controller.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = landscape_controller.png; sourceTree = "<group>"; };
 		BFD71BAA14A5AC2F00850EEE /* portrait_controller.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = portrait_controller.png; sourceTree = "<group>"; };
@@ -243,6 +252,7 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				BFA4E4CA14A6EB31000AA7DA /* SNES4iOS.entitlements */,
 				080E96DDFE201D6D7F000001 /* Classes */,
 				CE43A4CC119DFEF70007E399 /* Resources */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
@@ -354,6 +364,10 @@
 		BFD71BAD14A5AC3700850EEE /* iPhone */ = {
 			isa = PBXGroup;
 			children = (
+				BFA4E4A714A6BA18000AA7DA /* Controller.png */,
+				BFA4E4A814A6BA18000AA7DA /* Controller@2x.png */,
+				BFA4E4A214A6B482000AA7DA /* 31-circle-x.png */,
+				BFA4E4A314A6B482000AA7DA /* 31-circle-x@2x.png */,
 				BF7B7A2D14A64DFD00014E61 /* ConnectedIcon.png */,
 				BF7B7A2E14A64DFE00014E61 /* grayButton.png */,
 				BF7B7A2F14A64DFE00014E61 /* NotConnectedIcon.png */,
@@ -485,6 +499,10 @@
 				BF3B5F4614A661C100AC8101 /* snes-1.txt in Resources */,
 				BF3B5F4714A661C100AC8101 /* SNESControllerViewController.xib in Resources */,
 				BF3B5F5014A6810E00AC8101 /* portrait_controller.txt in Resources */,
+				BFA4E4A414A6B482000AA7DA /* 31-circle-x.png in Resources */,
+				BFA4E4A514A6B482000AA7DA /* 31-circle-x@2x.png in Resources */,
+				BFA4E4A914A6BA18000AA7DA /* Controller.png in Resources */,
+				BFA4E4AA14A6BA18000AA7DA /* Controller@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -521,8 +539,11 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_UNIVERSAL_IPHONE_OS)";
+				"ARCHS[sdk=iphonesimulator*]" = "$(ARCHS_STANDARD_32_BIT)";
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CODE_SIGN_ENTITLEMENTS = Entitlements.plist;
+				CODE_SIGN_ENTITLEMENTS = SNES4iOS.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer: Yvette Testut (B5VNWGK3MY)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Yvette Testut (B5VNWGK3MY)";
 				CODE_SIGN_RESOURCE_RULES_PATH = "$(SDKROOT)/ResourceRules.plist";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -541,6 +562,8 @@
 					"\"$(SRCROOT)/src/snes4iphone_src\"",
 				);
 				PRODUCT_NAME = SNES4iOS;
+				PROVISIONING_PROFILE = "A540BE5B-E262-4CC6-B213-FE164727E409";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "A540BE5B-E262-4CC6-B213-FE164727E409";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = armv7;
@@ -553,7 +576,8 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_UNIVERSAL_IPHONE_OS)";
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CODE_SIGN_ENTITLEMENTS = Entitlements.plist;
+				CODE_SIGN_ENTITLEMENTS = SNES4iOS.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer: Yvette Testut (B5VNWGK3MY)";
 				CODE_SIGN_RESOURCE_RULES_PATH = "$(SDKROOT)/ResourceRules.plist";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -570,6 +594,7 @@
 					"\"$(SRCROOT)/src/snes4iphone_src\"",
 				);
 				PRODUCT_NAME = SNES4iOS;
+				PROVISIONING_PROFILE = "A540BE5B-E262-4CC6-B213-FE164727E409";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
@@ -582,13 +607,15 @@
 			buildSettings = {
 				"ARCHS[sdk=iphoneos*]" = armv7;
 				"ARCHS[sdk=iphonesimulator*]" = i386;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_ENTITLEMENTS = SNES4iOS.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Yvette Testut (B5VNWGK3MY)";
 				FRAMEWORK_SEARCH_PATHS = /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS3.2.sdk/System/Library/PrivateFrameworks/;
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "A540BE5B-E262-4CC6-B213-FE164727E409";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 2;
 			};
@@ -599,6 +626,7 @@
 			buildSettings = {
 				"ARCHS[sdk=iphoneos*]" = armv7;
 				"ARCHS[sdk=iphonesimulator*]" = i386;
+				CODE_SIGN_ENTITLEMENTS = SNES4iOS.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS3.2.sdk/System/Library/PrivateFrameworks/;
 				GCC_C_LANGUAGE_STANDARD = c99;

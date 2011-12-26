@@ -29,14 +29,15 @@ SNES4iOSAppDelegate *AppDelegate()
 @synthesize emulationViewController, webViewController, webNavController;
 @synthesize tabBarController;
 @synthesize snesControllerAppDelegate, snesControllerViewController;
+@synthesize sramDirectoryPath;
 
 
 #pragma mark -
 #pragma mark Application lifecycle
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {    
-      
-      [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
+    
+    [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
     
 	settingsViewController = [[SettingsViewController alloc] init];
 	// access the view property to force it to load
@@ -45,18 +46,20 @@ SNES4iOSAppDelegate *AppDelegate()
 	controlPadConnectViewController = [[ControlPadConnectViewController alloc] init];
 	controlPadManager = [[ControlPadManager alloc] init];
 	
-
+    
 	NSString *documentsPath = [SNES4iOSAppDelegate applicationDocumentsDirectory];
-//	romDirectoryPath = [[documentsPath stringByAppendingPathComponent:@"ROMs/SNES/"] retain];
+    //	romDirectoryPath = [[documentsPath stringByAppendingPathComponent:@"ROMs/SNES/"] retain];
 	self.romDirectoryPath = [documentsPath copy];
 	self.saveDirectoryPath = [romDirectoryPath stringByAppendingPathComponent:@"saves"];
 	self.snapshotDirectoryPath = [saveDirectoryPath stringByAppendingPathComponent:@"snapshots"];
+    self.sramDirectoryPath = [self.romDirectoryPath stringByAppendingPathComponent:@"sram"];
     
     NSFileManager *fileManager = [[NSFileManager alloc] init];
     [fileManager createDirectoryAtPath:saveDirectoryPath withIntermediateDirectories:YES attributes:nil error:nil];
     [fileManager createDirectoryAtPath:snapshotDirectoryPath withIntermediateDirectories:YES attributes:nil error:nil];
+    [fileManager createDirectoryAtPath:self.sramDirectoryPath withIntermediateDirectories:YES attributes:nil error:nil];
     //Apple says its better to attempt to create the directories and accept an error than to manually check if they exist.
-		
+    
 	// Make the main emulator view controller
 	emulationViewController = [[EmulationViewController alloc] init];
 	emulationViewController.view.hidden = YES;
@@ -69,25 +72,23 @@ SNES4iOSAppDelegate *AppDelegate()
 	webNavController.navigationBar.barStyle = UIBarStyleBlack;
     
     
-    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    self.romSelectionViewController = [[RomSelectionViewController alloc] initWithNibName:@"RomSelectionViewController" bundle:[NSBundle mainBundle]];
-    UINavigationController *masterNavigationController = [[UINavigationController alloc] initWithRootViewController:self.romSelectionViewController];
-    
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+        self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+        self.romSelectionViewController = [[RomSelectionViewController alloc] initWithNibName:@"RomSelectionViewController" bundle:[NSBundle mainBundle]];
+        UINavigationController *masterNavigationController = [[UINavigationController alloc] initWithRootViewController:self.romSelectionViewController];
         
         self.snesControllerAppDelegate = [[SNESControllerAppDelegate alloc] init];
-        self.snesControllerViewController = [[SNESControllerViewController alloc] initWithNibName:@"SNESControllerViewController" bundle:[NSBundle mainBundle]];
-        self.snesControllerAppDelegate.viewController = self.snesControllerViewController;
-        self.tabBarController = [[UITabBarController alloc] init];
-        [self.tabBarController setViewControllers:[NSArray arrayWithObjects:masterNavigationController, nil]];
-        self.window.rootViewController = self.tabBarController;
-    } else {
-    	self.romDetailViewController = [[RomDetailViewController alloc] initWithNibName:@"DetailView" bundle:[NSBundle mainBundle]];
-        self.romSelectionViewController.romDetailViewController = self.romDetailViewController;
-        self.splitViewController = [[UISplitViewController alloc] init];
-        self.splitViewController.delegate = self.romDetailViewController;
-        self.splitViewController.viewControllers = [NSArray arrayWithObjects:masterNavigationController, self.romDetailViewController, nil];
         
+        masterNavigationController.toolbarHidden = NO;
+        
+        self.romSelectionViewController.title = @"ROMs";
+        
+        UIBarButtonItem *flexibleSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
+        UIBarButtonItem *controllerButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Controller"] style:UIBarButtonItemStyleBordered target:self.romSelectionViewController action:@selector(loadSNESController)];
+        self.romSelectionViewController.toolbarItems = [NSArray arrayWithObjects:flexibleSpace, controllerButton, nil];
+        
+        self.window.rootViewController = masterNavigationController;
+    } else {
         self.window.rootViewController = self.splitViewController;
     }
     [self.window makeKeyAndVisible];
@@ -97,12 +98,8 @@ SNES4iOSAppDelegate *AppDelegate()
     //[window addSubview:splitViewController.view];
 	
 	// Add the emulation view in its hidden state.
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-        [window addSubview:emulationViewController.view];
-    }
-    else {
-        emulationViewController.view.hidden = NO;
-    }
+    
+    emulationViewController.view.hidden = NO;
 	
     [window makeKeyAndVisible];
     
@@ -119,13 +116,27 @@ SNES4iOSAppDelegate *AppDelegate()
 	if (showOrHide) {
         self.splitViewController.view.hidden = YES;
         self.emulationViewController.view.hidden = NO;
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+            [self.window addSubview:self.emulationViewController.view];
+        }
 		[[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
 	} else {
+        UIViewController *presentedViewController = AppDelegate().snesControllerViewController;
+        if (ControllerAppDelegate().controllerType == SNESControllerTypeWireless) {
+            presentedViewController = AppDelegate().emulationViewController;
+        }
+        UIViewController *parentViewController = [presentedViewController parentViewController];
+        if ([presentedViewController respondsToSelector:@selector(presentingViewController)]) {
+            parentViewController = [presentedViewController presentingViewController];//Fixes iOS 5 bug
+        }
+        [parentViewController dismissModalViewControllerAnimated:YES];
+        
         self.emulationViewController.view.hidden = YES;
         if (self.emulationViewController.view.superview != nil) {
             [self.emulationViewController.view removeFromSuperview];
         }
         self.splitViewController.view.hidden = NO;
+        
 		[[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
 	}
 }

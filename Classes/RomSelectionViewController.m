@@ -12,6 +12,7 @@
 #import "EmulationViewController.h"
 #import "SNESControllerViewController.h"
 #import "ScreenLayer.h"
+#import "SettingsViewController.h"
 
 #define RADIANS(degrees) ((degrees * M_PI) / 180.0)
 
@@ -55,16 +56,43 @@
     [self.navigationController presentModalViewController:AppDelegate().webNavController animated:YES];
 }
 
+- (void)loadSNESController {
+    if (AppDelegate().snesControllerViewController == nil) {
+        AppDelegate().snesControllerViewController = [[SNESControllerViewController alloc] initWithNibName:@"SNESControllerViewController" bundle:[NSBundle mainBundle]];
+    }
+    AppDelegate().snesControllerViewController.imageName = @"snes-1";
+    AppDelegate().snesControllerAppDelegate.controllerType = SNESControllerTypeWireless;
+    AppDelegate().snesControllerViewController.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
+    [self presentModalViewController:AppDelegate().snesControllerViewController animated:YES];
+}
+
+- (void)dismissSNESController {
+    UIViewController *parentViewController = [AppDelegate().snesControllerViewController parentViewController];
+    if ([AppDelegate().snesControllerViewController respondsToSelector:@selector(presentingViewController)]) {
+        parentViewController = [AppDelegate().snesControllerViewController presentingViewController];//Fixes iOS 5 bug
+    }
+    [parentViewController dismissModalViewControllerAnimated:YES];
+}
+
 /*
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
 }
 */
-/*
+
+
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [self finishLoadingView];
+    });
 }
-*/
+
+- (void)finishLoadingView {
+    
+    //iCloud stuff will go here.
+}
+
 /*
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
@@ -170,8 +198,31 @@
 		}
 	}
 	
+    
+    [self checkForSram];
 	
 	[(UITableView*)self.view reloadData];
+}
+
+- (void) checkForSram {
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSString *documentsDirectory = AppDelegate().romDirectoryPath;
+    NSArray* dirContents = [fileManager contentsOfDirectoryAtPath:documentsDirectory error:nil];
+    [dirContents enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        NSString *filename = obj;
+        if ([filename hasSuffix:@"srm"]) {
+            NSError *error = nil;
+            NSString *originalFilePath = [documentsDirectory stringByAppendingPathComponent:filename];
+            NSString *destinaionFilePath = [AppDelegate().sramDirectoryPath stringByAppendingPathComponent:filename];
+            if ([fileManager copyItemAtPath:originalFilePath toPath:destinaionFilePath error:&error] && !error) {
+                [fileManager removeItemAtPath:originalFilePath error:nil];
+                NSLog(@"Successfully copied sram file to sram directory");
+            }
+            else {
+                NSLog(@"%@. %@.", error, [error userInfo]);
+            }
+        }
+    }];
 }
 
 
@@ -325,18 +376,23 @@
 	self.romDetailViewController.detailItem = (id)[romPath copy];
     
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+        if (AppDelegate().snesControllerViewController == nil) {
+            AppDelegate().snesControllerViewController = [[SNESControllerViewController alloc] initWithNibName:@"SNESControllerViewController" bundle:[NSBundle mainBundle]];
+        }
+        SNESControllerViewController *controllerViewController = AppDelegate().snesControllerViewController;
         AppDelegate().snesControllerAppDelegate.controllerType = SNESControllerTypeLocal;
         AppDelegate().emulationViewController.view.userInteractionEnabled = NO;
-        [AppDelegate().snesControllerViewController.view insertSubview:AppDelegate().emulationViewController.view atIndex:0];
-        AppDelegate().snesControllerViewController.wantsFullScreenLayout = YES;
+        [controllerViewController.view insertSubview:AppDelegate().emulationViewController.view atIndex:0];
+        controllerViewController.wantsFullScreenLayout = YES;
         CGFloat rotationAngle = 90.0f;
         AppDelegate().emulationViewController.view.bounds = CGRectMake(0, 0, 480, 320);
         ScreenLayer *screenLayer = (ScreenLayer *)AppDelegate().emulationViewController.view.layer;
         screenLayer.rotateTransform = CGAffineTransformRotate(CGAffineTransformIdentity, RADIANS(rotationAngle));
         
-        AppDelegate().emulationViewController.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
+        [AppDelegate().emulationViewController didRotate:[NSNotification notificationWithName:@"Notification" object:nil]];
+        controllerViewController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
         [UIApplication sharedApplication].statusBarHidden = YES;
-        [self presentViewController:AppDelegate().snesControllerViewController animated:YES completion:^{
+        [self presentViewController:controllerViewController animated:YES completion:^{
             [AppDelegate().emulationViewController startWithRom:romPath];
             [AppDelegate() showEmulator:YES];
         }];

@@ -21,5 +21,8 @@
 @property (nonatomic, strong) IBOutlet RomDetailViewController *romDetailViewController;
 
 - (void) scanRomDirectory:(NSString *)path;
+- (void)dismissSNESController;
+- (void) finishLoadingView;
+- (void) checkForSram;
 
 @end

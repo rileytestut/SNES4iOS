@@ -27,6 +27,8 @@
 @property (nonatomic, strong) IBOutlet UISwitch* speedHack;
 @property (nonatomic, strong) IBOutlet UISwitch* multiTap;
 @property (nonatomic, strong) IBOutlet UISwitch* autoconnect;
+@property (strong, nonatomic) IBOutlet UISwitch* iCloud;
+@property (nonatomic) BOOL useiCloud;
 
 - (IBAction) settingChanged:(id)sender;
 

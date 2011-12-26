@@ -11,8 +11,11 @@
 #import "SessionController.h"
 #import "ControlPadManager.h"
 #import "EmulationViewController.h"
+#import "RomSelectionViewController.h"
 
 #define	DefaultControllerImage @"landscape_controller"
+
+#define RADIANS(degrees) ((degrees * M_PI) / 180.0)
 
 unsigned long gp2x_pad_status;
 static unsigned long newtouches[10];
@@ -40,12 +43,15 @@ void rt_dispatch_sync_on_main_thread(dispatch_block_t block) {
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad {
     [super viewDidLoad];
-	
+    self.wantsFullScreenLayout = YES;
+	self.infoButton.transform = CGAffineTransformRotate(CGAffineTransformIdentity, RADIANS(0.0));
+    self.connectionButton.transform = CGAffineTransformRotate(CGAffineTransformIdentity, RADIANS(0.0));
 	self.view.multipleTouchEnabled = YES;
 	//self.imageView.image = [UIImage imageNamed:DefaultControllerImage];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
+    [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
     NSString *newImageName = @"landscape_controller";
     if (ControllerAppDelegate().controllerType == SNESControllerTypeLocal) {
         self.connectionButton.hidden = YES;
@@ -57,7 +63,8 @@ void rt_dispatch_sync_on_main_thread(dispatch_block_t block) {
         self.connectionButton.hidden = NO;
         newImageName = @"snes-1";
     }
-    
+    [self changeBackgroundImage:newImageName];
+    ControllerAppDelegate().viewController = self;
 }
 
 - (void) changeBackgroundImage:(NSString *)newImageName {
@@ -71,17 +78,34 @@ void rt_dispatch_sync_on_main_thread(dispatch_block_t block) {
 - (void) viewDidAppear:(BOOL)animated
 {
     if (ControllerAppDelegate().controllerType == SNESControllerTypeWireless) {
+        if (!ControllerAppDelegate().sessionController) {
+            ControllerAppDelegate().sessionController = [[SessionController alloc] initWithNibName:@"SessionController" bundle:[NSBundle mainBundle]];
+        }
         if (! ControllerAppDelegate().sessionController.isConnected)
         {
             [ControllerAppDelegate().sessionController showModal];
         }
     }
+    else {
+        [ControllerAppDelegate().sessionController disconnect];
+        [ControllerAppDelegate().sessionController stopSearching];
+    }
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [ControllerAppDelegate().sessionController dismissView];
 }
 
 // Override to allow orientations other than the default portrait orientation.
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
     // Return YES for supported orientations
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    if (ControllerAppDelegate().controllerType == SNESControllerTypeLocal) {
+        return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    }
+    else {
+        return (interfaceOrientation == UIInterfaceOrientationLandscapeLeft || 
+                interfaceOrientation == UIInterfaceOrientationLandscapeRight);
+    }
 }
 
 
@@ -103,9 +127,11 @@ void rt_dispatch_sync_on_main_thread(dispatch_block_t block) {
 {
 	if (sender == connectionButton) {
 		[ControllerAppDelegate().sessionController showModal];
-	} else if (sender == infoButton) {
-		NSLog(@"Info button pressed");
-	}
+	} 
+}
+
+- (IBAction)dismissController:(id)sender {
+    [AppDelegate().romSelectionViewController dismissSNESController];
 }
 
 - (void) updateConnectionStatus

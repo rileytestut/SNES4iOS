@@ -230,7 +230,7 @@ void saveScreenshotToFile(char *filepath)
 - (void) didRotate:(NSNotification *)notification {
     UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
     if ((orientation == UIDeviceOrientationPortrait || orientation == UIDeviceOrientationLandscapeLeft || 
-        orientation == UIDeviceOrientationLandscapeRight) && ![(UIAlertView *)self.pauseAlert isVisible] && self.view.superview != nil) {
+        orientation == UIDeviceOrientationLandscapeRight) && ![(UIAlertView *)self.pauseAlert isVisible] && self.view.superview != nil && [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         CGFloat rotationAngle = 0.0f;
         CGPoint anchorPoint = CGPointMake(0.0, 0.0);
         //These coordinates take into considerationt the fact that the UIWindow is in portrait mode
@@ -253,8 +253,10 @@ void saveScreenshotToFile(char *filepath)
         }
         else if (orientation == UIDeviceOrientationLandscapeLeft) {
             if (![AppDelegate().snesControllerViewController.imageName isEqualToString:@"landscape_controller"]) {
+                if ([AppDelegate().snesControllerViewController.imageName isEqualToString:@"portrait_controller"]) {
+                    AppDelegate().snesControllerViewController.imageView.frame = CGRectMake(0, 0, 320, 480);
+                }
                 [AppDelegate().snesControllerViewController changeBackgroundImage:@"landscape_controller"];
-                AppDelegate().snesControllerViewController.imageView.frame = CGRectMake(0, 0, 320, 480);
             }
             [UIApplication sharedApplication].statusBarOrientation = UIInterfaceOrientationLandscapeRight;
             //UIDeviceOrientationLandscapeLeft and UIInterfaceOrientationLandscapeLeft are NOT the same
@@ -271,8 +273,10 @@ void saveScreenshotToFile(char *filepath)
         }
         else if (orientation == UIDeviceOrientationLandscapeRight) {
             if (![AppDelegate().snesControllerViewController.imageName isEqualToString:@"landscape_controller"]) {
+                if ([AppDelegate().snesControllerViewController.imageName isEqualToString:@"portrait_controller"]) {
+                    AppDelegate().snesControllerViewController.imageView.frame = CGRectMake(0, 0, 320, 480);
+                }
                 [AppDelegate().snesControllerViewController changeBackgroundImage:@"landscape_controller"];
-                AppDelegate().snesControllerViewController.imageView.frame = CGRectMake(0, 0, 320, 480);
             }
             [UIApplication sharedApplication].statusBarOrientation = UIInterfaceOrientationLandscapeLeft;
             rotationAngle = 180.0f;
@@ -350,11 +354,19 @@ void saveScreenshotToFile(char *filepath)
     NSInteger quitIndex = 0;
     NSInteger saveCurrentIndex = 1;
 	NSInteger saveNewIndex = 2;
+    //NSInteger cancelButtonIndex = 3;
+    
+    /*if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+        saveCurrentIndex = 0;
+        saveNewIndex = 1;
+        cancelButtonIndex = 2;
+        quitIndex = 3;
+    }*/
 	
 	if (buttonIndex == quitIndex) {
         NSLog(@"Quit button clicked");
 		__emulation_run = 0;
-		[AppDelegate() showEmulator:NO];
+        [AppDelegate() showEmulator:NO];
 	} else if (buttonIndex == saveCurrentIndex) {
 		NSLog(@"save to current file button clicked");
 		__emulation_saving = 2;

@@ -17,6 +17,7 @@
 #define USER_DEFAULT_KEY_SPEED_HACK @"SpeedHack"
 #define USER_DEFAULT_KEY_MULTI_TAP @"MultiTap"
 #define USER_DEFAULT_KEY_AUTOCONNECT @"Autoconnect"
+#define USER_DEFAULT_KEY_ICLOUD @"iCloud"
 
 unsigned long __fps_debug = 0;
 int iphone_soundon = 1;
@@ -32,11 +33,12 @@ SettingsViewController *SettingsController()
 
 @implementation SettingsViewController
 
-@synthesize autosave, smoothScaling, fpsDisplay, transparency, speedHack, multiTap, autoconnect;
+@synthesize autosave, smoothScaling, fpsDisplay, transparency, speedHack, multiTap, autoconnect, iCloud, useiCloud;
 
 
 - (void) viewDidLoad
 {
+    BOOL iCloudEnabled = [NSUbiquitousKeyValueStore self] != nil && [[NSFileManager defaultManager] URLForUbiquityContainerIdentifier:nil] != nil;
 	NSDictionary *firstRunValues = [NSDictionary dictionaryWithObjectsAndKeys:
 									[NSNumber numberWithBool:NO], USER_DEFAULT_KEY_AUTOSAVE,
 									[NSNumber numberWithBool:YES], USER_DEFAULT_KEY_SMOOTH_SCALING,
@@ -45,6 +47,7 @@ SettingsViewController *SettingsController()
 									[NSNumber numberWithBool:NO], USER_DEFAULT_KEY_SPEED_HACK,
 									[NSNumber numberWithBool:NO], USER_DEFAULT_KEY_MULTI_TAP,
 									[NSNumber numberWithBool:YES], USER_DEFAULT_KEY_AUTOCONNECT,
+                                    [NSNumber numberWithBool:iCloudEnabled], USER_DEFAULT_KEY_ICLOUD,
 									nil];
 	
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -66,6 +69,8 @@ SettingsViewController *SettingsController()
 	[speedHack setOn:[defaults boolForKey:USER_DEFAULT_KEY_SPEED_HACK]];
 	[multiTap setOn:[defaults boolForKey:USER_DEFAULT_KEY_MULTI_TAP]];
 	[autoconnect setOn:[defaults boolForKey:USER_DEFAULT_KEY_AUTOCONNECT]];
+    [iCloud setOn:[defaults boolForKey:USER_DEFAULT_KEY_ICLOUD]];
+    [iCloud setEnabled:iCloudEnabled];
 	
 	[self settingChanged:nil];
 }	
@@ -74,7 +79,7 @@ SettingsViewController *SettingsController()
 
 - (void) viewDidAppear:(BOOL)animated
 {
-	self.contentSizeForViewInPopover = CGSizeMake(320, 300);
+	self.contentSizeForViewInPopover = CGSizeMake(320, 335);
 }
 
 - (IBAction) settingChanged:(id)sender
@@ -87,6 +92,7 @@ SettingsViewController *SettingsController()
 	else if (sender == speedHack) defaultKey = USER_DEFAULT_KEY_SPEED_HACK;
 	else if (sender == multiTap) defaultKey = USER_DEFAULT_KEY_MULTI_TAP;
 	else if (sender == autoconnect) defaultKey = USER_DEFAULT_KEY_AUTOCONNECT;
+    else if (sender == iCloud) defaultKey = USER_DEFAULT_KEY_ICLOUD;
 	
 	if (defaultKey)
 	{
@@ -99,6 +105,7 @@ SettingsViewController *SettingsController()
  	__transparency = [transparency isOn];
  	__speedhack = [speedHack isOn];
 	__smooth_scaling = [smoothScaling isOn];
+    self.useiCloud = [iCloud isOn];
 	
 	if (sender == multiTap)
 	{

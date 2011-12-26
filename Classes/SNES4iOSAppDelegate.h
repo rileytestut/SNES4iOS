@@ -55,6 +55,7 @@
 @property (nonatomic, copy) NSString *romDirectoryPath;
 @property (nonatomic, copy) NSString *saveDirectoryPath;
 @property (nonatomic, copy) NSString *snapshotDirectoryPath;
+@property (copy, nonatomic) NSString *sramDirectoryPath;
 
 - (void) showEmulator:(BOOL)showOrHide;
 //- (void) showEmulationMenu:(BOOL)showOrHide;
