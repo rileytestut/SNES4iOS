@@ -25,12 +25,19 @@ Known issues:
 •The iPad can only connect to the iPhone the first time the connection popover appears. Any subsequent times for some reason can’t find the phone.
 •Same with the iPhone, only the first time the popup appears on the controller view can you connect with the iPad.
 •There’s an iCloud toggle in the iPad app, but it doesn’t do anything since I haven’t added iCloud support yet.
+•Sometimes pausing the game crashes the ROM. So don’t pause unless you absolutely need to!
 
 Features to come:
 •iCloud support, so you can sync your game saved data across devices :)
 •Ability to control the iPad without having to use an iPhone/iPod Touch.
 •Save states for iPhone/iPod Touch.
 •Ability to load a save state from within the ROM.
+
+How-To’s:
+•To import a save file (.srm), simply drag it into the documents folder in iTunes. Upon the next launch or by tapping the refresh button, it will move it into the correct folder for you.
+•To connect iPhone to iPad, open up the iPad app. If you have it to automatically search for devices the connection popup will appear, if not, tap the player 1 controller. On the iPhone, open the app, and tap the controller button in the bottom left corner. The controller will appear and will start searching for your device. Tap it when you find it, then tap Confirm on the iPad when it appears.
+•To pause the game, double-tap the screen on the iPad, or tap the Menu button on the iPhone (located in the bottom left corner when in portrait mode).
+•To load a save state (iPad only for now), tap the ROM you want to launch, and then tap the save state from the tableview at the bottom of the screen. Next, tap “Load” instead of Power to load the save state.
 
 So for now get to compiling and enjoy your SNES emulator without having to jailbreak!
 
