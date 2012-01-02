@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "container:SNES4iOS.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:src/snes4iphone_src/pocketsnes.xcodeproj">
+   </FileRef>
+</Workspace>
