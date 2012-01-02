@@ -1,10 +1,10 @@
 VERSION=4.3
-COPT = -F/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS${VERSION}.sdk/System/Library/Frameworks -F/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS${VERSION}.sdk/System/Library/PrivateFrameworks -I../../ -I../../Classes/ -I/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS3.0.sdk/usr/lib/gcc/arm-apple-darwin9/4.2.1/include -isysroot /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS${VERSION}.sdk  -L/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS${VERSION}.sdk/usr/lib -I/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS${VERSION}.sdk/usr/include/
+COPT = -F/Developer_4.3/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS${VERSION}.sdk/System/Library/Frameworks -F/Developer_4.3/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS${VERSION}.sdk/System/Library/PrivateFrameworks -I../../ -I../../Classes/ -I/Developer_4.3/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS3.0.sdk/usr/lib/gcc/arm-apple-darwin9/4.2.1/include -isysroot /Developer_4.3/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS${VERSION}.sdk  -L/Developer_4.3/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS${VERSION}.sdk/usr/lib -I/Developer_4.3/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS${VERSION}.sdk/usr/include/
 COPT += -march=armv7-a -miphoneos-version-min=${VERSION} -I. -O3 -D__IPHONE__ -D_SNESPPC -DASM_SPC700 -DZLIB -DUNZIP_SUPPORT -DOLD_COLOUR_BLENDING -DUSE_SA1 -DSUPER_FX -DLSB_FIRST -DCPU_SHUTDOWN -DVAR_CYCLES
 COPT += -fnested-functions -funsigned-char -ffast-math -fexpensive-optimizations -ftemplate-depth-36 -mstructure-size-boundary=32 -falign-functions=32 -falign-loops -falign-labels -falign-jumps -finline -finline-functions -fno-builtin -fno-common -fomit-frame-pointer -fpeel-loops -fstrength-reduce -funroll-loops -fstrict-aliasing 
-GCC = /Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/arm-apple-darwin10-gcc-4.2.1
-GXX = /Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/arm-apple-darwin10-g++-4.2.1
-STRIP = /Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/strip
+GCC = /Developer_4.3/Platforms/iPhoneOS.platform/Developer/usr/bin/arm-apple-darwin10-gcc-4.2.1
+GXX = /Developer_4.3/Platforms/iPhoneOS.platform/Developer/usr/bin/arm-apple-darwin10-g++-4.2.1
+STRIP = /Developer_4.3/Platforms/iPhoneOS.platform/Developer/usr/bin/strip
 #-DSPC700_SHUTDOWN
 #-DRC_OPTIMIZED 
 # SNES stuff (c-based)
@@ -25,7 +25,7 @@ OBJS += sa1.o sdd1.o sdd1emu.o snapshot.o soundux.o spc700.o srtc.o tile.o unzip
 # Dave's minimal SDK
 #
 OBJS += iphone_sdk.o iphone_menutile.o iphone_highlightbar.o iphone_menu_header.o 
-OBJS += ../../main.o ../../Classes/EmulationViewController.o ../../Classes/ControlPadConnectViewController.o   ../../Classes/ControlPadManager.o ../../Classes/RomDetailViewController.o ../../Classes/RomSelectionViewController.o ../../Classes/ScreenView.o ../../Classes/ScreenLayer.o ../../Classes/SaveStateSelectionViewController.o ../../Classes/SettingsViewController.o ../../Classes/SNES4iPadAppDelegate.o ../../Classes/WebBrowserViewController.o
+OBJS += ../../main.o ../../Classes/EmulationViewController.o ../../Classes/ControlPadConnectViewController.o   ../../Classes/ControlPadManager.o ../../Classes/RomDetailViewController.o ../../Classes/RomSelectionViewController.o ../../Classes/ScreenView.o ../../Classes/ScreenLayer.o ../../Classes/SaveStateSelectionViewController.o ../../Classes/SettingsViewController.o ../../Classes/SNES4iOSAppDelegate.o ../../Classes/WebBrowserViewController.o
 
 
 #

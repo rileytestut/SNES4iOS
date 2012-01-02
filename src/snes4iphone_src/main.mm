@@ -1317,12 +1317,12 @@ int main(int argc, char *argv[])
     			gp_Reset();
     			app_MuteSound();
     			gp_deinitGraphics();
-    			if(vrambuffer != NULL) free(vrambuffer);
+    			/*if(vrambuffer != NULL) free(vrambuffer);
     			vrambuffer = NULL;
     			S9xGraphicsDeinit();
     			S9xDeinitAPU();
     			Memory.Deinit();
-    			pthread_exit(NULL);
+    			pthread_exit(NULL);*/
     			break;
     		}
   		}
