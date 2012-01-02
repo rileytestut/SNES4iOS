@@ -9,6 +9,7 @@
 #import "SNESControllerAppDelegate.h"
 #import "SNESControllerViewController.h"
 #import "SessionController.h"
+#import "SNES4iOSAppDelegate.h"
 
 #define SNES_CONTROLLER_SESSION_ID @"com.snes4iphone.controller"
 

@@ -11,8 +11,8 @@
 
 int main(int argc, char *argv[]) {
     
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    @autoreleasepool {
         int retVal = UIApplicationMain(argc, argv, nil, NSStringFromClass([SNES4iOSAppDelegate class]));
         return retVal;
-    
+    }
 }

@@ -6,6 +6,7 @@
 //  Copyright __MyCompanyName__ 2010. All rights reserved.
 //
 
+#import "SNES4iOSAppDelegate.h"
 #import "SNESControllerAppDelegate.h"
 #import "SNESControllerViewController.h"
 #import "SessionController.h"
@@ -17,7 +18,7 @@
 
 #define RADIANS(degrees) ((degrees * M_PI) / 180.0)
 
-unsigned long gp2x_pad_status;
+extern unsigned long gp2x_pad_status;
 static unsigned long newtouches[10];
 static unsigned long oldtouches[10];
 
