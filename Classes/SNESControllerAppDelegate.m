@@ -18,7 +18,7 @@ SNESControllerAppDelegate *ControllerAppDelegate()
 	return ((SNES4iOSAppDelegate *)[[UIApplication sharedApplication] delegate]).snesControllerAppDelegate;
 }
 
-#ifdef TARGET_OS_IPHONE
+#ifdef APP_BUILD
 
 extern unsigned long gp2x_pad_status;
 
@@ -72,7 +72,7 @@ void handle_event (void* target, void* refcon, IOHIDServiceRef service, IOHIDEve
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {    
     
-#ifdef TARGET_OS_IPHONE
+#ifdef APP_BUILD
 	NSLog(@"Setting up event handler");
 	// register our event handler callback
 	ioEventSystem = IOHIDEventSystemCreate(NULL);
@@ -109,7 +109,7 @@ void handle_event (void* target, void* refcon, IOHIDServiceRef service, IOHIDEve
 	//[self.sessionController sendPadStatus:gp2x_pad_status];
 }
 
-#ifdef TARGET_OS_IPHONE
+#ifdef APP_BUILD
 - (void) applicationWillTerminate:(UIApplication *)application
 {
 	// clean up our event handler
