@@ -848,7 +848,7 @@ int main(int argc, char *argv[])
     sprintf(snesRomDir, "%s", currentWorkingDir);
     
     printf("rom directory: %s\n", snesRomDir);
-    printf("sram directory: %s\n", snesSramDir);
+    printf("sram directory COOLIOSUPER: %s\n", snesSramDir);
     printf("save directory: %s\n", snesSaveStateDir);
 	
 	InputInit();  // clear input context

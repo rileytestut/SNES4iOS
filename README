@@ -6,6 +6,8 @@ https://github.com/WoozleWrangler/SNES--HD-
 
 This is the experimental branch, where I’ll be updating more frequently, but that also means this is the less stable version, and by less stable, I mean UNUSABLE (for now). The current version of SNES4iOS on this branch uses the Apple LLVM 3.0 compiler to compile the emulator code, but although it’s been modified to compile successfully, whenever you run the app all ROMs have garbled sound and only display the background color for whatever the ROM requires. I would greatly appreciate help from anyone who knows how this can be fixed, as once it can be compiled with the LLVM compiler it’s more or less future proof for the foreseeable future.
 
+NOTE: You MUST make clean the snes4iphone_src directory between builds, or else it won’t compile all your changes. You can still build from within Xcode, but the make clean has to be done from Terminal.
+
 Thanks again to Spencer Nielsen for writing the patch to allow this to work on non-jailbroken devices. Without him, none of this would have happened :)
 
 SNES4iOS is free for non-commercial use, in keeping with the original Snes9x licence, reproduced below:

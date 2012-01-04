@@ -38,11 +38,13 @@ void refreshScreenSurface()
 }
 
 // entry point for emulator thread
-void *threadedStart(void *arg)
+void *threadedStart(NSString *completeFilePath)
 {
 	@autoreleasepool {
-		char *filename = malloc(strlen((char *)arg) + 1);
-    strcpy(filename, (char *)arg);
+        void *romName = (void *)[[completeFilePath lastPathComponent] UTF8String];
+        void *completeUTF8StringFilePath = (void*)[completeFilePath UTF8String];
+		char *filename = malloc(strlen((char *)completeUTF8StringFilePath) + 1);
+    strcpy(filename, (char *)romName);
 		printf("Starting emulator for %s\n", filename);
 		__emulation_run = 1;
 		iphone_main(filename);
@@ -208,7 +210,8 @@ void saveScreenshotToFile(char *filepath)
     
     dispatch_queue_t dispatchQueue = dispatch_queue_create("EmulationThread", DISPATCH_QUEUE_CONCURRENT);
     dispatch_async(dispatchQueue, ^{
-        threadedStart((void *) [[romFile lastPathComponent] UTF8String]);
+        NSLog(@"RomFile Path:%@", romFile);
+        threadedStart(romFile);
     });
     dispatch_release(dispatchQueue);
 }

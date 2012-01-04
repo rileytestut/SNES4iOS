@@ -174,6 +174,7 @@
 		BFD1598614B11EC1009FE8C0 = {
 			isa = PBXGroup;
 			children = (
+				BFD15C1A14B120F5009FE8C0 /* main.mm */,
 				BFD15BC914B1204C009FE8C0 /* makefile */,
 				BFD15BCD14B120F5009FE8C0 /* 2xsaiwin.cpp */,
 				BFD15BCE14B120F5009FE8C0 /* 3d.h */,
@@ -252,7 +253,6 @@
 				BFD15C1714B120F5009FE8C0 /* libpocketsnes.a */,
 				BFD15C1814B120F5009FE8C0 /* loadzip.cpp */,
 				BFD15C1914B120F5009FE8C0 /* m3d_func.S */,
-				BFD15C1A14B120F5009FE8C0 /* main.mm */,
 				BFD15C1B14B120F5009FE8C0 /* Makefile_giz */,
 				BFD15C1C14B120F5009FE8C0 /* memcpy.s */,
 				BFD15C1D14B120F5009FE8C0 /* memmap.cpp */,
