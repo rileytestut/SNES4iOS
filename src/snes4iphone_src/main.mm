@@ -848,7 +848,7 @@ int main(int argc, char *argv[])
     sprintf(snesRomDir, "%s", currentWorkingDir);
     
     printf("rom directory: %s\n", snesRomDir);
-    printf("sram directory COOLIOSUPER: %s\n", snesSramDir);
+    printf("sram directory: %s\n", snesSramDir);
     printf("save directory: %s\n", snesSaveStateDir);
 	
 	InputInit();  // clear input context
@@ -1317,12 +1317,12 @@ int main(int argc, char *argv[])
     			gp_Reset();
     			app_MuteSound();
     			gp_deinitGraphics();
-    			/*if(vrambuffer != NULL) free(vrambuffer);
-    			vrambuffer = NULL;
+    			//if(vrambuffer != NULL) free(vrambuffer);
+    			//vrambuffer = NULL;
     			S9xGraphicsDeinit();
     			S9xDeinitAPU();
     			Memory.Deinit();
-    			pthread_exit(NULL);*/
+    			//pthread_exit(NULL);
     			break;
     		}
   		}
