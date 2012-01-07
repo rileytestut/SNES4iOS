@@ -106,7 +106,7 @@ void handle_event (void* target, void* refcon, IOHIDServiceRef service, IOHIDEve
 
 - (void) autosendStatus:(NSTimer *)timer
 {
-	//[self.sessionController sendPadStatus:gp2x_pad_status];
+	[self.sessionController sendPadStatus:gp2x_pad_status];
 }
 
 #ifdef APP_BUILD

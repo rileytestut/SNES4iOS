@@ -40,6 +40,10 @@
 		BFD71BAC14A5AC2F00850EEE /* portrait_controller.png in Resources */ = {isa = PBXBuildFile; fileRef = BFD71BAA14A5AC2F00850EEE /* portrait_controller.png */; };
 		BFD71BD414A5B23B00850EEE /* snes-1.png in Resources */ = {isa = PBXBuildFile; fileRef = BFD71BD114A5B23B00850EEE /* snes-1.png */; };
 		BFD71BD514A5B23B00850EEE /* landscape_controller.txt in Resources */ = {isa = PBXBuildFile; fileRef = BFD71BD214A5B23B00850EEE /* landscape_controller.txt */; };
+		BFFFEABB14B7F21400B4B2C7 /* sustainButton.png in Resources */ = {isa = PBXBuildFile; fileRef = BFFFEAB914B7F21400B4B2C7 /* sustainButton.png */; };
+		BFFFEABC14B7F21400B4B2C7 /* sustainButton@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BFFFEABA14B7F21400B4B2C7 /* sustainButton@2x.png */; };
+		BFFFEABF14B7F3D100B4B2C7 /* sustainButtonHighlighted@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BFFFEABD14B7F3D100B4B2C7 /* sustainButtonHighlighted@2x.png */; };
+		BFFFEAC014B7F3D100B4B2C7 /* sustainButtonHighlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = BFFFEABE14B7F3D100B4B2C7 /* sustainButtonHighlighted.png */; };
 		CE43A4A5119DEA3C0007E399 /* EmulationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE43A4A4119DEA3C0007E399 /* EmulationViewController.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		CE43A4B4119DF2B00007E399 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE43A4B3119DF2B00007E399 /* QuartzCore.framework */; };
 		CE43A4B6119DF2D80007E399 /* CoreSurface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE43A4B5119DF2D80007E399 /* CoreSurface.framework */; };
@@ -147,6 +151,10 @@
 		BFD71BAA14A5AC2F00850EEE /* portrait_controller.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = portrait_controller.png; sourceTree = "<group>"; };
 		BFD71BD114A5B23B00850EEE /* snes-1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "snes-1.png"; sourceTree = "<group>"; };
 		BFD71BD214A5B23B00850EEE /* landscape_controller.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = landscape_controller.txt; sourceTree = "<group>"; };
+		BFFFEAB914B7F21400B4B2C7 /* sustainButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sustainButton.png; sourceTree = "<group>"; };
+		BFFFEABA14B7F21400B4B2C7 /* sustainButton@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "sustainButton@2x.png"; sourceTree = "<group>"; };
+		BFFFEABD14B7F3D100B4B2C7 /* sustainButtonHighlighted@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "sustainButtonHighlighted@2x.png"; sourceTree = "<group>"; };
+		BFFFEABE14B7F3D100B4B2C7 /* sustainButtonHighlighted.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sustainButtonHighlighted.png; sourceTree = "<group>"; };
 		CE43A4A3119DEA3C0007E399 /* EmulationViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmulationViewController.h; sourceTree = "<group>"; };
 		CE43A4A4119DEA3C0007E399 /* EmulationViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EmulationViewController.m; sourceTree = "<group>"; };
 		CE43A4B3119DF2B00007E399 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
@@ -364,6 +372,10 @@
 		BFD71BAD14A5AC3700850EEE /* iPhone */ = {
 			isa = PBXGroup;
 			children = (
+				BFFFEAB914B7F21400B4B2C7 /* sustainButton.png */,
+				BFFFEABA14B7F21400B4B2C7 /* sustainButton@2x.png */,
+				BFFFEABD14B7F3D100B4B2C7 /* sustainButtonHighlighted@2x.png */,
+				BFFFEABE14B7F3D100B4B2C7 /* sustainButtonHighlighted.png */,
 				BFA4E4A714A6BA18000AA7DA /* Controller.png */,
 				BFA4E4A814A6BA18000AA7DA /* Controller@2x.png */,
 				BFA4E4A214A6B482000AA7DA /* 31-circle-x.png */,
@@ -503,6 +515,10 @@
 				BFA4E4A514A6B482000AA7DA /* 31-circle-x@2x.png in Resources */,
 				BFA4E4A914A6BA18000AA7DA /* Controller.png in Resources */,
 				BFA4E4AA14A6BA18000AA7DA /* Controller@2x.png in Resources */,
+				BFFFEABB14B7F21400B4B2C7 /* sustainButton.png in Resources */,
+				BFFFEABC14B7F21400B4B2C7 /* sustainButton@2x.png in Resources */,
+				BFFFEABF14B7F3D100B4B2C7 /* sustainButtonHighlighted@2x.png in Resources */,
+				BFFFEAC014B7F3D100B4B2C7 /* sustainButtonHighlighted.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -619,7 +635,7 @@
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "A540BE5B-E262-4CC6-B213-FE164727E409";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 2;
@@ -640,7 +656,7 @@
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 2;

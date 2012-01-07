@@ -8,7 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-
 @interface SNESControllerViewController : UIViewController <UIAlertViewDelegate> {
 	UIImageView *imageView;
 	UIButton *infoButton;
@@ -48,6 +47,9 @@
 @property (nonatomic, strong) IBOutlet UIButton *infoButton;
 @property (nonatomic, strong) IBOutlet UIButton *connectionButton;
 @property (copy, nonatomic) NSString *imageName;
+@property (strong, nonatomic) NSMutableSet *sustainedButtons;
+@property (weak, nonatomic) IBOutlet UIButton *sustainButton;
+@property (nonatomic) BOOL readyToSustain;
 
 - (IBAction) buttonPressed:(id)sender;
 - (void) getControllerCoords;
@@ -55,6 +57,7 @@
 - (void) showDisconnectionAlert;
 - (void) changeBackgroundImage:(NSString *)newImageName;
 - (IBAction)dismissController:(id)sender;
+- (IBAction)sustain:(id)sender;
 
 
 @end

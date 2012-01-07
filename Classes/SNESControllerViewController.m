@@ -40,6 +40,9 @@ void rt_dispatch_sync_on_main_thread(dispatch_block_t block) {
 @synthesize infoButton;
 @synthesize connectionButton;
 @synthesize imageName;
+@synthesize sustainedButtons;
+@synthesize sustainButton;
+@synthesize readyToSustain;
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad {
@@ -48,6 +51,7 @@ void rt_dispatch_sync_on_main_thread(dispatch_block_t block) {
 	self.infoButton.transform = CGAffineTransformRotate(CGAffineTransformIdentity, RADIANS(0.0));
     self.connectionButton.transform = CGAffineTransformRotate(CGAffineTransformIdentity, RADIANS(0.0));
 	self.view.multipleTouchEnabled = YES;
+    self.sustainedButtons = [NSMutableSet setWithCapacity:12];//12 = number of interaction buttons on SNES Controller
 	//self.imageView.image = [UIImage imageNamed:DefaultControllerImage];
 }
 
@@ -118,6 +122,7 @@ void rt_dispatch_sync_on_main_thread(dispatch_block_t block) {
 }
 
 - (void)viewDidUnload {
+    [self setSustainButton:nil];
 	// Release any retained subviews of the main view.
 	// e.g. self.myOutlet = nil;
 }
@@ -133,6 +138,20 @@ void rt_dispatch_sync_on_main_thread(dispatch_block_t block) {
 
 - (IBAction)dismissController:(id)sender {
     [AppDelegate().romSelectionViewController dismissSNESController];
+}
+
+- (IBAction)sustain:(id)sender {
+    self.readyToSustain = !self.readyToSustain;
+    UIButton *button = (UIButton *)sender;
+    
+    if (self.readyToSustain) {
+        [button setImage:[UIImage imageNamed:@"sustainButtonHighlighted"] forState:UIControlStateNormal];
+        [button setImage:[UIImage imageNamed:@"sustainButton"] forState:UIControlStateHighlighted];
+    }
+    else {
+        [button setImage:[UIImage imageNamed:@"sustainButton"] forState:UIControlStateNormal];
+        [button setImage:[UIImage imageNamed:@"sustainButtonHighlighted"] forState:UIControlStateHighlighted];
+    }
 }
 
 - (void) updateConnectionStatus
@@ -183,12 +202,18 @@ void rt_dispatch_sync_on_main_thread(dispatch_block_t block) {
 	int i;
 	NSSet *allTouches = [event allTouches];
 	int touchcount = [allTouches count];
+    
+    if (self.readyToSustain) {
+        gp2x_pad_status = 0;
+        [self.sustainedButtons removeAllObjects];
+    }
 	
 	for (i = 0; i < 10; i++) 
 	{
 		touchstate[i] = 0;
 		oldtouches[i] = newtouches[i];
 	}
+    
 	
 	for (i = 0; i < touchcount; i++) 
 	{
@@ -208,91 +233,155 @@ void rt_dispatch_sync_on_main_thread(dispatch_block_t block) {
 			{
 				gp2x_pad_status |= GP2X_LEFT;
 				newtouches[i] = GP2X_LEFT;
+                if (self.readyToSustain) {
+                    [self.sustainedButtons addObject:[NSNumber numberWithUnsignedInt:GP2X_LEFT]];
+                }
 			}
 			else if (MyCGRectContainsPoint(Right, point)) 
 			{
 				gp2x_pad_status |= GP2X_RIGHT;
 				newtouches[i] = GP2X_RIGHT;
+                if (self.readyToSustain) {
+                    [self.sustainedButtons addObject:[NSNumber numberWithUnsignedInt:GP2X_RIGHT]];
+                }
 			}
 			else if (MyCGRectContainsPoint(Up, point)) 
 			{
 				gp2x_pad_status |= GP2X_UP;
 				newtouches[i] = GP2X_UP;
+                if (self.readyToSustain) {
+                    [self.sustainedButtons addObject:[NSNumber numberWithUnsignedInt:GP2X_UP]];
+                }
 			}
 			else if (MyCGRectContainsPoint(Down, point))
 			{
 				gp2x_pad_status |= GP2X_DOWN;
 				newtouches[i] = GP2X_DOWN;
+                if (self.readyToSustain) {
+                    [self.sustainedButtons addObject:[NSNumber numberWithUnsignedInt:GP2X_DOWN]];
+                }
 			}
 			else if (MyCGRectContainsPoint(ButtonLeft, point)) 
 			{
 				gp2x_pad_status |= GP2X_A;
 				newtouches[i] = GP2X_A;
+                if (self.readyToSustain) {
+                    [self.sustainedButtons addObject:[NSNumber numberWithUnsignedInt:GP2X_A]];
+                }
 			}
 			else if (MyCGRectContainsPoint(ButtonRight, point)) 
 			{
 				gp2x_pad_status |= GP2X_B;
 				newtouches[i] = GP2X_B;
+                if (self.readyToSustain) {
+                    [self.sustainedButtons addObject:[NSNumber numberWithUnsignedInt:GP2X_B]];
+                }
 			}
 			else if (MyCGRectContainsPoint(ButtonUp, point)) 
 			{
 				gp2x_pad_status |= GP2X_Y;
 				newtouches[i] = GP2X_Y;
+                if (self.readyToSustain) {
+                    [self.sustainedButtons addObject:[NSNumber numberWithUnsignedInt:GP2X_Y]];
+                }
 			}
 			else if (MyCGRectContainsPoint(ButtonDown, point)) 
 			{
 				gp2x_pad_status |= GP2X_X;
 				newtouches[i] = GP2X_X;
+                if (self.readyToSustain) {
+                    [self.sustainedButtons addObject:[NSNumber numberWithUnsignedInt:GP2X_X]];
+                }
 			}
 			else if (MyCGRectContainsPoint(ButtonUpLeft, point)) 
 			{
 				gp2x_pad_status |= GP2X_A | GP2X_Y;
 				newtouches[i] = GP2X_A | GP2X_Y;
+                if (self.readyToSustain) {
+                    [self.sustainedButtons addObject:[NSNumber numberWithUnsignedInt:GP2X_A]];
+                    [self.sustainedButtons addObject:[NSNumber numberWithUnsignedInt:GP2X_Y]];
+                }
 			}
 			else if (MyCGRectContainsPoint(ButtonDownLeft, point)) 
 			{
 				gp2x_pad_status |= GP2X_X | GP2X_A;
 				newtouches[i] = GP2X_X | GP2X_A;
+                if (self.readyToSustain) {
+                    [self.sustainedButtons addObject:[NSNumber numberWithUnsignedInt:GP2X_X]];
+                    [self.sustainedButtons addObject:[NSNumber numberWithUnsignedInt:GP2X_A]];
+                }
 			}
 			else if (MyCGRectContainsPoint(ButtonUpRight, point)) 
 			{
 				gp2x_pad_status |= GP2X_B | GP2X_Y;
 				newtouches[i] = GP2X_B | GP2X_Y;
+                if (self.readyToSustain) {
+                    [self.sustainedButtons addObject:[NSNumber numberWithUnsignedInt:GP2X_B]];
+                    [self.sustainedButtons addObject:[NSNumber numberWithUnsignedInt:GP2X_Y]];
+                }
 			}
 			else if (MyCGRectContainsPoint(ButtonDownRight, point)) 
 			{
 				gp2x_pad_status |= GP2X_X | GP2X_B;
 				newtouches[i] = GP2X_X | GP2X_B;
+                if (self.readyToSustain) {
+                    [self.sustainedButtons addObject:[NSNumber numberWithUnsignedInt:GP2X_X]];
+                    [self.sustainedButtons addObject:[NSNumber numberWithUnsignedInt:GP2X_B]];
+                }
 			}
 			else if (MyCGRectContainsPoint(UpLeft, point)) 
 			{
 				gp2x_pad_status |= GP2X_UP | GP2X_LEFT;
 				newtouches[i] = GP2X_UP | GP2X_LEFT;
+                if (self.readyToSustain) {
+                    [self.sustainedButtons addObject:[NSNumber numberWithUnsignedInt:GP2X_UP]];
+                    [self.sustainedButtons addObject:[NSNumber numberWithUnsignedInt:GP2X_LEFT]];
+                }
 			} 
 			else if (MyCGRectContainsPoint(DownLeft, point)) 
 			{
 				gp2x_pad_status |= GP2X_DOWN | GP2X_LEFT;
 				newtouches[i] = GP2X_DOWN | GP2X_LEFT;
+                if (self.readyToSustain) {
+                    [self.sustainedButtons addObject:[NSNumber numberWithUnsignedInt:GP2X_DOWN]];
+                    [self.sustainedButtons addObject:[NSNumber numberWithUnsignedInt:GP2X_LEFT]];
+                }
 			}
 			else if (MyCGRectContainsPoint(UpRight, point)) 
 			{
 				gp2x_pad_status |= GP2X_UP | GP2X_RIGHT;
 				newtouches[i] = GP2X_UP | GP2X_RIGHT;
+                if (self.readyToSustain) {
+                    [self.sustainedButtons addObject:[NSNumber numberWithUnsignedInt:GP2X_UP]];
+                    [self.sustainedButtons addObject:[NSNumber numberWithUnsignedInt:GP2X_RIGHT]];
+                }
 			}
 			else if (MyCGRectContainsPoint(DownRight, point)) 
 			{
 				gp2x_pad_status |= GP2X_DOWN | GP2X_RIGHT;
 				newtouches[i] = GP2X_DOWN | GP2X_RIGHT;
+                if (self.readyToSustain) {
+                    [self.sustainedButtons addObject:[NSNumber numberWithUnsignedInt:GP2X_DOWN]];
+                    [self.sustainedButtons addObject:[NSNumber numberWithUnsignedInt:GP2X_RIGHT]];
+                }
 			}			
 			else if (MyCGRectContainsPoint(LPad, point)) 
 			{
 				gp2x_pad_status |= GP2X_L;
 				newtouches[i] = GP2X_L;
+                if (self.readyToSustain) {
+                    [self.sustainedButtons addObject:[NSNumber numberWithUnsignedInt:GP2X_L]];
+                    [self.sustainedButtons addObject:[NSNumber numberWithUnsignedInt:GP2X_L]];
+                }
 			}
 			else if (MyCGRectContainsPoint(RPad, point)) 
 			{
 				gp2x_pad_status |= GP2X_R;
 				newtouches[i] = GP2X_R;
+                if (self.readyToSustain) {
+                    [self.sustainedButtons addObject:[NSNumber numberWithUnsignedInt:GP2X_R]];
+                    [self.sustainedButtons addObject:[NSNumber numberWithUnsignedInt:GP2X_R]];
+                }
 			}			
 			else if (MyCGRectContainsPoint(LPad2, point)) 
 			{
@@ -308,11 +397,17 @@ void rt_dispatch_sync_on_main_thread(dispatch_block_t block) {
 			{
 				gp2x_pad_status |= GP2X_SELECT;
 				newtouches[i] = GP2X_SELECT;
+                if (self.readyToSustain) {
+                    [self.sustainedButtons addObject:[NSNumber numberWithUnsignedInt:GP2X_SELECT]];
+                }
 			}
 			else if (MyCGRectContainsPoint(Start, point)) 
 			{
 				gp2x_pad_status |= GP2X_START;
 				newtouches[i] = GP2X_START;
+                if (self.readyToSustain) {
+                    [self.sustainedButtons addObject:[NSNumber numberWithUnsignedInt:GP2X_START]];
+                }
 			}
 			else if (MyCGRectContainsPoint(Menu, point)) 
 			{
@@ -324,9 +419,9 @@ void rt_dispatch_sync_on_main_thread(dispatch_block_t block) {
 			{
 				gp2x_pad_status &= ~(oldtouches[i]);
 			}
-		}	
+		}
 	} 
-	
+    
 	for (i = 0; i < 10; i++) 
 	{
 		if(touchstate[i] == 0)
@@ -336,6 +431,18 @@ void rt_dispatch_sync_on_main_thread(dispatch_block_t block) {
 			oldtouches[i] = 0;
 		}
 	}
+    
+    if (!self.readyToSustain) {//This way it doesn't re-add the objects when sustaining the button
+        NSArray *objects = [self.sustainedButtons allObjects];
+        for (int i = 0; i < objects.count; i++) {
+            gp2x_pad_status |= [[objects objectAtIndex:i] unsignedIntValue];
+        }
+    }
+    else {
+        self.readyToSustain = NO;
+        [self.sustainButton setImage:[UIImage imageNamed:@"sustainButton"] forState:UIControlStateNormal];
+        [self.sustainButton setImage:[UIImage imageNamed:@"sustainButtonHighlighted"] forState:UIControlStateHighlighted];
+    }
 	
     if (ControllerAppDelegate().controllerType == SNESControllerTypeWireless) {
         [ControllerAppDelegate().sessionController sendPadStatus:gp2x_pad_status];

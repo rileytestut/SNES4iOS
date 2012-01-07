@@ -224,7 +224,7 @@ bool8_32 CMemory::Init ()
 
 void CMemory::Deinit ()
 {
-    if (RAM)
+    /*if (RAM)
     {
 	free ((char *) RAM);
 	RAM = NULL;
@@ -278,7 +278,7 @@ void CMemory::Deinit ()
 	IPPU.TileCached [TILE_8BIT] = NULL;
     }
 
-    FreeSDD1Data ();
+    FreeSDD1Data ();*/
 }
 
 void CMemory::FreeSDD1Data ()
