@@ -1,12 +1,56 @@
 Emulators for various platforms have been available for years on the iOS platform, but they’ve always required the user to jailbreak their devices. Thanks to Spencer Nielsen (@snielsen42 http://www.aorensoftware.com/blog/2011/05/23/play-snes-games-on-your-ipad-without-jailbreaking/), an SNES emulator for iOS is now available, albeit only for developers.
 
+WHAT’S NEW IN VERSION 1.1:
+•Sustain Button: a new button (looks like a circle with four arrows pointed towards the center) allows you to essentially sustain, or hold down a button without keeping your finger on the button. You tap the sustain button, it will turn orange, and then you tap the button you wish to sustain. For example, if you wanted to keep your character moving to the right, you’d tap the sustain button, then tap the right button, and then you can lift your finger off and it will keep going to the right. This is especially useful in platformers such as Mario games, as you can sustain the run button without having to hold it down!
+•Both the Objective-C app code and the C snes9x emulator code are included in the same .xcworkspace file. It’s strongly recommended you use the workspace file instead of the individual project files.
+•Since the snes9x code is now in an Xcode project, it can be compiled natively in Xcode via the included makefile. However, you MUST clean the pocketsnes target before EVERY build, or else it won’t build all your changes.
+•Converted everything to LLVM 3.0! No longer need to use an old Xcode version to change the snes9s code!
+•No longer crashes when loading a ROM (however, at this time it still crashes when quitting one).
+
+
 This port is a modified version of SNES--HD- by WoozleWrangler, found here:
 
 https://github.com/WoozleWrangler/SNES--HD-
 
-This is the experimental branch, where I’ll be updating more frequently, but that also means this is the less stable version, and by less stable, I mean UNUSABLE (for now). The current version of SNES4iOS on this branch uses the Apple LLVM 3.0 compiler to compile the emulator code, but although it’s been modified to compile successfully, whenever you run the app all ROMs have garbled sound and only display the background color for whatever the ROM requires. I would greatly appreciate help from anyone who knows how this can be fixed, as once it can be compiled with the LLVM compiler it’s more or less future proof for the foreseeable future.
+This provided the vast majority of the Objective-C code. Some improvements found in this version include:
 
-NOTE: You MUST make clean the snes4iphone_src directory between builds, or else it won’t compile all your changes. You can still build from within Xcode, but the make clean has to be done from Terminal.
+•iTunes FIle Sharing support
+•Universal app to support iPhone in addition to the already included iPad.
+•Incorporates the functionality of ControlPad (http://github.com/WoozleWrangler/ControlPad) into the same binary, so you don’t need to keep track of two apps.
+
+But skipping past all that, here are the big features of this port at this time:
+•Universal app to play all SNES ROMs on your iPhone and iPad.
+•When playing on your iPad, you use an iPhone/iPod Touch to control it.
+•Load ROMs through iTunes File Sharing, or by downloading them from within the app.
+•Saves your ROM data through .srm files.
+•iPhone/iPod Touch offers two orientations to control game: portrait and landscape (iPad is only landscape).
+•Save states available for iPad (coming soon to iPhone/iPod Touch)
+
+Known issues:
+•Although saving states is supported on the iPhone, there’s no way to load them at this time.
+•Quitting a ROM crashes the app (but if you’re quitting the ROM, surely this doesn’t matter that much right? :P)
+•The iPad can only connect to the iPhone the first time the connection popover appears. Any subsequent times for some reason can’t find the phone.
+•Same with the iPhone, only the first time the popup appears on the controller view can you connect with the iPad.
+•There’s an iCloud toggle in the iPad app, but it doesn’t do anything since I haven’t added iCloud support yet.
+•Sometimes pausing the game crashes the ROM. So don’t pause unless you absolutely need to! (Haven’t seen this in version 1.1, but continue at your own risk!)
+
+Features to come:
+•iCloud support, so you can sync your game saved data across devices :)
+•Ability to control the iPad without having to use an iPhone/iPod Touch.
+•Save states for iPhone/iPod Touch.
+•Ability to load a save state from within the ROM.
+
+How-To’s:
+•To import a save file (.srm), simply drag it into the documents folder in iTunes. Upon the next launch or by tapping the refresh button, it will move it into the correct folder for you.
+•To connect iPhone to iPad, open up the iPad app. If you have it to automatically search for devices the connection popup will appear, if not, tap the player 1 controller. On the iPhone, open the app, and tap the controller button in the bottom left corner. The controller will appear and will start searching for your device. Tap it when you find it, then tap Confirm on the iPad when it appears.
+•To pause the game, double-tap the screen on the iPad, or tap the Menu button on the iPhone (located in the bottom left corner when in portrait mode).
+•To load a save state (iPad only for now), tap the ROM you want to launch, and then tap the save state from the tableview at the bottom of the screen. Next, tap “Load” instead of Power to load the save state.
+
+So for now get to compiling and enjoy your SNES emulator without having to jailbreak!
+
+If you want to contribute…
+
+The actual emulator code seems to crash for various reasons, and I haven’t had time to look through it all. I’ve included the snes9x source in the SNES4iOS.xcworkspace file, so edit your changes in there. Once done, CLEAN the pocketsnes target, THEN build it.
 
 Thanks again to Spencer Nielsen for writing the patch to allow this to work on non-jailbroken devices. Without him, none of this would have happened :)
 
