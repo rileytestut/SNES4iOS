@@ -67,6 +67,7 @@ void rt_dispatch_sync_on_main_thread(dispatch_block_t block) {
         self.connectionButton.hidden = NO;
         self.connectionButton.hidden = NO;
         newImageName = @"snes-1";
+        self.sustainButton.center = CGPointMake(240, 66);
     }
     [self changeBackgroundImage:newImageName];
     ControllerAppDelegate().viewController = self;

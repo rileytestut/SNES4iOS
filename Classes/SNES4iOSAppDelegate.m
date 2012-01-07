@@ -85,8 +85,7 @@ SNES4iOSAppDelegate *AppDelegate()
         
         UIBarButtonItem *flexibleSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
         UIBarButtonItem *controllerButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Controller"] style:UIBarButtonItemStyleBordered target:self.romSelectionViewController action:@selector(loadSNESController)];
-        UIBarButtonItem *rileyButton = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:self action:@selector(showRileyMessage:)];
-        self.romSelectionViewController.toolbarItems = [NSArray arrayWithObjects:flexibleSpace, controllerButton, rileyButton, nil];
+        self.romSelectionViewController.toolbarItems = [NSArray arrayWithObjects:flexibleSpace, controllerButton, nil];
         
         self.window.rootViewController = masterNavigationController;
     } else {
@@ -105,11 +104,6 @@ SNES4iOSAppDelegate *AppDelegate()
     [window makeKeyAndVisible];
     
     return YES;
-}
-
-- (void)showRileyMessage:(id)sender {
-    UIBarButtonItem *button = (UIBarButtonItem *)sender;
-    button.title = @"by Riley Testut";
 }
 
 

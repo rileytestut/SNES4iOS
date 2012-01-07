@@ -253,6 +253,8 @@ void saveScreenshotToFile(char *filepath)
             self.view.superview.bounds = CGRectMake(0, 0, 320, 480);
             self.view.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
             self.view.superview.frame = CGRectMake(0, 0, self.view.superview.frame.size.width, self.view.superview.frame.size.height);
+            
+            AppDelegate().snesControllerViewController.sustainButton.center = CGPointMake(301, 461);
         }
         else if (orientation == UIDeviceOrientationLandscapeLeft) {
             if (![AppDelegate().snesControllerViewController.imageName isEqualToString:@"landscape_controller"]) {
@@ -273,6 +275,8 @@ void saveScreenshotToFile(char *filepath)
             self.view.superview.bounds = CGRectMake(0, 0, 320, 480);
             self.view.frame = CGRectMake(320, 0, self.view.frame.size.width, self.view.frame.size.height);
             self.view.superview.frame = CGRectMake(0, 0, self.view.superview.frame.size.width, self.view.superview.frame.size.height);
+            
+            AppDelegate().snesControllerViewController.sustainButton.center = CGPointMake(24, 456);
         }
         else if (orientation == UIDeviceOrientationLandscapeRight) {
             if (![AppDelegate().snesControllerViewController.imageName isEqualToString:@"landscape_controller"]) {
@@ -292,6 +296,8 @@ void saveScreenshotToFile(char *filepath)
             self.view.superview.bounds = CGRectMake(0, 0, 320, 480);
             self.view.frame = CGRectMake(320, 0, self.view.frame.size.width, self.view.frame.size.height);
             self.view.superview.frame = CGRectMake(0, 0, self.view.superview.frame.size.width, self.view.superview.frame.size.height);
+            
+            AppDelegate().snesControllerViewController.sustainButton.center = CGPointMake(24, 456);
         }
     }
 }
