@@ -41,7 +41,9 @@ void rt_dispatch_sync_on_main_thread(dispatch_block_t block) {
 @synthesize connectionButton;
 @synthesize imageName;
 @synthesize sustainedButtons;
+#if APP_BUILD
 @synthesize sustainButton;
+#endif
 @synthesize readyToSustain;
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
