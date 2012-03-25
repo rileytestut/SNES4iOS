@@ -1,10 +1,10 @@
-VERSION=5.0
-COPT = -F/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS${VERSION}.sdk/System/Library/Frameworks -F/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS${VERSION}.sdk/System/Library/PrivateFrameworks -I../../ -I../../Classes/ -I/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/clang/3.0/include -isysroot /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS${VERSION}.sdk  -L/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS${VERSION}.sdk/usr/lib -I/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS${VERSION}.sdk/usr/include/
+VERSION=5.1
+COPT = -F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS${VERSION}.sdk/System/Library/Frameworks -F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS${VERSION}.sdk/System/Library/PrivateFrameworks -I../../ -I../../Classes/ -I/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/clang/3.0/include -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS${VERSION}.sdk  -L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS${VERSION}.sdk/usr/lib -I/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS${VERSION}.sdk/usr/include/
 COPT += -march=armv7-a -miphoneos-version-min=${VERSION} -I. -O0 -D__IPHONE__ -D_SNESPPC -DASM_SPC700 -DZLIB -DUNZIP_SUPPORT -DOLD_COLOUR_BLENDING -DUSE_SA1 -DSUPER_FX -DLSB_FIRST -DCPU_SHUTDOWN -DVAR_CYCLES
 COPT += -fnested-functions -funsigned-char -ffast-math -ftemplate-depth-36 -mstructure-size-boundary=32 -falign-functions=32 -falign-loops -falign-labels -falign-jumps -finline -finline-functions -fno-builtin -fno-common -fomit-frame-pointer -fpeel-loops -fstrength-reduce -funroll-loops -fstrict-aliasing -arch armv7
-GCC = /Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/clang
-GXX = /Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/clang++
-STRIP = /Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/strip
+GCC = /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/clang
+GXX = /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/clang++
+STRIP = /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/strip
 #-DSPC700_SHUTDOWN
 #-DRC_OPTIMIZED 
 # SNES stuff (c-based)
