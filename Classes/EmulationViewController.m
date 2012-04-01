@@ -241,6 +241,7 @@ void saveScreenshotToFile(char *filepath)
             if (![AppDelegate().snesControllerViewController.imageName isEqualToString:@"portrait_controller"]) {
                 [AppDelegate().snesControllerViewController changeBackgroundImage:@"portrait_controller"];
                 AppDelegate().snesControllerViewController.imageView.frame = CGRectMake(0, 240, 320, 240);
+                AppDelegate().snesControllerViewController.imageView.alpha = 1.0f;
             }
             [UIApplication sharedApplication].statusBarOrientation = UIInterfaceOrientationPortrait;
             rotationAngle = 0.0f;
@@ -262,6 +263,7 @@ void saveScreenshotToFile(char *filepath)
                     AppDelegate().snesControllerViewController.imageView.frame = CGRectMake(0, 0, 320, 480);
                 }
                 [AppDelegate().snesControllerViewController changeBackgroundImage:@"landscape_controller"];
+                AppDelegate().snesControllerViewController.imageView.alpha = 0.5;
             }
             [UIApplication sharedApplication].statusBarOrientation = UIInterfaceOrientationLandscapeRight;
             //UIDeviceOrientationLandscapeLeft and UIInterfaceOrientationLandscapeLeft are NOT the same
@@ -284,6 +286,7 @@ void saveScreenshotToFile(char *filepath)
                     AppDelegate().snesControllerViewController.imageView.frame = CGRectMake(0, 0, 320, 480);
                 }
                 [AppDelegate().snesControllerViewController changeBackgroundImage:@"landscape_controller"];
+                AppDelegate().snesControllerViewController.imageView.alpha = 0.5;
             }
             [UIApplication sharedApplication].statusBarOrientation = UIInterfaceOrientationLandscapeLeft;
             rotationAngle = 180.0f;
