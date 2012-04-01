@@ -1,0 +1,10 @@
+# Xcode user-specific files
+*xcuserdata*
+*.pbxuser
+*.perspectivev3
+
+# compiled object files
+*.o
+
+# vim swap files
+.*.swp
