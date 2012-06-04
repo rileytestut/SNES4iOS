@@ -324,7 +324,7 @@
 
     if(returnData != nil)
     {
-      NSString* fileName = [[[downloadRequest URL] path] lastPathComponent];
+      NSString* fileName = [urlResponse suggestedFilename];
       if(![fileName hasSuffix:@".zip"] && ![fileName hasSuffix:@".smc"] && ![fileName hasSuffix:@".swc"] && ![fileName hasSuffix:@".zip"] && ![fileName hasSuffix:@".bin"])
       {
         if([downloadType isEqualToString:@"application/zip"] || [downloadType isEqualToString:@"application/x-zip"])
