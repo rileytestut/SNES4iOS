@@ -38,11 +38,15 @@
     self.contentSizeForViewInPopover = CGSizeMake(320.0, 600.0);
     
     UIBarButtonItem *refreshButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(rescanRomDirectory)];
+
     self.navigationItem.rightBarButtonItem = refreshButton;
     
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         UIBarButtonItem *searchButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSearch target:self action:@selector(getMoreRoms)];
         self.navigationItem.leftBarButtonItem = searchButton;
+        
+        UIBarButtonItem *settingsButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(showSettings)];
+        self.navigationItem.rightBarButtonItems = [NSArray arrayWithObjects:settingsButton, refreshButton, nil];
     }
 	
 	[self scanRomDirectory:[AppDelegate() romDirectoryPath]];
@@ -54,6 +58,10 @@
 
 - (void)getMoreRoms {
     [self.navigationController presentModalViewController:AppDelegate().webNavController animated:YES];
+}
+
+- (void)showSettings {
+    [self.navigationController pushViewController:AppDelegate().settingsViewController animated:YES];
 }
 
 - (void)loadSNESController {
