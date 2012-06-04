@@ -274,7 +274,7 @@
 
 - (void)loadBaseURL
 {
-  NSString *urlAddress = @"http://www.google.com/search?hl=en&source=hp&q=doperoms+legal+backups+super+nintendo&aq=f&oq=&aqi=";
+  NSString *urlAddress = @"http://www.coolrom.com/roms/snes/";
 
   //[NSClassFromString(@"WebDownload") changeMethod: @selector(initWithRequest:delegate:) withMethod: @selector(NSURLDownload_initWithRequest:delegate:) error:nil];
   
