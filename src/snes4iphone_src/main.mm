@@ -1313,6 +1313,8 @@ int main(int argc, char *argv[])
   			}
   			if(!__emulation_run)
   			{
+                printf("exit from emulation");
+
     			set_gamma(100);
     			gp_Reset();
     			app_MuteSound();

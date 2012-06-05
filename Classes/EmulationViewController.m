@@ -378,7 +378,7 @@ void saveScreenshotToFile(char *filepath)
 	if (buttonIndex == quitIndex) {
         NSLog(@"Quit button clicked");
 		__emulation_run = 0;
-        [AppDelegate() showEmulator:NO];
+//        [self performSelector:@selector(exit:) withObject:self afterDelay:1.0];
 	} else if (buttonIndex == saveCurrentIndex) {
 		NSLog(@"save to current file button clicked");
 		__emulation_saving = 2;
