@@ -51,6 +51,7 @@
 }
 #endif
 
+
 -(void)UIWebView_webView:(id)sender decidePolicyForMIMEType:(NSString*)type request:(NSURLRequest*)request frame:(id)frame decisionListener:(WebPolicyDecisionListener*)listener
 {
   //NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:apiUrl]  cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
@@ -227,6 +228,7 @@
 	[NSClassFromString(@"WebDefaultPolicyDelegate") changeMethod: @selector(webView:decidePolicyForMIMEType:request:frame:decisionListener:) withMethod: @selector(UIWebView_webView:decidePolicyForMIMEType:request:frame:decisionListener:) error:nil];
 	
 	[webView setScalesPageToFit: YES];
+    
 	webView.delegate = self;
 	
 	UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"ArrowBack.png"]
@@ -283,6 +285,8 @@
 
   //URL Requst Object
   NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
+    
+
 
   //Load the request in the UIWebView.
 	NSLog(@"loading URL: %@", url);
